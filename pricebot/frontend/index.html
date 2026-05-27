@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PriceBot — Extractor de Listas de Precios</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon">🤖</div>
+        <div class="logo-text">Price<span>Bot</span></div>
+        <span class="badge">v1.0 — MULTI-AGENT</span>
+      </div>
+      <div class="api-config">
+        <span>API:</span>
+        <input type="text" id="apiUrl" value="http://localhost:8000" placeholder="http://localhost:8000">
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+
+    <!-- HERO -->
+    <section class="hero">
+      <h1>Extractor de<br><span class="highlight">Listas de Precios</span></h1>
+      <p>Subí PDFs, planillas XLS/XLSX, CSVs o imágenes de listas de precios. El sistema multi-agente extrae, transforma y valida los datos automáticamente.</p>
+
+      <!-- Agent status pills -->
+      <div class="agents-bar">
+        <div class="agent-chip" id="chip-orchestrator">
+          <div class="dot"></div>
+          <span>Orquestador</span>
+        </div>
+        <div class="agent-chip" id="chip-extractor">
+          <div class="dot"></div>
+          <span>Extractor</span>
+        </div>
+        <div class="agent-chip" id="chip-transformer">
+          <div class="dot"></div>
+          <span>Transformador</span>
+        </div>
+        <div class="agent-chip" id="chip-verifier">
+          <div class="dot"></div>
+          <span>Verificador</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAIN CARD -->
+    <div class="main-card">
+
+      <div class="card-tabs">
+        <button class="tab active" onclick="switchTab('upload')">📤 Subir Archivos</button>
+        <button class="tab" onclick="switchTab('results')">📊 Resultados</button>
+        <button class="tab" onclick="switchTab('api')">⚡ API Docs</button>
+      </div>
+
+      <!-- TAB: UPLOAD -->
+      <div class="tab-panel active" id="tab-upload">
+
+        <div class="dropzone" id="dropzone">
+          <input type="file" id="fileInput" multiple
+            accept=".pdf,.xls,.xlsx,.xlsm,.csv,.jpg,.jpeg,.png,.webp">
+          <span class="dropzone-icon">📁</span>
+          <h3>Arrastrá archivos aquí</h3>
+          <p>PDF, XLS, XLSX, CSV, JPG, PNG — máx. 50MB por archivo</p>
+        </div>
+
+        <div class="file-list" id="fileList"></div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>CUIT del Proveedor (opcional)</label>
+            <input type="text" id="supplierCuit" placeholder="30-12345678-1"
+              pattern="\d{2}-\d{8}-\d{1}">
+          </div>
+          <div class="form-group">
+            <label>Modo de descarga</label>
+            <input type="text" id="downloadMode" value="XLSX compatible" readonly
+              style="cursor:default;">
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" id="btnExtract" onclick="startExtraction()" disabled>
+            🤖 Extraer con IA
+          </button>
+          <button class="btn btn-secondary" id="btnDownload" onclick="downloadXlsx()" disabled>
+            ⬇️ Descargar XLSX
+          </button>
+          <button class="btn btn-outline" onclick="clearAll()">
+            🗑️ Limpiar
+          </button>
+        </div>
+
+        <!-- Progress -->
+        <div class="progress-section" id="progressSection">
+          <div class="progress-log" id="progressLog"></div>
+        </div>
+
+      </div>
+
+      <!-- TAB: RESULTS -->
+      <div class="tab-panel" id="tab-results">
+
+        <div class="results-section" id="resultsSection">
+
+          <div class="results-header">
+            <div class="results-meta">
+              <div class="stat-pill">Filas: <span class="stat-val" id="statRows">0</span></div>
+              <div class="stat-pill">Calidad: <span class="stat-val" id="statQuality">0%</span></div>
+              <div class="stat-pill">Válidas: <span class="stat-val" id="statValid">0</span></div>
+              <div class="stat-pill">Con issues: <span class="stat-val" id="statIssues">0</span></div>
+            </div>
+            <div class="quality-bar" style="width:200px">
+              <div class="quality-fill" id="qualityFill" style="width:0%"></div>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Cód. Artículo</th>
+                  <th>Descripción</th>
+                  <th>Desc. Adicional</th>
+                  <th>Moneda</th>
+                  <th>Unidad</th>
+                  <th>Precio</th>
+                  <th>Bonif.</th>
+                  <th>Cód. Lista</th>
+                  <th>Vigencia Desde</th>
+                  <th>Vigencia Hasta</th>
+                </tr>
+              </thead>
+              <tbody id="resultsBody"></tbody>
+            </table>
+          </div>
+
+          <div class="issues-panel" id="issuesPanel">
+            <h4>⚠️ Issues detectados</h4>
+            <div id="issuesList"></div>
+          </div>
+
+          <div class="btn-row" style="margin-top:16px">
+            <button class="btn btn-primary" onclick="downloadXlsx()">⬇️ Descargar XLSX</button>
+            <button class="btn btn-secondary" onclick="copyJson()">📋 Copiar JSON</button>
+          </div>
+
+        </div>
+
+        <div id="resultsEmpty" style="text-align:center; padding:60px 20px; color:var(--muted); font-family:var(--mono); font-size:13px;">
+          Procesá un archivo para ver los resultados aquí.
+        </div>
+
+      </div>
+
+      <!-- TAB: API DOCS -->
+      <div class="tab-panel" id="tab-api">
+
+        <div class="api-block">
+          <h3><span class="method-badge get">GET</span> /</h3>
+          <div class="code-block">
+<span class="cmt"># Health check</span>
+<span class="kw">curl</span> http://localhost:8000/
+          </div>
+        </div>
+
+        <div class="api-block">
+          <h3><span class="method-badge post">POST</span> /extract — Extraer JSON</h3>
+          <div class="code-block">
+<span class="kw">curl</span> -X POST http://localhost:8000/extract \
+  -F <span class="str">"file=@lista_precios.pdf"</span> \
+  -F <span class="str">"supplier_cuit=30-12345678-1"</span>
+
+<span class="cmt"># Respuesta:</span>
+{
+  <span class="str">"filename"</span>: <span class="str">"lista_precios.pdf"</span>,
+  <span class="str">"rows"</span>: [
+    {
+      <span class="str">"Cód. Artículo"</span>: <span class="str">"2002"</span>,
+      <span class="str">"Descripción artículo"</span>: <span class="str">"Terminal de cobre SCC 1.5/2"</span>,
+      <span class="str">"Moneda"</span>: <span class="str">"ARS"</span>,
+      <span class="str">"Precio"</span>: <span class="str">"490.78"</span>,
+      ...
+    }
+  ],
+  <span class="str">"report"</span>: { <span class="str">"total_rows"</span>: 48, <span class="str">"quality_score"</span>: 95.8 },
+  <span class="str">"log"</span>: [...]
+}
+          </div>
+        </div>
+
+        <div class="api-block">
+          <h3><span class="method-badge post">POST</span> /extract/download — Descargar XLSX</h3>
+          <div class="code-block">
+<span class="kw">curl</span> -X POST http://localhost:8000/extract/download \
+  -F <span class="str">"file=@lista.xlsx"</span> \
+  -F <span class="str">"supplier_cuit=30-12345678-1"</span> \
+  -o precios_extraidos.xlsx
+          </div>
+        </div>
+
+        <div class="api-block">
+          <h3><span class="method-badge post">POST</span> /extract/batch — Múltiples archivos</h3>
+          <div class="code-block">
+<span class="kw">curl</span> -X POST http://localhost:8000/extract/batch \
+  -F <span class="str">"files=@lista1.pdf"</span> \
+  -F <span class="str">"files=@lista2.xlsx"</span> \
+  -F <span class="str">"files=@lista3.jpg"</span>
+          </div>
+        </div>
+
+        <div class="api-block">
+          <h3>📋 Columnas del Template (Plantilla_Precios_Compras)</h3>
+          <div class="code-block">
+<span class="cmt">Fila 0:</span>  CUIT del proveedor
+<span class="cmt">Fila 1:</span>  Encabezados de columnas
+<span class="cmt">Fila 2+:</span> Datos extraídos
+
+Columnas:
+  <span class="str">Cód. Artículo</span>           → Código del artículo del proveedor
+  <span class="str">Descripción artículo</span>     → Descripción principal
+  <span class="str">Desc. adicional artículo</span> → Especificaciones técnicas
+  <span class="str">Sinónimo</span>                 → Código alternativo
+  <span class="str">Cód. Lista</span>              → Código de lista de precios
+  <span class="str">Desc. Lista</span>             → Nombre de la lista
+  <span class="str">Moneda</span>                  → ARS / USD / EUR
+  <span class="str">Unidad</span>                  → Un / m / kg / caja
+  <span class="str">Precio</span>                  → Numérico sin símbolo
+  <span class="str">Bonif.</span>                  → % de descuento
+  <span class="str">Fecha vigencia desde</span>    → DD/MM/YYYY
+  <span class="str">Fecha vigencia hasta</span>    → DD/MM/YYYY
+          </div>
+        </div>
+
+        <div class="api-block">
+          <h3>🏗️ Arquitectura Multi-Agente</h3>
+          <div class="code-block">
+<span class="str">Orchestrator</span>  → coordina el flujo completo
+   ↓
+<span class="str">Extractor</span>     → lee PDF/XLS/CSV/imagen → texto crudo
+   ↓
+<span class="str">Transformer</span>   → Claude IA → mapea al template
+   ↓
+<span class="str">Verifier</span>      → valida precios, monedas, formatos
+   ↓
+<span class="str">Output</span>        → JSON + XLSX listo para importar
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    PriceBot — Sistema multi-agente de extracción de listas de precios •
+    Powered by Claude claude-sonnet-4-20250514 •
+    Template: Plantilla_Precios_Compras
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
