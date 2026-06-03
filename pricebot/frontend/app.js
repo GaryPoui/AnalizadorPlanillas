@@ -1,7 +1,7 @@
 // ─── STATE ───────────────────────────────────
 let files = [];
 let lastResult = null;
-let currentUploadFile = null;
+const API_URL = 'http://127.0.0.1:8000';
 
 // ─── TAB SWITCHING ───────────────────────────
 function switchTab(name) {
@@ -112,6 +112,12 @@ function resetAgentChips() {
   ['orchestrator','extractor','transformer','verifier'].forEach(id => setAgent(id, ''));
 }
 
+// ─── PROGRESS ────────────────────────────────
+function setProgress(pct, label) {
+  document.getElementById('progressBarFill').style.width = pct + '%';
+  document.getElementById('progressStatus').textContent = label;
+}
+
 // ─── PROGRESS LOG ────────────────────────────
 function addLog(step, status, detail) {
   const log = document.getElementById('progressLog');
@@ -131,7 +137,6 @@ function addLog(step, status, detail) {
 async function startExtraction() {
   if (files.length === 0) return;
 
-  const apiUrl = document.getElementById('apiUrl').value.trim();
   const cuit = document.getElementById('supplierCuit').value.trim();
   const btn = document.getElementById('btnExtract');
 
@@ -142,6 +147,7 @@ async function startExtraction() {
 
   resetAgentChips();
   setAgent('orchestrator', 'active');
+  setProgress(5, 'Iniciando extracción...');
   addLog('orquestador', 'running', `Iniciando con ${files.length} archivo(s)...`);
 
   let allRows = [];
@@ -151,13 +157,14 @@ async function startExtraction() {
     const file = files[i];
     addLog('extractor', 'running', `Extrayendo: ${file.name}`);
     setAgent('extractor', 'active');
+    setProgress(10 + (i / files.length * 20), `Extrayendo ${file.name}...`);
 
     const formData = new FormData();
     formData.append('file', file);
     if (cuit) formData.append('supplier_cuit', cuit);
 
     try {
-      const resp = await fetch(`${apiUrl}/extract`, {
+      const resp = await fetch(`${API_URL}/extract`, {
         method: 'POST',
         body: formData
       });
@@ -169,22 +176,31 @@ async function startExtraction() {
 
       const data = await resp.json();
       setAgent('extractor', 'done');
-      addLog('extractor', 'done', `${data.metadata?.pages || 1} página(s) procesadas`);
+      
+      // Determine extraction method from file type
+      const ext = file.name.split('.').pop().toLowerCase();
+      let method = 'IA completa';
+      if (['csv','xlsx','xls','xlsm'].includes(ext)) method = 'Directo + IA';
+      else if (['jpg','jpeg','png','webp'].includes(ext)) method = 'Vision AI';
+      
+      addLog('extractor', 'done', `${data.metadata?.pages || 1} página(s) — método: ${method}`);
+      setProgress(40 + (i / files.length * 20), 'Transformando datos...');
 
       setAgent('transformer', 'active');
       addLog('transformador', 'running', `Mapeando ${data.rows?.length || 0} productos...`);
       setAgent('transformer', 'done');
       addLog('transformador', 'done', `${data.rows?.length || 0} filas extraídas`);
+      setProgress(70 + (i / files.length * 15), 'Verificando calidad...');
 
       setAgent('verifier', 'active');
       addLog('verificador', 'running', 'Validando datos...');
       setAgent('verifier', 'done');
       addLog('verificador', 'done',
         `Calidad: ${data.report?.quality_score}% — ${data.report?.valid_rows}/${data.report?.total_rows} válidas`);
+      setProgress(90, 'Finalizando...');
 
       allRows = allRows.concat(data.rows || []);
       lastReport = data.report;
-      currentUploadFile = file;
       lastResult = data;
 
     } catch (err) {
@@ -194,11 +210,13 @@ async function startExtraction() {
   }
 
   setAgent('orchestrator', 'done');
+  setProgress(100, `✓ Completado — ${allRows.length} productos extraídos`);
   addLog('orquestador', 'done', `Completado. Total: ${allRows.length} productos.`);
 
   if (allRows.length > 0) {
     lastResult = { ...lastResult, rows: allRows };
     renderResults(allRows, lastReport);
+    renderMapping(lastResult.column_mapping || {});
     document.getElementById('btnDownload').disabled = false;
     // Switch to results tab
     document.querySelectorAll('.tab').forEach((t,i) => {
@@ -224,6 +242,15 @@ function renderResults(rows, report) {
   document.getElementById('statValid').textContent = report?.valid_rows || rows.length;
   document.getElementById('statIssues').textContent = report?.rows_with_issues || 0;
   document.getElementById('qualityFill').style.width = (report?.quality_score || 100) + '%';
+
+  // Extraction method
+  if (files.length > 0) {
+    const ext = files[0].name.split('.').pop().toLowerCase();
+    let methodLabel = 'IA completa';
+    if (['csv','xlsx','xls','xlsm'].includes(ext)) methodLabel = 'Directo + IA';
+    else if (['jpg','jpeg','png','webp'].includes(ext)) methodLabel = 'Vision AI';
+    document.getElementById('statMethod').textContent = methodLabel;
+  }
 
   // Table
   const tbody = document.getElementById('resultsBody');
@@ -267,18 +294,18 @@ function esc(v) {
 }
 
 // ─── DOWNLOAD ────────────────────────────────
-async function downloadXlsx() {
+async function downloadFile(format) {
   if (!files.length) return;
-  const apiUrl = document.getElementById('apiUrl').value.trim();
   const cuit = document.getElementById('supplierCuit').value.trim();
   const file = files[0];
 
   const formData = new FormData();
   formData.append('file', file);
   if (cuit) formData.append('supplier_cuit', cuit);
+  formData.append('format', format);
 
   try {
-    const resp = await fetch(`${apiUrl}/extract/download`, {
+    const resp = await fetch(`${API_URL}/extract/download?format=${format}`, {
       method: 'POST',
       body: formData
     });
@@ -291,7 +318,7 @@ async function downloadXlsx() {
     a.href = url;
     const cd = resp.headers.get('content-disposition') || '';
     const match = cd.match(/filename=(.+)/);
-    a.download = match ? match[1] : 'precios_extraidos.xlsx';
+    a.download = match ? match[1] : `precios_extraidos.${format}`;
     a.click();
     URL.revokeObjectURL(url);
   } catch (err) {
@@ -305,4 +332,22 @@ function copyJson() {
   navigator.clipboard.writeText(JSON.stringify(lastResult.rows, null, 2))
     .then(() => alert('JSON copiado al portapapeles'))
     .catch(() => alert('No se pudo copiar'));
+}
+
+// ─── COLUMN MAPPING ──────────────────────────
+function renderMapping(mapping) {
+  const panel = document.getElementById('mappingPanel');
+  const grid = document.getElementById('mappingGrid');
+  if (!mapping || Object.keys(mapping).length === 0) {
+    panel.classList.remove('visible');
+    return;
+  }
+  panel.classList.add('visible');
+  grid.innerHTML = Object.entries(mapping).map(([src, dest]) => `
+    <div class="mapping-row">
+      <span class="mapping-src">${esc(src)}</span>
+      <span class="mapping-arrow">→</span>
+      <span class="mapping-dest">${esc(dest)}</span>
+    </div>
+  `).join('');
 }

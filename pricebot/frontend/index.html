@@ -5,32 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PriceBot — Extractor de Listas de Precios</title>
 <link rel="stylesheet" href="styles.css">
+<link rel="icon" href="Imagenes/lOGO.jpg" type="image/jpeg">
 </head>
 <body>
-
-<header>
-  <div class="container">
-    <div class="header-inner">
-      <div class="logo">
-        <div class="logo-icon">🤖</div>
-        <div class="logo-text">Price<span>Bot</span></div>
-        <span class="badge">v1.0 — MULTI-AGENT</span>
-      </div>
-      <div class="api-config">
-        <span>API:</span>
-        <input type="text" id="apiUrl" value="http://localhost:8000" placeholder="http://localhost:8000">
-      </div>
-    </div>
-  </div>
-</header>
 
 <main>
   <div class="container">
 
     <!-- HERO -->
     <section class="hero">
-      <h1>Extractor de<br><span class="highlight">Listas de Precios</span></h1>
-      <p>Subí PDFs, planillas XLS/XLSX, CSVs o imágenes de listas de precios. El sistema multi-agente extrae, transforma y valida los datos automáticamente.</p>
+      <div class="hero-badge">Powered by Claude AI</div>
+      <h1>Extractor Inteligente de<br><span class="highlight">Listas de Precios</span></h1>
+      <p>Cargá archivos de listas de precios en cualquier formato. El sistema multi-agente extrae, transforma y valida los datos al formato de importación.</p>
 
       <!-- Agent status pills -->
       <div class="agents-bar">
@@ -59,7 +45,6 @@
       <div class="card-tabs">
         <button class="tab active" onclick="switchTab('upload')">📤 Subir Archivos</button>
         <button class="tab" onclick="switchTab('results')">📊 Resultados</button>
-        <button class="tab" onclick="switchTab('api')">⚡ API Docs</button>
       </div>
 
       <!-- TAB: UPLOAD -->
@@ -67,10 +52,16 @@
 
         <div class="dropzone" id="dropzone">
           <input type="file" id="fileInput" multiple
-            accept=".pdf,.xls,.xlsx,.xlsm,.csv,.jpg,.jpeg,.png,.webp">
-          <span class="dropzone-icon">📁</span>
-          <h3>Arrastrá archivos aquí</h3>
-          <p>PDF, XLS, XLSX, CSV, JPG, PNG — máx. 50MB por archivo</p>
+            accept=".pdf,.xls,.xlsx,.xlsm,.csv,.doc,.docx,.jpg,.jpeg,.png,.webp">
+          <div class="dropzone-content">
+            <span class="dropzone-icon">
+              <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+              </svg>
+            </span>
+            <h3>Arrastrá archivos aquí o hacé clic</h3>
+            <p>PDF, Word, XLS, XLSX, CSV, JPG, PNG — máx. 50MB por archivo</p>
+          </div>
         </div>
 
         <div class="file-list" id="fileList"></div>
@@ -82,9 +73,41 @@
               pattern="\d{2}-\d{8}-\d{1}">
           </div>
           <div class="form-group">
-            <label>Modo de descarga</label>
-            <input type="text" id="downloadMode" value="XLSX compatible" readonly
-              style="cursor:default;">
+            <label>Formatos soportados</label>
+            <div class="format-chips">
+              <span class="format-chip" title="Extracción directa + IA mapping">📊 XLSX/XLS</span>
+              <span class="format-chip" title="Parsing directo + IA mapping">📋 CSV</span>
+              <span class="format-chip" title="Extracción de tablas + IA">📄 PDF</span>
+              <span class="format-chip" title="Extracción de texto + IA">📝 Word</span>
+              <span class="format-chip" title="OCR + Vision AI">🖼️ JPG/PNG</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Extraction method info -->
+        <div class="extraction-info" id="extractionInfo">
+          <div class="info-header">Método de extracción por formato:</div>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-format">CSV / XLSX / XLS</span>
+              <span class="info-method">Lectura estructurada → Claude AI mapea columnas al template</span>
+              <span class="info-badge direct">Directo + IA</span>
+            </div>
+            <div class="info-item">
+              <span class="info-format">PDF con texto</span>
+              <span class="info-method">Extracción de tablas/texto → Claude AI interpreta y mapea</span>
+              <span class="info-badge ai">IA completa</span>
+            </div>
+            <div class="info-item">
+              <span class="info-format">Word (DOC/DOCX)</span>
+              <span class="info-method">Extracción de texto y tablas → Claude AI interpreta y mapea</span>
+              <span class="info-badge ai">IA completa</span>
+            </div>
+            <div class="info-item">
+              <span class="info-format">Imágenes / PDF escaneado</span>
+              <span class="info-method">Claude Vision analiza la imagen directamente</span>
+              <span class="info-badge vision">Vision AI</span>
+            </div>
           </div>
         </div>
 
@@ -92,8 +115,8 @@
           <button class="btn btn-primary" id="btnExtract" onclick="startExtraction()" disabled>
             🤖 Extraer con IA
           </button>
-          <button class="btn btn-secondary" id="btnDownload" onclick="downloadXlsx()" disabled>
-            ⬇️ Descargar XLSX
+          <button class="btn btn-secondary" id="btnDownload" onclick="downloadFile('xls')" disabled>
+            ⬇️ Descargar XLS
           </button>
           <button class="btn btn-outline" onclick="clearAll()">
             🗑️ Limpiar
@@ -102,6 +125,10 @@
 
         <!-- Progress -->
         <div class="progress-section" id="progressSection">
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="progressBarFill"></div>
+          </div>
+          <div class="progress-status" id="progressStatus"></div>
           <div class="progress-log" id="progressLog"></div>
         </div>
 
@@ -118,6 +145,7 @@
               <div class="stat-pill">Calidad: <span class="stat-val" id="statQuality">0%</span></div>
               <div class="stat-pill">Válidas: <span class="stat-val" id="statValid">0</span></div>
               <div class="stat-pill">Con issues: <span class="stat-val" id="statIssues">0</span></div>
+              <div class="stat-pill">Método: <span class="stat-val" id="statMethod">—</span></div>
             </div>
             <div class="quality-bar" style="width:200px">
               <div class="quality-fill" id="qualityFill" style="width:0%"></div>
@@ -151,8 +179,15 @@
           </div>
 
           <div class="btn-row" style="margin-top:16px">
-            <button class="btn btn-primary" onclick="downloadXlsx()">⬇️ Descargar XLSX</button>
-            <button class="btn btn-secondary" onclick="copyJson()">📋 Copiar JSON</button>
+            <button class="btn btn-primary" onclick="downloadFile('xls')">⬇️ Descargar .XLS (Plantilla)</button>
+            <button class="btn btn-secondary" onclick="downloadFile('xlsx')">⬇️ Descargar .XLSX</button>
+            <button class="btn btn-outline" onclick="copyJson()">📋 Copiar JSON</button>
+          </div>
+
+          <!-- Column Mapping -->
+          <div class="mapping-panel" id="mappingPanel">
+            <h4>🔗 Mapeo de columnas detectado</h4>
+            <div class="mapping-grid" id="mappingGrid"></div>
           </div>
 
         </div>
@@ -163,114 +198,10 @@
 
       </div>
 
-      <!-- TAB: API DOCS -->
-      <div class="tab-panel" id="tab-api">
-
-        <div class="api-block">
-          <h3><span class="method-badge get">GET</span> /</h3>
-          <div class="code-block">
-<span class="cmt"># Health check</span>
-<span class="kw">curl</span> http://localhost:8000/
-          </div>
-        </div>
-
-        <div class="api-block">
-          <h3><span class="method-badge post">POST</span> /extract — Extraer JSON</h3>
-          <div class="code-block">
-<span class="kw">curl</span> -X POST http://localhost:8000/extract \
-  -F <span class="str">"file=@lista_precios.pdf"</span> \
-  -F <span class="str">"supplier_cuit=30-12345678-1"</span>
-
-<span class="cmt"># Respuesta:</span>
-{
-  <span class="str">"filename"</span>: <span class="str">"lista_precios.pdf"</span>,
-  <span class="str">"rows"</span>: [
-    {
-      <span class="str">"Cód. Artículo"</span>: <span class="str">"2002"</span>,
-      <span class="str">"Descripción artículo"</span>: <span class="str">"Terminal de cobre SCC 1.5/2"</span>,
-      <span class="str">"Moneda"</span>: <span class="str">"ARS"</span>,
-      <span class="str">"Precio"</span>: <span class="str">"490.78"</span>,
-      ...
-    }
-  ],
-  <span class="str">"report"</span>: { <span class="str">"total_rows"</span>: 48, <span class="str">"quality_score"</span>: 95.8 },
-  <span class="str">"log"</span>: [...]
-}
-          </div>
-        </div>
-
-        <div class="api-block">
-          <h3><span class="method-badge post">POST</span> /extract/download — Descargar XLSX</h3>
-          <div class="code-block">
-<span class="kw">curl</span> -X POST http://localhost:8000/extract/download \
-  -F <span class="str">"file=@lista.xlsx"</span> \
-  -F <span class="str">"supplier_cuit=30-12345678-1"</span> \
-  -o precios_extraidos.xlsx
-          </div>
-        </div>
-
-        <div class="api-block">
-          <h3><span class="method-badge post">POST</span> /extract/batch — Múltiples archivos</h3>
-          <div class="code-block">
-<span class="kw">curl</span> -X POST http://localhost:8000/extract/batch \
-  -F <span class="str">"files=@lista1.pdf"</span> \
-  -F <span class="str">"files=@lista2.xlsx"</span> \
-  -F <span class="str">"files=@lista3.jpg"</span>
-          </div>
-        </div>
-
-        <div class="api-block">
-          <h3>📋 Columnas del Template (Plantilla_Precios_Compras)</h3>
-          <div class="code-block">
-<span class="cmt">Fila 0:</span>  CUIT del proveedor
-<span class="cmt">Fila 1:</span>  Encabezados de columnas
-<span class="cmt">Fila 2+:</span> Datos extraídos
-
-Columnas:
-  <span class="str">Cód. Artículo</span>           → Código del artículo del proveedor
-  <span class="str">Descripción artículo</span>     → Descripción principal
-  <span class="str">Desc. adicional artículo</span> → Especificaciones técnicas
-  <span class="str">Sinónimo</span>                 → Código alternativo
-  <span class="str">Cód. Lista</span>              → Código de lista de precios
-  <span class="str">Desc. Lista</span>             → Nombre de la lista
-  <span class="str">Moneda</span>                  → ARS / USD / EUR
-  <span class="str">Unidad</span>                  → Un / m / kg / caja
-  <span class="str">Precio</span>                  → Numérico sin símbolo
-  <span class="str">Bonif.</span>                  → % de descuento
-  <span class="str">Fecha vigencia desde</span>    → DD/MM/YYYY
-  <span class="str">Fecha vigencia hasta</span>    → DD/MM/YYYY
-          </div>
-        </div>
-
-        <div class="api-block">
-          <h3>🏗️ Arquitectura Multi-Agente</h3>
-          <div class="code-block">
-<span class="str">Orchestrator</span>  → coordina el flujo completo
-   ↓
-<span class="str">Extractor</span>     → lee PDF/XLS/CSV/imagen → texto crudo
-   ↓
-<span class="str">Transformer</span>   → Claude IA → mapea al template
-   ↓
-<span class="str">Verifier</span>      → valida precios, monedas, formatos
-   ↓
-<span class="str">Output</span>        → JSON + XLSX listo para importar
-          </div>
-        </div>
-
-      </div>
-
     </div>
 
   </div>
 </main>
-
-<footer>
-  <div class="container">
-    PriceBot — Sistema multi-agente de extracción de listas de precios •
-    Powered by Claude claude-sonnet-4-20250514 •
-    Template: Plantilla_Precios_Compras
-  </div>
-</footer>
 
 <script src="app.js"></script>
 </body>

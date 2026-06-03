@@ -18,6 +18,7 @@ import httpx
 import pandas as pd
 import pdfplumber
 import pytesseract
+from docx import Document as DocxDocument
 from PIL import Image
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -34,26 +35,36 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Ollama configuration
-OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.1")
+# Anthropic (Claude) configuration
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-20250514")
 
 
-async def ollama_chat(messages: list, system: str = "") -> str:
-    """Send a chat request to Ollama and return the response text."""
+async def claude_chat(messages: list, system: str = "") -> str:
+    """Send a chat request to Anthropic Claude API and return the response text."""
+    headers = {
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
+    }
     payload = {
-        "model": OLLAMA_MODEL,
+        "model": CLAUDE_MODEL,
+        "max_tokens": 8000,
+        "temperature": 0.1,
         "messages": messages,
-        "stream": False,
-        "options": {"temperature": 0.1, "num_predict": 8000},
     }
     if system:
-        payload["messages"] = [{"role": "system", "content": system}] + payload["messages"]
+        payload["system"] = system
 
     async with httpx.AsyncClient(timeout=300.0) as client:
-        resp = await client.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload)
+        resp = await client.post(
+            "https://api.anthropic.com/v1/messages",
+            headers=headers,
+            json=payload,
+        )
         resp.raise_for_status()
-        return resp.json()["message"]["content"]
+        data = resp.json()
+        return data["content"][0]["text"]
 
 # Template columns matching Plantilla_Precios_Compras
 TEMPLATE_COLUMNS = [
@@ -122,35 +133,67 @@ async def agent_extractor(file_bytes: bytes, filename: str, file_type: str) -> d
             raw_text = "\n".join(sheets_text)
 
         elif ext in [".csv"]:
-            df = pd.read_csv(io.BytesIO(file_bytes), encoding="utf-8", errors="replace")
-            raw_text = df.to_csv(index=False)
+            # Auto-detect separator (;  ,  \t)
+            sample = file_bytes[:4096].decode("utf-8", errors="replace")
+            if sample.count(";") > sample.count(","):
+                sep = ";"
+            elif sample.count("\t") > sample.count(","):
+                sep = "\t"
+            else:
+                sep = ","
+            df = pd.read_csv(io.BytesIO(file_bytes), sep=sep, encoding="utf-8", errors="replace")
+            raw_text = df.to_csv(index=False, sep=",")
+
+        elif ext in [".docx", ".doc"]:
+            doc = DocxDocument(io.BytesIO(file_bytes))
+            parts = []
+            # Extract paragraphs
+            for para in doc.paragraphs:
+                if para.text.strip():
+                    parts.append(para.text)
+            # Extract tables
+            for i, table in enumerate(doc.tables):
+                parts.append(f"=== TABLE {i+1} ===")
+                for row in table.rows:
+                    cells = [cell.text.strip() for cell in row.cells]
+                    parts.append(" | ".join(cells))
+            raw_text = "\n".join(parts)
 
         elif ext in [".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tiff"]:
-            # Use Ollama Vision (llava or similar) for image files
+            # Use Claude Vision for image files
             img_b64 = base64.standard_b64encode(file_bytes).decode("utf-8")
+            media_type = "image/jpeg"
+            if ext == ".png":
+                media_type = "image/png"
+            elif ext == ".webp":
+                media_type = "image/webp"
+            
             messages = [
                 {
                     "role": "user",
-                    "content": (
-                        "Extract ALL price/product information from this image. "
-                        "Include: product codes, descriptions, prices, units, "
-                        "currency, discounts, validity dates, and any other "
-                        "relevant data. Format as structured text preserving "
-                        "all values exactly as shown."
-                    ),
-                    "images": [img_b64],
+                    "content": [
+                        {
+                            "type": "image",
+                            "source": {
+                                "type": "base64",
+                                "media_type": media_type,
+                                "data": img_b64,
+                            },
+                        },
+                        {
+                            "type": "text",
+                            "text": (
+                                "Extract ALL price/product information from this image. "
+                                "Include: product codes, descriptions, prices, units, "
+                                "currency, discounts, validity dates, and any other "
+                                "relevant data. Format as structured text preserving "
+                                "all values exactly as shown."
+                            ),
+                        },
+                    ],
                 }
             ]
-            # Use llava model for vision tasks
-            payload = {
-                "model": os.getenv("OLLAMA_VISION_MODEL", "llava"),
-                "messages": messages,
-                "stream": False,
-            }
-            async with httpx.AsyncClient(timeout=300.0) as http_client:
-                resp = await http_client.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload)
-                resp.raise_for_status()
-                raw_text = resp.json()["message"]["content"]
+            raw_text = await claude_chat(messages)
             metadata["type"] = "image"
 
         else:
@@ -167,6 +210,9 @@ async def agent_extractor(file_bytes: bytes, filename: str, file_type: str) -> d
         "raw_text": raw_text,
         "metadata": metadata,
         "char_count": len(raw_text),
+        "extraction_method": "vision_ai" if metadata.get("type") == "image"
+            else "direct_structured" if ext in [".csv", ".xlsx", ".xlsm", ".xls"]
+            else "pdf_text_ai",
     }
 
 
@@ -174,10 +220,10 @@ async def agent_extractor(file_bytes: bytes, filename: str, file_type: str) -> d
 # AGENT 2: Transformation Agent
 # Maps raw text → template columns
 # ─────────────────────────────────────────────
-async def agent_transformer(raw_data: dict, supplier_cuit: str = "") -> list[dict]:
+async def agent_transformer(raw_data: dict, supplier_cuit: str = "") -> dict:
     """
     Uses Claude to map raw extracted text to the template columns.
-    Returns a list of row dicts.
+    Returns a dict with 'rows' and 'column_mapping'.
     """
     system_prompt = """You are a specialized data extraction agent for price lists.
 Your task: extract product/price records from raw text and map them to the template columns.
@@ -200,11 +246,15 @@ RULES:
 1. Extract EVERY product/price row found
 2. Leave fields empty ("") if not available
 3. Infer currency from context ($ = ARS, U$S/USD = USD)
-4. Return ONLY valid JSON array, no markdown, no preamble
+4. Return ONLY valid JSON, no markdown, no preamble
 5. For prices: use numeric values only (e.g. 1535.26 not "$1.535,26")
 6. Normalize Argentine number format: 1.535,26 → 1535.26
 7. Extract dates in DD/MM/YYYY format
-8. If a list code/name is mentioned in header, apply it to all rows"""
+8. If a list code/name is mentioned in header, apply it to all rows
+
+RESPONSE FORMAT: Return a JSON object with two keys:
+- "column_mapping": object mapping source column names to template column names (e.g. {"PARTID": "Cód. Artículo", "DESCRIPCION": "Descripción artículo"})
+- "rows": array of product objects with template column names"""
 
     user_prompt = f"""Extract all product price records from this raw data:
 
@@ -214,28 +264,34 @@ CHAR COUNT: {raw_data['char_count']}
 RAW DATA:
 {raw_data['raw_text'][:12000]}
 
-Return JSON array of objects with these exact keys:
-{json.dumps(TEMPLATE_COLUMNS)}
+Return JSON object with:
+1. "column_mapping": mapping from source columns to template columns
+2. "rows": array of objects with these exact keys: {json.dumps(TEMPLATE_COLUMNS)}
 
-Example row:
-{json.dumps({
-    "Cód. Artículo": "2002",
-    "Descripción artículo": "Terminal de cobre SCC 1.5/2",
-    "Descripción adicional artículo": "Sección 1.5mm² - ø 5/32 pulgadas",
-    "Sinónimo": "SCC1.5/2",
-    "Cód. Lista": "LCT-01-2026",
-    "Desc. Lista": "Lista LCT Enero 2026",
-    "Moneda": "ARS",
-    "Unidad": "Un",
-    "Precio": "490.78",
-    "Bonif.": "",
-    "Fecha vigencia desde": "",
-    "Fecha vigencia hasta": ""
-})}
+Example:
+{{
+  "column_mapping": {{"PARTID": "Cód. Artículo", "DESCRIPCION": "Descripción artículo", "UNIT_PRICE": "Precio", "MONEDA": "Moneda", "STOCK_UM": "Unidad"}},
+  "rows": [
+    {{
+      "Cód. Artículo": "2002",
+      "Descripción artículo": "Terminal de cobre SCC 1.5/2",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "",
+      "Desc. Lista": "",
+      "Moneda": "ARS",
+      "Unidad": "Un",
+      "Precio": "490.78",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    }}
+  ]
+}}
 
-Return ONLY the JSON array."""
+Return ONLY the JSON object."""
 
-    text = await ollama_chat(
+    text = await claude_chat(
         messages=[{"role": "user", "content": user_prompt}],
         system=system_prompt,
     )
@@ -248,15 +304,24 @@ Return ONLY the JSON array."""
     text = text.strip()
 
     try:
-        rows = json.loads(text)
-        if not isinstance(rows, list):
-            rows = [rows]
+        parsed = json.loads(text)
+        column_mapping = {}
+        rows = []
+
+        if isinstance(parsed, dict) and "rows" in parsed:
+            column_mapping = parsed.get("column_mapping", {})
+            rows = parsed["rows"]
+        elif isinstance(parsed, list):
+            rows = parsed
+        else:
+            rows = [parsed]
+
         # Ensure all template columns exist
         for row in rows:
             for col in TEMPLATE_COLUMNS:
                 if col not in row:
                     row[col] = ""
-        return rows
+        return {"rows": rows, "column_mapping": column_mapping}
     except json.JSONDecodeError as e:
         raise HTTPException(
             status_code=500, detail=f"Transform parse error: {str(e)}\nRaw: {text[:500]}"
@@ -373,7 +438,9 @@ async def orchestrator(file_bytes: bytes, filename: str, supplier_cuit: str = ""
 
     # Step 2: Transform
     log_step("transformation", "running", "Mapping data to template columns")
-    rows = await agent_transformer(raw_data, supplier_cuit)
+    transform_result = await agent_transformer(raw_data, supplier_cuit)
+    rows = transform_result["rows"]
+    column_mapping = transform_result["column_mapping"]
     log_step("transformation", "done", f"Extracted {len(rows)} product rows")
 
     # Step 3: Verify
@@ -390,6 +457,8 @@ async def orchestrator(file_bytes: bytes, filename: str, supplier_cuit: str = ""
         "rows": result["rows"],
         "report": result["report"],
         "metadata": raw_data["metadata"],
+        "extraction_method": raw_data.get("extraction_method", "unknown"),
+        "column_mapping": column_mapping,
         "log": log,
     }
 
@@ -429,9 +498,11 @@ async def extract_file(
 async def extract_and_download(
     file: UploadFile = File(...),
     supplier_cuit: str = "",
+    format: str = "xlsx",
 ):
     """
-    Same as /extract but returns an XLSX file ready to import.
+    Same as /extract but returns a file ready to import.
+    format: 'xlsx' or 'xls'
     """
     allowed_ext = {".pdf", ".xls", ".xlsx", ".xlsm", ".csv", ".jpg", ".jpeg", ".png", ".webp"}
     ext = Path(file.filename).suffix.lower()
@@ -441,25 +512,49 @@ async def extract_and_download(
     file_bytes = await file.read()
     result = await orchestrator(file_bytes, file.filename, supplier_cuit)
 
-    # Build XLSX matching the template format
-    output = io.BytesIO()
-    with pd.ExcelWriter(output, engine="openpyxl") as writer:
-        # Row 0: CUIT
-        cuit_val = supplier_cuit or "30-55555555-1"
-        header_df = pd.DataFrame([[cuit_val] + [""] * 11])
-        header_df.to_excel(writer, index=False, header=False, sheet_name="Sheet1", startrow=0)
-
-        # Row 1: Column headers + data
-        df = pd.DataFrame(result["rows"], columns=TEMPLATE_COLUMNS)
-        df.to_excel(writer, index=False, sheet_name="Sheet1", startrow=1)
-
-    output.seek(0)
+    cuit_val = supplier_cuit or "30-55555555-1"
     safe_name = Path(file.filename).stem
-    out_filename = f"precios_{safe_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+    df = pd.DataFrame(result["rows"], columns=TEMPLATE_COLUMNS)
+
+    output = io.BytesIO()
+
+    if format == "xls":
+        # Generate .xls (legacy format matching template exactly)
+        import xlwt
+        wb = xlwt.Workbook(encoding="utf-8")
+        ws = wb.add_sheet("Sheet1")
+
+        # Row 0: CUIT
+        ws.write(0, 0, cuit_val)
+
+        # Row 1: Column headers
+        for col_idx, col_name in enumerate(TEMPLATE_COLUMNS):
+            ws.write(1, col_idx, col_name)
+
+        # Row 2+: Data
+        for row_idx, row in enumerate(result["rows"]):
+            for col_idx, col_name in enumerate(TEMPLATE_COLUMNS):
+                val = row.get(col_name, "")
+                ws.write(row_idx + 2, col_idx, val)
+
+        wb.save(output)
+        output.seek(0)
+        out_filename = f"precios_{safe_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xls"
+        media_type = "application/vnd.ms-excel"
+    else:
+        # Generate .xlsx
+        with pd.ExcelWriter(output, engine="openpyxl") as writer:
+            header_df = pd.DataFrame([[cuit_val] + [""] * 11])
+            header_df.to_excel(writer, index=False, header=False, sheet_name="Sheet1", startrow=0)
+            df.to_excel(writer, index=False, sheet_name="Sheet1", startrow=1)
+
+        output.seek(0)
+        out_filename = f"precios_{safe_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        media_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
     return StreamingResponse(
         output,
-        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        media_type=media_type,
         headers={"Content-Disposition": f"attachment; filename={out_filename}"},
     )
 
