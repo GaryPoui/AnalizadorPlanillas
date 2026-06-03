@@ -63,48 +63,6 @@ automáticamente al formato de la **Plantilla_Precios_Compras**.
 
 ---
 
-## Setup Rápido
-
-### Opción 1: Docker (recomendado)
-
-```bash
-# 1. Clonar / copiar el proyecto
-git clone ... && cd price-extractor
-
-# 2. Configurar API key
-cp .env.example .env
-echo "ANTHROPIC_API_KEY=sk-ant-..." >> .env
-
-# 3. Levantar
-docker-compose up --build
-
-# Frontend: http://localhost:3000
-# API:      http://localhost:8000
-# Docs:     http://localhost:8000/docs
-```
-
-### Opción 2: Python directo
-
-```bash
-cd api
-
-# Instalar dependencias del sistema (Ubuntu/Debian)
-sudo apt-get install -y tesseract-ocr tesseract-ocr-spa poppler-utils
-
-# Instalar dependencias Python
-pip install -r requirements.txt
-
-# Configurar API key
-export ANTHROPIC_API_KEY="sk-ant-..."
-
-# Correr
-uvicorn main:app --reload --port 8000
-```
-
-Abrí `frontend/index.html` en el navegador (o servilo con cualquier servidor HTTP).
-
----
-
 ## Uso de la API
 
 ### Extraer → JSON
@@ -177,14 +135,6 @@ curl -X POST http://localhost:8000/extract/batch \
   ]
 }
 ```
-
----
-
-## Variables de Entorno
-
-| Variable | Descripción | Default |
-|----------|-------------|---------|
-| `ANTHROPIC_API_KEY` | API key de Anthropic | requerido |
 
 ---
 
