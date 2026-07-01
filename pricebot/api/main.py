@@ -8,8 +8,10 @@ import os
 import io
 import json
 import base64
+import re
 import asyncio
 import tempfile
+import unicodedata
 from pathlib import Path
 from typing import Optional
 from datetime import datetime
@@ -18,6 +20,7 @@ import httpx
 import pandas as pd
 import pdfplumber
 import pytesseract
+from dotenv import load_dotenv
 from docx import Document as DocxDocument
 from PIL import Image
 from fastapi import FastAPI, File, UploadFile, HTTPException
@@ -27,21 +30,35 @@ from pydantic import BaseModel
 
 app = FastAPI(title="Price Extractor API", version="1.0.0")
 
+# Load local env files for non-Docker runs.
+API_DIR = Path(__file__).resolve().parent
+load_dotenv(API_DIR / ".env", override=True)
+load_dotenv(API_DIR.parent / ".env", override=True)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # Anthropic (Claude) configuration
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-20250514")
+CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-6")
 
 
-async def claude_chat(messages: list, system: str = "") -> str:
+async def claude_chat(messages: list, system: str = "", max_tokens: int = 8000) -> str:
     """Send a chat request to Anthropic Claude API and return the response text."""
+    if not ANTHROPIC_API_KEY:
+        raise HTTPException(
+            status_code=500,
+            detail=(
+                "ANTHROPIC_API_KEY is not configured. "
+                "Set it in your environment or .env file."
+            ),
+        )
+
     headers = {
         "x-api-key": ANTHROPIC_API_KEY,
         "anthropic-version": "2023-06-01",
@@ -49,22 +66,49 @@ async def claude_chat(messages: list, system: str = "") -> str:
     }
     payload = {
         "model": CLAUDE_MODEL,
-        "max_tokens": 8000,
-        "temperature": 0.1,
+        "max_tokens": max_tokens,
         "messages": messages,
     }
     if system:
         payload["system"] = system
 
     async with httpx.AsyncClient(timeout=300.0) as client:
-        resp = await client.post(
-            "https://api.anthropic.com/v1/messages",
-            headers=headers,
-            json=payload,
-        )
-        resp.raise_for_status()
+        try:
+            resp = await client.post(
+                "https://api.anthropic.com/v1/messages",
+                headers=headers,
+                json=payload,
+            )
+            resp.raise_for_status()
+        except httpx.HTTPStatusError as e:
+            detail = e.response.text[:600] if e.response is not None else str(e)
+            raise HTTPException(
+                status_code=502,
+                detail=f"Anthropic API error ({e.response.status_code}): {detail}",
+            )
+        except httpx.HTTPError as e:
+            raise HTTPException(
+                status_code=502,
+                detail=f"Anthropic connection error: {str(e)}",
+            )
+
         data = resp.json()
-        return data["content"][0]["text"]
+        content_blocks = data.get("content", [])
+        texts = []
+        for block in content_blocks:
+            if isinstance(block, dict) and block.get("text"):
+                texts.append(block["text"])
+
+        if texts:
+            return "\n".join(texts)
+
+        raise HTTPException(
+            status_code=502,
+            detail=(
+                "Anthropic response did not include text content. "
+                f"Raw: {json.dumps(data)[:600]}"
+            ),
+        )
 
 # Template columns matching Plantilla_Precios_Compras
 TEMPLATE_COLUMNS = [
@@ -94,7 +138,20 @@ async def agent_extractor(file_bytes: bytes, filename: str, file_type: str) -> d
     """
     ext = Path(filename).suffix.lower()
     raw_text = ""
+    structured_rows = []
     metadata = {"filename": filename, "type": ext, "pages": 0}
+
+    def normalize_df_to_records(df: pd.DataFrame) -> list[dict]:
+        if df is None or df.empty:
+            return []
+        local_df = df.copy().fillna("")
+        local_df.columns = [str(c).strip() for c in local_df.columns]
+        records = local_df.to_dict(orient="records")
+        normalized = []
+        for rec in records:
+            row = {str(k).strip(): str(v).strip() if v is not None else "" for k, v in rec.items()}
+            normalized.append(row)
+        return normalized
 
     try:
         if ext in [".pdf"]:
@@ -119,6 +176,7 @@ async def agent_extractor(file_bytes: bytes, filename: str, file_type: str) -> d
             sheets_text = []
             for sheet in xl.sheet_names:
                 df = pd.read_excel(io.BytesIO(file_bytes), sheet_name=sheet)
+                structured_rows.extend(normalize_df_to_records(df))
                 sheets_text.append(f"=== SHEET: {sheet} ===\n{df.to_csv(index=False)}")
             raw_text = "\n".join(sheets_text)
 
@@ -129,6 +187,7 @@ async def agent_extractor(file_bytes: bytes, filename: str, file_type: str) -> d
                 df = pd.read_excel(
                     io.BytesIO(file_bytes), engine="xlrd", sheet_name=sheet
                 )
+                structured_rows.extend(normalize_df_to_records(df))
                 sheets_text.append(f"=== SHEET: {sheet} ===\n{df.to_csv(index=False)}")
             raw_text = "\n".join(sheets_text)
 
@@ -141,7 +200,9 @@ async def agent_extractor(file_bytes: bytes, filename: str, file_type: str) -> d
                 sep = "\t"
             else:
                 sep = ","
-            df = pd.read_csv(io.BytesIO(file_bytes), sep=sep, encoding="utf-8", errors="replace")
+            csv_text = file_bytes.decode("utf-8", errors="replace")
+            df = pd.read_csv(io.StringIO(csv_text), sep=sep)
+            structured_rows.extend(normalize_df_to_records(df))
             raw_text = df.to_csv(index=False, sep=",")
 
         elif ext in [".docx", ".doc"]:
@@ -208,6 +269,7 @@ async def agent_extractor(file_bytes: bytes, filename: str, file_type: str) -> d
 
     return {
         "raw_text": raw_text,
+        "structured_rows": structured_rows,
         "metadata": metadata,
         "char_count": len(raw_text),
         "extraction_method": "vision_ai" if metadata.get("type") == "image"
@@ -243,68 +305,132 @@ TEMPLATE COLUMNS (exact names required):
 - Fecha vigencia hasta: validity end date (DD/MM/YYYY)
 
 RULES:
-1. Extract EVERY product/price row found
-2. Leave fields empty ("") if not available
-3. Infer currency from context ($ = ARS, U$S/USD = USD)
-4. Return ONLY valid JSON, no markdown, no preamble
-5. For prices: use numeric values only (e.g. 1535.26 not "$1.535,26")
-6. Normalize Argentine number format: 1.535,26 → 1535.26
-7. Extract dates in DD/MM/YYYY format
-8. If a list code/name is mentioned in header, apply it to all rows
+1. Extract EVERY product/price row found in the provided chunk.
+2. Leave fields empty ("") if not available.
+3. Infer currency from context ($ = ARS, U$S/USD = USD).
+4. Return ONLY valid JSON, no markdown, no preamble.
+5. For prices: use numeric values only (e.g. 1535.26 not "$1.535,26").
+6. Normalize Argentine number format: 1.535,26 → 1535.26.
+7. Extract dates in DD/MM/YYYY format.
+8. If a list code/name is mentioned in header, apply it to all rows.
 
 RESPONSE FORMAT: Return a JSON object with two keys:
-- "column_mapping": object mapping source column names to template column names (e.g. {"PARTID": "Cód. Artículo", "DESCRIPCION": "Descripción artículo"})
-- "rows": array of product objects with template column names"""
+- "column_mapping": object mapping source column names to template column names.
+- "rows": array of product objects with template column names."""
 
-    user_prompt = f"""Extract all product price records from this raw data:
+    def normalize_key(text: str) -> str:
+        text = unicodedata.normalize("NFKD", str(text).lower())
+        text = "".join(ch for ch in text if not unicodedata.combining(ch))
+        text = re.sub(r"[^a-z0-9]+", " ", text)
+        return " ".join(text.split())
 
-SOURCE FILE: {raw_data['metadata']['filename']}
-CHAR COUNT: {raw_data['char_count']}
+    def normalize_json_text(raw_text: str) -> str:
+        cleaned = raw_text.strip()
+        if cleaned.startswith("```"):
+            parts = cleaned.split("```")
+            if len(parts) > 1:
+                cleaned = parts[1]
+                if cleaned.startswith("json"):
+                    cleaned = cleaned[4:]
+        cleaned = cleaned.strip()
 
-RAW DATA:
-{raw_data['raw_text'][:12000]}
+        start = cleaned.find("{")
+        end = cleaned.rfind("}")
+        if start != -1 and end != -1 and end > start:
+            cleaned = cleaned[start:end + 1]
 
-Return JSON object with:
-1. "column_mapping": mapping from source columns to template columns
-2. "rows": array of objects with these exact keys: {json.dumps(TEMPLATE_COLUMNS)}
+        return cleaned.strip()
 
-Example:
-{{
-  "column_mapping": {{"PARTID": "Cód. Artículo", "DESCRIPCION": "Descripción artículo", "UNIT_PRICE": "Precio", "MONEDA": "Moneda", "STOCK_UM": "Unidad"}},
-  "rows": [
-    {{
-      "Cód. Artículo": "2002",
-      "Descripción artículo": "Terminal de cobre SCC 1.5/2",
-      "Descripción adicional artículo": "",
-      "Sinónimo": "",
-      "Cód. Lista": "",
-      "Desc. Lista": "",
-      "Moneda": "ARS",
-      "Unidad": "Un",
-      "Precio": "490.78",
-      "Bonif.": "",
-      "Fecha vigencia desde": "",
-      "Fecha vigencia hasta": ""
-    }}
-  ]
-}}
+    def extract_balanced_object(src: str, open_idx: int) -> tuple[str, int]:
+        depth = 0
+        in_string = False
+        escaped = False
+        i = open_idx
+        while i < len(src):
+            ch = src[i]
+            if in_string:
+                if escaped:
+                    escaped = False
+                elif ch == "\\":
+                    escaped = True
+                elif ch == '"':
+                    in_string = False
+            else:
+                if ch == '"':
+                    in_string = True
+                elif ch == "{":
+                    depth += 1
+                elif ch == "}":
+                    depth -= 1
+                    if depth == 0:
+                        return src[open_idx:i + 1], i
+            i += 1
+        return "", -1
 
-Return ONLY the JSON object."""
+    def salvage_rows_from_malformed_json(raw_text: str) -> tuple[dict, list[dict]]:
+        column_mapping = {}
+        rows = []
 
-    text = await claude_chat(
-        messages=[{"role": "user", "content": user_prompt}],
-        system=system_prompt,
-    )
-    text = text.strip()
-    # Strip markdown if present
-    if text.startswith("```"):
-        text = text.split("```")[1]
-        if text.startswith("json"):
-            text = text[4:]
-    text = text.strip()
+        cm_key = '"column_mapping"'
+        cm_pos = raw_text.find(cm_key)
+        if cm_pos != -1:
+            cm_open = raw_text.find("{", cm_pos)
+            if cm_open != -1:
+                cm_obj, _ = extract_balanced_object(raw_text, cm_open)
+                if cm_obj:
+                    try:
+                        parsed_cm = json.loads(cm_obj)
+                        if isinstance(parsed_cm, dict):
+                            column_mapping = parsed_cm
+                    except json.JSONDecodeError:
+                        column_mapping = {}
 
-    try:
-        parsed = json.loads(text)
+        rows_key = '"rows"'
+        rows_pos = raw_text.find(rows_key)
+        if rows_pos == -1:
+            return column_mapping, rows
+
+        arr_start = raw_text.find("[", rows_pos)
+        if arr_start == -1:
+            return column_mapping, rows
+
+        i = arr_start + 1
+        while i < len(raw_text):
+            ch = raw_text[i]
+            if ch == "]":
+                break
+            if ch != "{":
+                i += 1
+                continue
+
+            obj_text, obj_end = extract_balanced_object(raw_text, i)
+            if not obj_text or obj_end == -1:
+                break
+
+            try:
+                row = json.loads(obj_text)
+                if isinstance(row, dict):
+                    rows.append(row)
+            except json.JSONDecodeError:
+                pass
+
+            i = obj_end + 1
+
+        return column_mapping, rows
+
+    def normalize_rows(rows: list[dict]) -> list[dict]:
+        normalized = []
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            for col in TEMPLATE_COLUMNS:
+                if col not in row:
+                    row[col] = ""
+            normalized.append(row)
+        return normalized
+
+    def parse_transform_response(raw_text: str) -> tuple[dict, list[dict]]:
+        parsed = json.loads(raw_text)
         column_mapping = {}
         rows = []
 
@@ -316,16 +442,185 @@ Return ONLY the JSON object."""
         else:
             rows = [parsed]
 
-        # Ensure all template columns exist
-        for row in rows:
-            for col in TEMPLATE_COLUMNS:
-                if col not in row:
-                    row[col] = ""
-        return {"rows": rows, "column_mapping": column_mapping}
-    except json.JSONDecodeError as e:
-        raise HTTPException(
-            status_code=500, detail=f"Transform parse error: {str(e)}\nRaw: {text[:500]}"
+        if not isinstance(column_mapping, dict):
+            column_mapping = {}
+
+        return column_mapping, normalize_rows(rows)
+
+    def pick_column(columns: list[str], patterns: list[str]) -> Optional[str]:
+        normalized = {c: normalize_key(c) for c in columns}
+        for pat in patterns:
+            for col, key in normalized.items():
+                if pat in key:
+                    return col
+        return None
+
+    def transform_structured_rows(structured_rows: list[dict]) -> dict:
+        if not structured_rows:
+            return {"rows": [], "column_mapping": {}}
+
+        columns = list(structured_rows[0].keys())
+        code_col = pick_column(columns, ["codigo", "cod", "partid", "sku", "item", "articulo", "ean"])
+        desc_col = pick_column(columns, ["descripcion", "producto", "detalle", "articulo", "nombre"])
+        add_col = pick_column(columns, ["adicional", "familia", "rubro", "linea", "modelo", "detalle2"])
+        syn_col = pick_column(columns, ["sinonimo", "marca", "alias"])
+        list_col = pick_column(columns, ["cod lista", "lista", "list code"])
+        list_desc_col = pick_column(columns, ["desc lista", "lista desc", "list name"])
+        currency_col = pick_column(columns, ["moneda", "currency", "divisa"])
+        unit_col = pick_column(columns, ["unidad", "um", "u m", "stock um", "presentacion", "medida"])
+        price_col = pick_column(columns, ["precio", "unit price", "price", "valor", "importe", "neto"])
+        bonif_col = pick_column(columns, ["bonif", "descuento", "dto"])
+        from_col = pick_column(columns, ["vigencia desde", "fecha desde", "inicio", "desde"])
+        to_col = pick_column(columns, ["vigencia hasta", "fecha hasta", "hasta", "fin"])
+
+        selected = {
+            code_col: "Cód. Artículo",
+            desc_col: "Descripción artículo",
+            add_col: "Descripción adicional artículo",
+            syn_col: "Sinónimo",
+            list_col: "Cód. Lista",
+            list_desc_col: "Desc. Lista",
+            currency_col: "Moneda",
+            unit_col: "Unidad",
+            price_col: "Precio",
+            bonif_col: "Bonif.",
+            from_col: "Fecha vigencia desde",
+            to_col: "Fecha vigencia hasta",
+        }
+        column_mapping = {src: dst for src, dst in selected.items() if src}
+
+        def get_value(row: dict, col: Optional[str]) -> str:
+            if not col:
+                return ""
+            return str(row.get(col, "") or "").strip()
+
+        out_rows = []
+        for row in structured_rows:
+            mapped = {
+                "Cód. Artículo": get_value(row, code_col),
+                "Descripción artículo": get_value(row, desc_col),
+                "Descripción adicional artículo": get_value(row, add_col),
+                "Sinónimo": get_value(row, syn_col),
+                "Cód. Lista": get_value(row, list_col),
+                "Desc. Lista": get_value(row, list_desc_col),
+                "Moneda": get_value(row, currency_col) or "ARS",
+                "Unidad": get_value(row, unit_col),
+                "Precio": get_value(row, price_col),
+                "Bonif.": get_value(row, bonif_col),
+                "Fecha vigencia desde": get_value(row, from_col),
+                "Fecha vigencia hasta": get_value(row, to_col),
+            }
+            if any(v for v in mapped.values()):
+                out_rows.append(mapped)
+
+        return {"rows": normalize_rows(out_rows), "column_mapping": column_mapping}
+
+    async def transform_chunk(chunk_text: str) -> tuple[dict, list[dict]]:
+        user_prompt = f"""Extract all product price records from this raw data chunk.
+
+SOURCE FILE: {raw_data['metadata']['filename']}
+CHUNK CHAR COUNT: {len(chunk_text)}
+
+RAW DATA CHUNK:
+{chunk_text}
+
+Return JSON object with:
+1. "column_mapping": mapping from source columns to template columns
+2. "rows": array of objects with these exact keys: {json.dumps(TEMPLATE_COLUMNS)}
+
+Return ONLY the JSON object."""
+
+        text = await claude_chat(
+            messages=[{"role": "user", "content": user_prompt}],
+            system=system_prompt,
+            max_tokens=12000,
         )
+
+        text = normalize_json_text(text)
+
+        try:
+            return parse_transform_response(text)
+        except json.JSONDecodeError as e:
+            repair_prompt = f"""Fix this malformed JSON and return ONLY valid JSON.
+
+Rules:
+- Keep the same schema with keys: column_mapping, rows.
+- If truncated, keep only complete row objects and close the JSON properly.
+- Escape all quotes/newlines correctly.
+- No markdown, no comments, no extra text.
+
+MALFORMED JSON:
+{text[:50000]}"""
+
+            repaired_text = await claude_chat(
+                messages=[{"role": "user", "content": repair_prompt}],
+                system="You are a JSON repair assistant. Return valid JSON only.",
+                max_tokens=12000,
+            )
+            repaired_text = normalize_json_text(repaired_text)
+
+            try:
+                return parse_transform_response(repaired_text)
+            except json.JSONDecodeError:
+                salvaged_mapping, salvaged_rows = salvage_rows_from_malformed_json(text)
+                salvaged_rows = normalize_rows(salvaged_rows)
+                if salvaged_rows:
+                    return salvaged_mapping, salvaged_rows
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Transform parse error: {str(e)}\nRaw: {text[:500]}",
+                )
+
+    structured_rows = raw_data.get("structured_rows") or []
+    if structured_rows and raw_data.get("metadata", {}).get("type") in {".csv", ".xlsx", ".xls", ".xlsm"}:
+        return transform_structured_rows(structured_rows)
+
+    raw_text = raw_data.get("raw_text", "")
+    if not raw_text.strip():
+        return {"rows": [], "column_mapping": {}}
+
+    chunks = []
+    max_chunk_chars = 9000
+    if "=== PAGE" in raw_text:
+        pages = re.split(r"(?=^=== PAGE\s+\d+\s+===)", raw_text, flags=re.MULTILINE)
+        current = ""
+        for page in pages:
+            if not page.strip():
+                continue
+            if len(current) + len(page) > max_chunk_chars and current:
+                chunks.append(current)
+                current = page
+            else:
+                current += page
+        if current.strip():
+            chunks.append(current)
+    else:
+        for i in range(0, len(raw_text), max_chunk_chars):
+            chunk = raw_text[i:i + max_chunk_chars]
+            if chunk.strip():
+                chunks.append(chunk)
+
+    all_rows = []
+    merged_mapping = {}
+    for chunk in chunks:
+        chunk_mapping, chunk_rows = await transform_chunk(chunk)
+        merged_mapping.update(chunk_mapping)
+        all_rows.extend(chunk_rows)
+
+    deduped = []
+    seen = set()
+    for row in all_rows:
+        key = (
+            str(row.get("Cód. Artículo", "")).strip().lower(),
+            str(row.get("Descripción artículo", "")).strip().lower(),
+            str(row.get("Precio", "")).strip().lower(),
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(row)
+
+    return {"rows": normalize_rows(deduped), "column_mapping": merged_mapping}
 
 
 # ─────────────────────────────────────────────
@@ -349,9 +644,18 @@ async def agent_verifier(rows: list[dict], raw_data: dict) -> dict:
         # Validate price
         price_str = str(row.get("Precio", "")).strip()
         if price_str:
-            # Normalize: remove thousand separators, fix decimal
-            price_str = price_str.replace("$", "").strip()
-            price_str = price_str.replace(".", "").replace(",", ".")
+            # Normalize price for both AR and EN number formats.
+            price_str = price_str.replace("$", "").replace(" ", "").strip()
+            if "," in price_str and "." in price_str:
+                if price_str.rfind(",") > price_str.rfind("."):
+                    # 1.535,26 -> 1535.26
+                    price_str = price_str.replace(".", "").replace(",", ".")
+                else:
+                    # 1,535.26 -> 1535.26
+                    price_str = price_str.replace(",", "")
+            elif "," in price_str:
+                # 1535,26 -> 1535.26
+                price_str = price_str.replace(",", ".")
             try:
                 price_val = float(price_str)
                 if price_val <= 0:
@@ -518,26 +822,42 @@ async def extract_and_download(
 
     output = io.BytesIO()
 
+    def sanitize_xls_value(value):
+        # BIFF8 (.xls) max cell text length is 32767 characters.
+        if value is None:
+            return ""
+        text = str(value)
+        if len(text) > 32767:
+            text = text[:32767]
+        return text
+
     if format == "xls":
         # Generate .xls (legacy format matching template exactly)
         import xlwt
-        wb = xlwt.Workbook(encoding="utf-8")
-        ws = wb.add_sheet("Sheet1")
+        try:
+            wb = xlwt.Workbook(encoding="utf-8")
+            ws = wb.add_sheet("Sheet1")
 
-        # Row 0: CUIT
-        ws.write(0, 0, cuit_val)
+            # Row 0: CUIT
+            ws.write(0, 0, sanitize_xls_value(cuit_val))
 
-        # Row 1: Column headers
-        for col_idx, col_name in enumerate(TEMPLATE_COLUMNS):
-            ws.write(1, col_idx, col_name)
-
-        # Row 2+: Data
-        for row_idx, row in enumerate(result["rows"]):
+            # Row 1: Column headers
             for col_idx, col_name in enumerate(TEMPLATE_COLUMNS):
-                val = row.get(col_name, "")
-                ws.write(row_idx + 2, col_idx, val)
+                ws.write(1, col_idx, sanitize_xls_value(col_name))
 
-        wb.save(output)
+            # Row 2+: Data
+            for row_idx, row in enumerate(result["rows"]):
+                for col_idx, col_name in enumerate(TEMPLATE_COLUMNS):
+                    val = sanitize_xls_value(row.get(col_name, ""))
+                    ws.write(row_idx + 2, col_idx, val)
+
+            wb.save(output)
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"XLS generation error: {str(e)}",
+            )
+
         output.seek(0)
         out_filename = f"precios_{safe_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xls"
         media_type = "application/vnd.ms-excel"
