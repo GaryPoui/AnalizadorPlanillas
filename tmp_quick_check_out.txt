@@ -1,0 +1,8 @@
+PDF size: 3802070 bytes
+status: 200
+total_rows: 981
+quality_score: 100.0
+code 2200: NOT FOUND
+code 3000: NOT FOUND
+code 4501: FOUND
+code 4033: NOT FOUND

@@ -2,6 +2,7 @@
 let files = [];
 let lastResult = null;
 const API_URL = 'http://127.0.0.1:8000';
+const REQUEST_TIMEOUT_MS = 180000;
 
 // ─── TAB SWITCHING ───────────────────────────
 function switchTab(name) {
@@ -164,10 +165,13 @@ async function startExtraction() {
     if (cuit) formData.append('supplier_cuit', cuit);
 
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
       const resp = await fetch(`${API_URL}/extract`, {
         method: 'POST',
-        body: formData
-      });
+        body: formData,
+        signal: controller.signal
+      }).finally(() => clearTimeout(timeoutId));
 
       if (!resp.ok) {
         const err = await resp.json().catch(() => ({detail: resp.statusText}));
@@ -205,7 +209,10 @@ async function startExtraction() {
 
     } catch (err) {
       setAgent('extractor', 'error');
-      addLog('error', 'error', `Error en ${file.name}: ${err.message}`);
+      const msg = err?.name === 'AbortError'
+        ? `Timeout de ${Math.round(REQUEST_TIMEOUT_MS / 1000)}s en ${file.name}`
+        : `Error en ${file.name}: ${err.message}`;
+      addLog('error', 'error', msg);
     }
   }
 

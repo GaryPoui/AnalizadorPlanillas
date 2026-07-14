@@ -1,0 +1,42 @@
+    [321] 6029 LYA34L 500 MCM 5/8” 25 $ 33096,13
+    [322] LYA Terminal de cobre. Código Modelo Sección Color Largo (mm) Cant x Env. Precio unitario
+>>> [323] Un orificio. Tubo largo. 6030 LYA6C 6 AWG 46 250 $ 2997,01
+    [324] 6031 LYA4C 4 AWG 47 200 $ 3368,45
+    [325] 6032 LYA2C 2 AWG 62 100 $ 5241,65
+---
+    [502] SCA Terminal de aluminio. Un orificio. Tubo standard. UCA Unión de aluminio. Tubo standard.
+    [503] Código Modelo Sección Ø (pulgadas) Precio unitario Código Modelo Sección Largo mm Precio unitario
+>>> [504] 2170 SCA 10 10 5/16 $ 896,85 2200 UCA 10 10 45 $ 708,30
+    [505] 2171 SCA 16 16 5/16 $ 988,93 2201 UCA 16 16 50 $ 813,63
+    [506] 2172 SCA 25 25 5/16 $ 1267,61 2202 UCA 25 25 50 $ 937,84
+---
+    [703] TERMINALES PREAISLADOS - LÍNEA TERMI-PLAST
+    [704] Sección: 0,25 / 1,5 mm2
+>>> [705] 3000 3001 3002 3003 3004 3005 3006 3007 3008 3009 CODIGO
+    [706] A2 A3 A4 A5 A6 A7 A9 A10 A11 A12 MODELO
+    [707] ø3mm ø4mm ø5mm ø6mm ø8mm ø10mm ø3mm ø4mm ø5mm C-10mm Ø - ANCHO
+---
+    [981] LCT 21
+    [982] HERRAMIENTAS MANUALES PARA COMPRESION DE TERMINALES
+>>> [983] 4033 4072 4315 CÓDIGO
+    [984] LY-10 LY-16 LY-35 MODELO
+    [985] A criquet para terminales Identación para terminales Cabezal tipo revolver
+---
+    [1000] LCT 22
+    [1001] HERRAMIENTAS MANUALES PARA COMPRESIÓN
+>>> [1002] 4032 4073 4074 CÓDIGO
+    [1003] LY-03C LY-16C LY-35C MODELO
+    [1004] A criquet para terminales A criquet para terminales Comp. S/aislación 10-50mm2
+---
+    [1056] LCT 24
+    [1057] CORTACABLES
+>>> [1058] 4044 4045 4043 CÓDIGO
+    [1059] LK-30 LK-60 LK-240 MODELO
+    [1060] Tipo alicate hasta 25mm2 Tipo alicate hasta 50mm2 Tipo t
+---
+    [1469] MORSETERÍA
+    [1470] GD Grampa dentada para derivación en paralelo Código Modelo Rango Precio unitario
+>>> [1471] 4501 GD-1 6 / 35 $ 7 0 0 1 ,66
+    [1472] 4502 GD-2 16 / 50 $ 1 2 0 1 9,83
+    [1473] Material: Bronce 4503 GD-3 25 / 70 $ 2 0 3 5 8,42
+---

@@ -15,7 +15,7 @@ automáticamente al formato de la **Plantilla_Precios_Compras**.
              │
     ┌────────▼──────────┐
     │   AGENT EXTRACTOR  │
-    │  PDF → pdfplumber  │
+    │ PDF → MarkItDown   │
     │  XLS/XLSX → pandas │
     │  CSV → pandas      │
     │  IMG → Claude Vision│
@@ -93,7 +93,7 @@ curl -X POST http://localhost:8000/extract/batch \
 
 | Formato | Método de extracción |
 |---------|---------------------|
-| `.pdf` | pdfplumber (texto + tablas) |
+| `.pdf` | MarkItDown (principal) + pdfplumber (fallback) |
 | `.xlsx` / `.xlsm` | pandas + openpyxl |
 | `.xls` | pandas + xlrd |
 | `.csv` | pandas |
@@ -141,7 +141,8 @@ curl -X POST http://localhost:8000/extract/batch \
 ## Notas Técnicas
 
 - El **Transformer** usa `claude-sonnet-4-20250514` con contexto de hasta 12.000 chars por chunk
-- Los PDFs con tablas se benefician especialmente de pdfplumber (extrae estructura tabular)
+- Los PDFs se convierten primero con MarkItDown para reducir texto ruidoso antes de enviar a IA
+- Si MarkItDown no logra extraer contenido utilizable, la API vuelve a pdfplumber como respaldo
 - Las imágenes usan Claude Vision directamente (no OCR local)
 - El Verifier normaliza formatos argentinos: `$1.535,26` → `1535.26`
 - El XLSX de salida respeta exactamente el formato de `Plantilla_Precios_Compras`

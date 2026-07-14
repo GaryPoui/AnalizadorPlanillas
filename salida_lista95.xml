@@ -1,0 +1,1256 @@
+<?xml version='1.0' encoding='utf-8'?>
+<PriceList>
+  <SourceFile>Lista de Precios N° 95 (2).pdf</SourceFile>
+  <Currency>ARS</Currency>
+  <ItemCount>208</ItemCount>
+  <Items>
+    <Item id="1">
+      <CodigoArticulo>BE64-12-150</CodigoArticulo>
+      <Precio>49440.42</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="2">
+      <CodigoArticulo>BE92-12-150</CodigoArticulo>
+      <Precio>58155.88</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="3">
+      <CodigoArticulo>BP50-05-050</CodigoArticulo>
+      <Precio>13145.05</Precio>
+      <Moneda>ARS</Moneda>  
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="4">
+      <CodigoArticulo>TBP-05-050</CodigoArticulo>
+      <Precio>8545.11</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="5">
+      <CodigoArticulo>BE64-12-300</CodigoArticulo>
+      <Precio>53486.87</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="6">
+      <CodigoArticulo>BE92-12-300</CodigoArticulo>
+      <Precio>61085.84</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="7">
+      <CodigoArticulo>BP50-05-100</CodigoArticulo>
+      <Precio>17187.83</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="8">
+      <CodigoArticulo>TBP-05-100</CodigoArticulo>
+      <Precio>11750.64</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="9">
+      <CodigoArticulo>BE64-12-450</CodigoArticulo>
+      <Precio>57727.38</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="10">
+      <CodigoArticulo>BE92-12-450</CodigoArticulo>
+      <Precio>65331.48</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="11">
+      <CodigoArticulo>BP50-05-150</CodigoArticulo>
+      <Precio>20126.95</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="12">
+      <CodigoArticulo>TBP-05-150</CodigoArticulo>
+      <Precio>15191.60</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="13">
+      <CodigoArticulo>BE64-12-600</CodigoArticulo>
+      <Precio>60877.80</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="14">
+      <CodigoArticulo>BE92-12-600</CodigoArticulo>
+      <Precio>68485.72</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="15">
+      <CodigoArticulo>BP50-05-200</CodigoArticulo>
+      <Precio>23066.08</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="16">
+      <CodigoArticulo>TBP-05-200</CodigoArticulo>
+      <Precio>19574.32</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="17">
+      <CodigoArticulo>BP50-05-250</CodigoArticulo>
+      <Precio>28671.24</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="18">
+      <CodigoArticulo>TBP-05-250</CodigoArticulo>
+      <Precio>23015.29</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="19">
+      <CodigoArticulo>BE64-16-150</CodigoArticulo>
+      <Precio>56104.82</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="20">
+      <CodigoArticulo>BE92-16-150</CodigoArticulo>
+      <Precio>66275.92</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="21">
+      <CodigoArticulo>TBE-07-150</CodigoArticulo>
+      <Precio>17814.76</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="22">
+      <CodigoArticulo>TBE-09-150</CodigoArticulo>
+      <Precio>23626.31</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="23">
+      <CodigoArticulo>BE64-16-300</CodigoArticulo>
+      <Precio>60684.79</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="24">
+      <CodigoArticulo>BE92-16-300</CodigoArticulo>
+      <Precio>71960.84</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="25">
+      <CodigoArticulo>TBE-07-300</CodigoArticulo>
+      <Precio>30240.50</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="26">
+      <CodigoArticulo>TBE-09-300</CodigoArticulo>
+      <Precio>41465.26</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="27">
+      <CodigoArticulo>BE64-16-450</CodigoArticulo>
+      <Precio>65935.97</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="28">
+      <CodigoArticulo>BE92-16-450</CodigoArticulo>
+      <Precio>76083.38</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="29">
+      <CodigoArticulo>TBE-07-450</CodigoArticulo>
+      <Precio>44741.57</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="30">
+      <CodigoArticulo>TBE-09-450</CodigoArticulo>
+      <Precio>55000.10</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="31">
+      <CodigoArticulo>BE64-16-600</CodigoArticulo>
+      <Precio>70515.94</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="32">
+      <CodigoArticulo>BE92-16-600</CodigoArticulo>
+      <Precio>80652.31</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="33">
+      <CodigoArticulo>TBE-07-600</CodigoArticulo>
+      <Precio>60302.16</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="34">
+      <CodigoArticulo>TBE-09-600</CodigoArticulo>
+      <Precio>70963.44</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="35">
+      <CodigoArticulo>CPE90-64-16-150</CodigoArticulo>
+      <Precio>23268.59</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="36">
+      <CodigoArticulo>CPE90-92-16-150</CodigoArticulo>
+      <Precio>24979.47</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="37">
+      <CodigoArticulo>TCPE90-07-150</CodigoArticulo>
+      <Precio>16634.21</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="38">
+      <CodigoArticulo>CPE90-64-16-300</CodigoArticulo>
+      <Precio>27420.48</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="39">
+      <CodigoArticulo>CPE90-92-16-300</CodigoArticulo>
+      <Precio>29986.79</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="40">
+      <CodigoArticulo>TCPE90-07-300</CodigoArticulo>
+      <Precio>21520.41</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="41">
+      <CodigoArticulo>CPE90-64-16-450</CodigoArticulo>
+      <Precio>32035.50</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="42">
+      <CodigoArticulo>CPE90-92-16-450</CodigoArticulo>
+      <Precio>35724.24</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="43">
+      <CodigoArticulo>TCPE90-09-450</CodigoArticulo>
+      <Precio>37452.06</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="44">
+      <CodigoArticulo>CPE90-64-16-600</CodigoArticulo>
+      <Precio>35526.72</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="45">
+      <CodigoArticulo>CPE90-92-16-600</CodigoArticulo>
+      <Precio>39377.57</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="46">
+      <CodigoArticulo>TCPE90-09-600</CodigoArticulo>
+      <Precio>50605.17</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="47">
+      <CodigoArticulo>CPE45-64-16-150</CodigoArticulo>
+      <Precio>17422.21</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="48">
+      <CodigoArticulo>CPE45-92-16-150</CodigoArticulo>
+      <Precio>18697.40</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="49">
+      <CodigoArticulo>TCPE45-07-150</CodigoArticulo>
+      <Precio>14410.33</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="50">
+      <CodigoArticulo>CPE45-64-16-300</CodigoArticulo>
+      <Precio>18962.73</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="51">
+      <CodigoArticulo>CPE45-92-16-300</CodigoArticulo>
+      <Precio>20662.98</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="52">
+      <CodigoArticulo>TCPE45-07-300</CodigoArticulo>
+      <Precio>16248.60</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="53">
+      <CodigoArticulo>CPE45-64-16-450</CodigoArticulo>
+      <Precio>22053.22</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="54">
+      <CodigoArticulo>CPE45-92-16-450</CodigoArticulo>
+      <Precio>23753.47</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="55">
+      <CodigoArticulo>TCPE45-09-450</CodigoArticulo>
+      <Precio>27309.90</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="56">
+      <CodigoArticulo>CPE45-64-16-600</CodigoArticulo>
+      <Precio>24293.60</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="57">
+      <CodigoArticulo>CPE45-92-16-600</CodigoArticulo>
+      <Precio>25993.84</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="58">
+      <CodigoArticulo>TCPE45-09-600</CodigoArticulo>
+      <Precio>39533.32</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="59">
+      <CodigoArticulo>UTE92-16-150</CodigoArticulo>
+      <Precio>41182.53</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="60">
+      <CodigoArticulo>TUTE-07-150</CodigoArticulo>
+      <Precio>28620.86</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="61">
+      <CodigoArticulo>UTE64-16-300</CodigoArticulo>
+      <Precio>41845.97</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="62">
+      <CodigoArticulo>UTE92-16-300</CodigoArticulo>
+      <Precio>44858.84</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="63">
+      <CodigoArticulo>TUTE-07-300</CodigoArticulo>
+      <Precio>34223.28</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="64">
+      <CodigoArticulo>UTE64-16-450</CodigoArticulo>
+      <Precio>49143.78</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="65">
+      <CodigoArticulo>UTE92-16-450</CodigoArticulo>
+      <Precio>52587.06</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="66">
+      <CodigoArticulo>TUTE-09-450</CodigoArticulo>
+      <Precio>51020.23</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="67">
+      <CodigoArticulo>UTE64-16-600</CodigoArticulo>
+      <Precio>53483.52</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="68">
+      <CodigoArticulo>UTE92-16-600</CodigoArticulo>
+      <Precio>56926.80</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="69">
+      <CodigoArticulo>TUTE-09-600</CodigoArticulo>
+      <Precio>62266.35</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="70">
+      <CodigoArticulo>UCE64-16-150</CodigoArticulo>
+      <Precio>46059.62</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="71">
+      <CodigoArticulo>UCE-92-16-150</CodigoArticulo>
+      <Precio>49072.49</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="72">
+      <CodigoArticulo>TUCE-07-150</CodigoArticulo>
+      <Precio>34873.29</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="73">
+      <CodigoArticulo>UCE64-16-300</CodigoArticulo>
+      <Precio>50435.01</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="74">
+      <CodigoArticulo>UCE-92-16-300</CodigoArticulo>
+      <Precio>53447.88</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="75">
+      <CodigoArticulo>TUCE-07-300</CodigoArticulo>
+      <Precio>44571.77</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="76">
+      <CodigoArticulo>UCE64-16-450</CodigoArticulo>
+      <Precio>58557.99</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="77">
+      <CodigoArticulo>UCE-92-16-450</CodigoArticulo>
+      <Precio>61570.86</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="78">
+      <CodigoArticulo>TUCE-09-450</CodigoArticulo>
+      <Precio>62936.99</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="79">
+      <CodigoArticulo>UCE64-16-600</CodigoArticulo>
+      <Precio>63095.12</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="80">
+      <CodigoArticulo>UCE-92-16-600</CodigoArticulo>
+      <Precio>65677.58</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="81">
+      <CodigoArticulo>TUCE-09-600</CodigoArticulo>
+      <Precio>75008.51</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="82">
+      <CodigoArticulo>EE64-16-150</CodigoArticulo>
+      <Precio>4823.25</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="83">
+      <CodigoArticulo>EE92-16-150</CodigoArticulo>
+      <Precio>5690.98</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="84">
+      <CodigoArticulo>TEE-07-150</CodigoArticulo>
+      <Precio>1705.13</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="85">
+      <CodigoArticulo>EE64-16-300</CodigoArticulo>
+      <Precio>5179.28</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="86">
+      <CodigoArticulo>EE92-16-300</CodigoArticulo>
+      <Precio>6162.06</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="87">
+      <CodigoArticulo>TEE-07-300</CodigoArticulo>
+      <Precio>2549.04</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="88">
+      <CodigoArticulo>EE64-16-450</CodigoArticulo>
+      <Precio>6087.61</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="89">
+      <CodigoArticulo>EE92-16-450</CodigoArticulo>
+      <Precio>6564.11</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="90">
+      <CodigoArticulo>TEE-09-450</CodigoArticulo>
+      <Precio>3110.41</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="91">
+      <CodigoArticulo>EE64-16-600</CodigoArticulo>
+      <Precio>6558.70</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="92">
+      <CodigoArticulo>EE92-16-600</CodigoArticulo>
+      <Precio>7219.30</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="93">
+      <CodigoArticulo>TEE-09-600</CodigoArticulo>
+      <Precio>3836.59</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="94">
+      <CodigoArticulo>DE45-64-16-150</CodigoArticulo>
+      <Precio>29694.14</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="95">
+      <CodigoArticulo>DE45-92-16-150</CodigoArticulo>
+      <Precio>32213.21</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="96">
+      <CodigoArticulo>TDE45-07-150</CodigoArticulo>
+      <Precio>26408.33</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="97">
+      <CodigoArticulo>DE45-64-16-300</CodigoArticulo>
+      <Precio>35868.80</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="98">
+      <CodigoArticulo>DE45-92-16-300</CodigoArticulo>
+      <Precio>39227.55</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="99">
+      <CodigoArticulo>TDE45-07-300</CodigoArticulo>
+      <Precio>38085.56</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="100">
+      <CodigoArticulo>DE45-64-16-450</CodigoArticulo>
+      <Precio>42760.15</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="101">
+      <CodigoArticulo>DE45-92-16-450</CodigoArticulo>
+      <Precio>46958.59</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="102">
+      <CodigoArticulo>TDE45-09-450</CodigoArticulo>
+      <Precio>49146.98</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="103">
+      <CodigoArticulo>DE45-64-16-600</CodigoArticulo>
+      <Precio>51034.03</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="104">
+      <CodigoArticulo>DE45-92-16-600</CodigoArticulo>
+      <Precio>56911.84</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="105">
+      <CodigoArticulo>TDE45-09-600</CodigoArticulo>
+      <Precio>65056.17</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="106">
+      <CodigoArticulo>CSE2B-16</CodigoArticulo>
+      <Precio>1929.02</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="107">
+      <CodigoArticulo>CE4B-16</CodigoArticulo>
+      <Precio>2624.27</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="108">
+      <CodigoArticulo>CAE-16</CodigoArticulo>
+      <Precio>3345.12</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="109">
+      <CodigoArticulo>GT-16</CodigoArticulo>
+      <Precio>1807.41</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="110">
+      <CodigoArticulo>BP50-07-050</CodigoArticulo>
+      <Precio>15046.47</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="111">
+      <CodigoArticulo>TBP-07-050</CodigoArticulo>
+      <Precio>9164.52</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="112">
+      <CodigoArticulo>BP50-07-200</CodigoArticulo>
+      <Precio>27018.09</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="113">
+      <CodigoArticulo>BP50-09-200</CodigoArticulo>
+      <Precio>37166.80</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="114">
+      <CodigoArticulo>TBP-07-200</CodigoArticulo>
+      <Precio>21071.42</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="115">
+      <CodigoArticulo>BP50-07-250</CodigoArticulo>
+      <Precio>32671.52</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="116">
+      <CodigoArticulo>BP50-09-250</CodigoArticulo>
+      <Precio>42702.73</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="117">
+      <CodigoArticulo>TBP-07-250</CodigoArticulo>
+      <Precio>26731.82</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="118">
+      <CodigoArticulo>BP50-07-300</CodigoArticulo>
+      <Precio>35172.18</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="119">
+      <CodigoArticulo>BP50-09-300</CodigoArticulo>
+      <Precio>49347.96</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="120">
+      <CodigoArticulo>TBP-07-300</CodigoArticulo>
+      <Precio>30240.50</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="121">
+      <CodigoArticulo>BP50-07-450</CodigoArticulo>
+      <Precio>51300.94</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="122">
+      <CodigoArticulo>BP50-09-450</CodigoArticulo>
+      <Precio>63071.57</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="123">
+      <CodigoArticulo>TBP-09-450</CodigoArticulo>
+      <Precio>55000.10</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="124">
+      <CodigoArticulo>BP50-07-600</CodigoArticulo>
+      <Precio>64516.77</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="125">
+      <CodigoArticulo>BP50-09-600</CodigoArticulo>
+      <Precio>78147.46</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="126">
+      <CodigoArticulo>TBP-09-600</CodigoArticulo>
+      <Precio>70963.44</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="127">
+      <CodigoArticulo>CPP90-07-050</CodigoArticulo>
+      <Precio>3640.54</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="128">
+      <CodigoArticulo>TCPP90-07-050</CodigoArticulo>
+      <Precio>2650.76</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="129">
+      <CodigoArticulo>CPP90-07-100</CodigoArticulo>
+      <Precio>4292.48</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="130">
+      <CodigoArticulo>TCPP90-07-100</CodigoArticulo>
+      <Precio>3239.94</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="131">
+      <CodigoArticulo>CPP90-07-150</CodigoArticulo>
+      <Precio>5125.15</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="132">
+      <CodigoArticulo>TCPP90-07-150</CodigoArticulo>
+      <Precio>4090.02</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="133">
+      <CodigoArticulo>CPP90-07-250</CodigoArticulo>
+      <Precio>7489.78</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="134">
+      <CodigoArticulo>TCPP90-07-250</CodigoArticulo>
+      <Precio>6114.18</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="135">
+      <CodigoArticulo>CPP90-07-300</CodigoArticulo>
+      <Precio>8780.75</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="136">
+      <CodigoArticulo>TCPP90-07-300</CodigoArticulo>
+      <Precio>6789.97</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="137">
+      <CodigoArticulo>CPP90-09-450</CodigoArticulo>
+      <Precio>19138.63</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="138">
+      <CodigoArticulo>TCPP90-09-450</CodigoArticulo>
+      <Precio>11922.54</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="139">
+      <CodigoArticulo>CPP90-09-600</CodigoArticulo>
+      <Precio>27648.27</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="140">
+      <CodigoArticulo>TCPP90-09-600</CodigoArticulo>
+      <Precio>17910.53</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="141">
+      <CodigoArticulo>CPP45--07-050</CodigoArticulo>
+      <Precio>2934.12</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="142">
+      <CodigoArticulo>TCPP45-07-050</CodigoArticulo>
+      <Precio>2073.35</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="143">
+      <CodigoArticulo>CPP45-07-100</CodigoArticulo>
+      <Precio>3731.81</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="144">
+      <CodigoArticulo>TCPP45-07-100</CodigoArticulo>
+      <Precio>2379.16</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="145">
+      <CodigoArticulo>CPP45-07-200</CodigoArticulo>
+      <Precio>5226.67</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="146">
+      <CodigoArticulo>TCPP45-07-200</CodigoArticulo>
+      <Precio>4204.43</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="147">
+      <CodigoArticulo>CPP45-07-250</CodigoArticulo>
+      <Precio>6292.75</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="148">
+      <CodigoArticulo>TCPP45-07-250</CodigoArticulo>
+      <Precio>5179.62</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="149">
+      <CodigoArticulo>CPP45-07-300</CodigoArticulo>
+      <Precio>6939.67</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="150">
+      <CodigoArticulo>TCPP45-07-300</CodigoArticulo>
+      <Precio>5966.62</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="151">
+      <CodigoArticulo>CPP45-09-450</CodigoArticulo>
+      <Precio>15686.43</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="152">
+      <CodigoArticulo>TCPP45-09-450</CodigoArticulo>
+      <Precio>9307.06</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="153">
+      <CodigoArticulo>UTP-09-450</CodigoArticulo>
+      <Precio>19835.24</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="154">
+      <CodigoArticulo>TUTP-09-450</CodigoArticulo>
+      <Precio>13237.76</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="155">
+      <CodigoArticulo>UCP-07-050</CodigoArticulo>
+      <Precio>6014.52</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="156">
+      <CodigoArticulo>TUCP-07-050</CodigoArticulo>
+      <Precio>2819.71</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="157">
+      <CodigoArticulo>CRP-09-450</CodigoArticulo>
+      <Precio>18139.39</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="158">
+      <CodigoArticulo>TCRP-09-450</CodigoArticulo>
+      <Precio>10873.57</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="159">
+      <CodigoArticulo>CRP-09-600</CodigoArticulo>
+      <Precio>22222.70</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="160">
+      <CodigoArticulo>TCRP-09-600</CodigoArticulo>
+      <Precio>12713.81</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="161">
+      <CodigoArticulo>EP-07-050</CodigoArticulo>
+      <Precio>2313.48</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="162">
+      <CodigoArticulo>TEP-07-050</CodigoArticulo>
+      <Precio>1195.49</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="163">
+      <CodigoArticulo>CBV-50X40</CodigoArticulo>
+      <Precio>33193.44</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="164">
+      <CodigoArticulo>CON-07-150</CodigoArticulo>
+      <Precio>10163.75</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="165">
+      <CodigoArticulo>EP-07-100</CodigoArticulo>
+      <Precio>2575.89</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="166">
+      <CodigoArticulo>TEP-07-100</CodigoArticulo>
+      <Precio>1461.61</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="167">
+      <CodigoArticulo>CBV-70X60</CodigoArticulo>
+      <Precio>42866.29</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="168">
+      <CodigoArticulo>CON-07-200</CodigoArticulo>
+      <Precio>10372.47</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="169">
+      <CodigoArticulo>EP-07-150</CodigoArticulo>
+      <Precio>2757.06</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="170">
+      <CodigoArticulo>TEP-07-150</CodigoArticulo>
+      <Precio>1571.95</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="171">
+      <CodigoArticulo>CON-07-250</CodigoArticulo>
+      <Precio>10539.46</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="172">
+      <CodigoArticulo>EP-07-300</CodigoArticulo>
+      <Precio>3166.39</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="173">
+      <CodigoArticulo>TEP-07-300</CodigoArticulo>
+      <Precio>1972.63</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="174">
+      <CodigoArticulo>EP-09-450</CodigoArticulo>
+      <Precio>5260.38</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="175">
+      <CodigoArticulo>TEP-09-450</CodigoArticulo>
+      <Precio>2617.85</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="176">
+      <CodigoArticulo>RSP25</CodigoArticulo>
+      <Precio>1979.63</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="177">
+      <CodigoArticulo>RSP50</CodigoArticulo>
+      <Precio>2353.46</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="178">
+      <CodigoArticulo>RSP75</CodigoArticulo>
+      <Precio>2384.07</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="179">
+      <CodigoArticulo>RSP100</CodigoArticulo>
+      <Precio>2578.12</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="180">
+      <CodigoArticulo>RSP150</CodigoArticulo>
+      <Precio>2646.11</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="181">
+      <CodigoArticulo>EMP-09-050</CodigoArticulo>
+      <Precio>23356.51</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="182">
+      <CodigoArticulo>ATP-09-050</CodigoArticulo>
+      <Precio>3165.06</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="183">
+      <CodigoArticulo>BDP-07-050</CodigoArticulo>
+      <Precio>8411.45</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="184">
+      <CodigoArticulo>CSP2B-09</CodigoArticulo>
+      <Precio>833.93</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="185">
+      <CodigoArticulo>CP4B-09</CodigoArticulo>
+      <Precio>1140.64</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="186">
+      <CodigoArticulo>CAP-09</CodigoArticulo>
+      <Precio>1624.26</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="187">
+      <CodigoArticulo>TEP-09-050</CodigoArticulo>
+      <Precio>2085.27</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="188">
+      <CodigoArticulo>CUPC</CodigoArticulo>
+      <Precio>2309.03</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="189">
+      <CodigoArticulo>GSPC</CodigoArticulo>
+      <Precio>2887.42</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="190">
+      <CodigoArticulo>TPC-07</CodigoArticulo>
+      <Precio>9336.22</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="191">
+      <CodigoArticulo>CP45PC44</CodigoArticulo>
+      <Precio>3939.45</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="192">
+      <CodigoArticulo>UTPC44</CodigoArticulo>
+      <Precio>3986.21</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="193">
+      <CodigoArticulo>UCPC44</CodigoArticulo>
+      <Precio>4136.39</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="194">
+      <CodigoArticulo>SRVS</CodigoArticulo>
+      <Precio>1552.51</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="195">
+      <CodigoArticulo>SJPC</CodigoArticulo>
+      <Precio>2104.79</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="196">
+      <CodigoArticulo>NGPV</CodigoArticulo>
+      <Precio>6585.50</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="197">
+      <CodigoArticulo>UARPC-12</CodigoArticulo>
+      <Precio>3909.59</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="198">
+      <CodigoArticulo>SM-230</CodigoArticulo>
+      <Precio>3464.69</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="199">
+      <CodigoArticulo>SES-200</CodigoArticulo>
+      <Precio>4994.20</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="200">
+      <CodigoArticulo>SM-280</CodigoArticulo>
+      <Precio>3998.80</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="201">
+      <CodigoArticulo>SES-250</CodigoArticulo>
+      <Precio>5332.23</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="202">
+      <CodigoArticulo>SM-330</CodigoArticulo>
+      <Precio>4626.62</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="203">
+      <CodigoArticulo>SES-300</CodigoArticulo>
+      <Precio>5477.88</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="204">
+      <CodigoArticulo>SS-100</CodigoArticulo>
+      <Precio>2072.79</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="205">
+      <CodigoArticulo>SG-100</CodigoArticulo>
+      <Precio>2285.00</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="206">
+      <CodigoArticulo>SM-480</CodigoArticulo>
+      <Precio>6718.82</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="207">
+      <CodigoArticulo>SS-150</CodigoArticulo>
+      <Precio>2355.75</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+    <Item id="208">
+      <CodigoArticulo>SG-150</CodigoArticulo>
+      <Precio>2610.40</Precio>
+      <Moneda>ARS</Moneda>
+      <Unidad>Un</Unidad>
+    </Item>
+  </Items>
+</PriceList>

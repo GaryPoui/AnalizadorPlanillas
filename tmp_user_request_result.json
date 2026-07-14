@@ -1,0 +1,92 @@
+﻿{
+    "status_code":  200,
+    "report":  {
+                   "total_rows":  568,
+                   "valid_rows":  568,
+                   "quality_score":  100.0
+               },
+    "first_20_pairs":  [
+                           {
+                               "code":  "60352",
+                               "price":  "61238.0"
+                           },
+                           {
+                               "code":  "60269",
+                               "price":  "60269.0"
+                           },
+                           {
+                               "code":  "10166",
+                               "price":  "3.04"
+                           },
+                           {
+                               "code":  "12773",
+                               "price":  "6.39"
+                           },
+                           {
+                               "code":  "20409",
+                               "price":  "4.27"
+                           },
+                           {
+                               "code":  "10114",
+                               "price":  "4.78"
+                           },
+                           {
+                               "code":  "14888",
+                               "price":  "8.34"
+                           },
+                           {
+                               "code":  "18714",
+                               "price":  "4.16"
+                           },
+                           {
+                               "code":  "26275",
+                               "price":  "3.96"
+                           },
+                           {
+                               "code":  "13970",
+                               "price":  "5.43"
+                           },
+                           {
+                               "code":  "18599",
+                               "price":  "7.09"
+                           },
+                           {
+                               "code":  "23171",
+                               "price":  "4.71"
+                           },
+                           {
+                               "code":  "12475",
+                               "price":  "7.08"
+                           },
+                           {
+                               "code":  "24063",
+                               "price":  "3.11"
+                           },
+                           {
+                               "code":  "29782",
+                               "price":  "8.91"
+                           },
+                           {
+                               "code":  "15163",
+                               "price":  "6.43"
+                           },
+                           {
+                               "code":  "13431",
+                               "price":  "3.51"
+                           },
+                           {
+                               "code":  "20311",
+                               "price":  "6.33"
+                           },
+                           {
+                               "code":  "15327",
+                               "price":  "6.35"
+                           },
+                           {
+                               "code":  "LYA25",
+                               "price":  "5312.0"
+                           }
+                       ],
+    "first_code_is_2002":  false,
+    "extraction_method":  "pdf_dual"
+}

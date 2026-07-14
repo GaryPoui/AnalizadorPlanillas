@@ -1,0 +1,1252 @@
+{
+  "rows": [
+    {
+      "CodigoArticulo": "BE64-12-150",
+      "Precio": "49440.42",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BE92-12-150",
+      "Precio": "58155.88",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BP50-05-050",
+      "Precio": "13145.05",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TBP-05-050",
+      "Precio": "8545.11",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BE64-12-300",
+      "Precio": "53486.87",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BE92-12-300",
+      "Precio": "61085.84",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BP50-05-100",
+      "Precio": "17187.83",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TBP-05-100",
+      "Precio": "11750.64",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BE64-12-450",
+      "Precio": "57727.38",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BE92-12-450",
+      "Precio": "65331.48",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BP50-05-150",
+      "Precio": "20126.95",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TBP-05-150",
+      "Precio": "15191.60",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BE64-12-600",
+      "Precio": "60877.80",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BE92-12-600",
+      "Precio": "68485.72",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BP50-05-200",
+      "Precio": "23066.08",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TBP-05-200",
+      "Precio": "19574.32",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BP50-05-250",
+      "Precio": "28671.24",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TBP-05-250",
+      "Precio": "23015.29",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BE64-16-150",
+      "Precio": "56104.82",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BE92-16-150",
+      "Precio": "66275.92",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TBE-07-150",
+      "Precio": "17814.76",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TBE-09-150",
+      "Precio": "23626.31",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BE64-16-300",
+      "Precio": "60684.79",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BE92-16-300",
+      "Precio": "71960.84",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TBE-07-300",
+      "Precio": "30240.50",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TBE-09-300",
+      "Precio": "41465.26",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BE64-16-450",
+      "Precio": "65935.97",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BE92-16-450",
+      "Precio": "76083.38",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TBE-07-450",
+      "Precio": "44741.57",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TBE-09-450",
+      "Precio": "55000.10",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BE64-16-600",
+      "Precio": "70515.94",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BE92-16-600",
+      "Precio": "80652.31",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TBE-07-600",
+      "Precio": "60302.16",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TBE-09-600",
+      "Precio": "70963.44",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPE90-64-16-150",
+      "Precio": "23268.59",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPE90-92-16-150",
+      "Precio": "24979.47",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TCPE90-07-150",
+      "Precio": "16634.21",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPE90-64-16-300",
+      "Precio": "27420.48",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPE90-92-16-300",
+      "Precio": "29986.79",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TCPE90-07-300",
+      "Precio": "21520.41",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPE90-64-16-450",
+      "Precio": "32035.50",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPE90-92-16-450",
+      "Precio": "35724.24",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TCPE90-09-450",
+      "Precio": "37452.06",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPE90-64-16-600",
+      "Precio": "35526.72",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPE90-92-16-600",
+      "Precio": "39377.57",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TCPE90-09-600",
+      "Precio": "50605.17",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPE45-64-16-150",
+      "Precio": "17422.21",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPE45-92-16-150",
+      "Precio": "18697.40",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TCPE45-07-150",
+      "Precio": "14410.33",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPE45-64-16-300",
+      "Precio": "18962.73",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPE45-92-16-300",
+      "Precio": "20662.98",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TCPE45-07-300",
+      "Precio": "16248.60",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPE45-64-16-450",
+      "Precio": "22053.22",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPE45-92-16-450",
+      "Precio": "23753.47",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TCPE45-09-450",
+      "Precio": "27309.90",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPE45-64-16-600",
+      "Precio": "24293.60",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPE45-92-16-600",
+      "Precio": "25993.84",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TCPE45-09-600",
+      "Precio": "39533.32",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "UTE92-16-150",
+      "Precio": "41182.53",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TUTE-07-150",
+      "Precio": "28620.86",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "UTE64-16-300",
+      "Precio": "41845.97",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "UTE92-16-300",
+      "Precio": "44858.84",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TUTE-07-300",
+      "Precio": "34223.28",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "UTE64-16-450",
+      "Precio": "49143.78",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "UTE92-16-450",
+      "Precio": "52587.06",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TUTE-09-450",
+      "Precio": "51020.23",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "UTE64-16-600",
+      "Precio": "53483.52",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "UTE92-16-600",
+      "Precio": "56926.80",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TUTE-09-600",
+      "Precio": "62266.35",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "UCE64-16-150",
+      "Precio": "46059.62",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "UCE-92-16-150",
+      "Precio": "49072.49",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TUCE-07-150",
+      "Precio": "34873.29",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "UCE64-16-300",
+      "Precio": "50435.01",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "UCE-92-16-300",
+      "Precio": "53447.88",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TUCE-07-300",
+      "Precio": "44571.77",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "UCE64-16-450",
+      "Precio": "58557.99",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "UCE-92-16-450",
+      "Precio": "61570.86",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TUCE-09-450",
+      "Precio": "62936.99",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "UCE64-16-600",
+      "Precio": "63095.12",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "UCE-92-16-600",
+      "Precio": "65677.58",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TUCE-09-600",
+      "Precio": "75008.51",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "EE64-16-150",
+      "Precio": "4823.25",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "EE92-16-150",
+      "Precio": "5690.98",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TEE-07-150",
+      "Precio": "1705.13",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "EE64-16-300",
+      "Precio": "5179.28",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "EE92-16-300",
+      "Precio": "6162.06",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TEE-07-300",
+      "Precio": "2549.04",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "EE64-16-450",
+      "Precio": "6087.61",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "EE92-16-450",
+      "Precio": "6564.11",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TEE-09-450",
+      "Precio": "3110.41",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "EE64-16-600",
+      "Precio": "6558.70",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "EE92-16-600",
+      "Precio": "7219.30",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TEE-09-600",
+      "Precio": "3836.59",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "DE45-64-16-150",
+      "Precio": "29694.14",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "DE45-92-16-150",
+      "Precio": "32213.21",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TDE45-07-150",
+      "Precio": "26408.33",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "DE45-64-16-300",
+      "Precio": "35868.80",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "DE45-92-16-300",
+      "Precio": "39227.55",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TDE45-07-300",
+      "Precio": "38085.56",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "DE45-64-16-450",
+      "Precio": "42760.15",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "DE45-92-16-450",
+      "Precio": "46958.59",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TDE45-09-450",
+      "Precio": "49146.98",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "DE45-64-16-600",
+      "Precio": "51034.03",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "DE45-92-16-600",
+      "Precio": "56911.84",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TDE45-09-600",
+      "Precio": "65056.17",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CSE2B-16",
+      "Precio": "1929.02",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CE4B-16",
+      "Precio": "2624.27",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CAE-16",
+      "Precio": "3345.12",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "GT-16",
+      "Precio": "1807.41",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BP50-07-050",
+      "Precio": "15046.47",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TBP-07-050",
+      "Precio": "9164.52",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BP50-07-200",
+      "Precio": "27018.09",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BP50-09-200",
+      "Precio": "37166.80",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TBP-07-200",
+      "Precio": "21071.42",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BP50-07-250",
+      "Precio": "32671.52",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BP50-09-250",
+      "Precio": "42702.73",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TBP-07-250",
+      "Precio": "26731.82",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BP50-07-300",
+      "Precio": "35172.18",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BP50-09-300",
+      "Precio": "49347.96",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TBP-07-300",
+      "Precio": "30240.50",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BP50-07-450",
+      "Precio": "51300.94",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BP50-09-450",
+      "Precio": "63071.57",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TBP-09-450",
+      "Precio": "55000.10",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BP50-07-600",
+      "Precio": "64516.77",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BP50-09-600",
+      "Precio": "78147.46",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TBP-09-600",
+      "Precio": "70963.44",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPP90-07-050",
+      "Precio": "3640.54",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TCPP90-07-050",
+      "Precio": "2650.76",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPP90-07-100",
+      "Precio": "4292.48",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TCPP90-07-100",
+      "Precio": "3239.94",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPP90-07-150",
+      "Precio": "5125.15",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TCPP90-07-150",
+      "Precio": "4090.02",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPP90-07-250",
+      "Precio": "7489.78",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TCPP90-07-250",
+      "Precio": "6114.18",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPP90-07-300",
+      "Precio": "8780.75",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TCPP90-07-300",
+      "Precio": "6789.97",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPP90-09-450",
+      "Precio": "19138.63",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TCPP90-09-450",
+      "Precio": "11922.54",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPP90-09-600",
+      "Precio": "27648.27",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TCPP90-09-600",
+      "Precio": "17910.53",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPP45--07-050",
+      "Precio": "2934.12",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TCPP45-07-050",
+      "Precio": "2073.35",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPP45-07-100",
+      "Precio": "3731.81",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TCPP45-07-100",
+      "Precio": "2379.16",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPP45-07-200",
+      "Precio": "5226.67",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TCPP45-07-200",
+      "Precio": "4204.43",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPP45-07-250",
+      "Precio": "6292.75",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TCPP45-07-250",
+      "Precio": "5179.62",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPP45-07-300",
+      "Precio": "6939.67",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TCPP45-07-300",
+      "Precio": "5966.62",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CPP45-09-450",
+      "Precio": "15686.43",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TCPP45-09-450",
+      "Precio": "9307.06",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "UTP-09-450",
+      "Precio": "19835.24",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TUTP-09-450",
+      "Precio": "13237.76",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "UCP-07-050",
+      "Precio": "6014.52",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TUCP-07-050",
+      "Precio": "2819.71",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CRP-09-450",
+      "Precio": "18139.39",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TCRP-09-450",
+      "Precio": "10873.57",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CRP-09-600",
+      "Precio": "22222.70",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TCRP-09-600",
+      "Precio": "12713.81",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "EP-07-050",
+      "Precio": "2313.48",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TEP-07-050",
+      "Precio": "1195.49",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CBV-50X40",
+      "Precio": "33193.44",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CON-07-150",
+      "Precio": "10163.75",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "EP-07-100",
+      "Precio": "2575.89",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TEP-07-100",
+      "Precio": "1461.61",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CBV-70X60",
+      "Precio": "42866.29",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CON-07-200",
+      "Precio": "10372.47",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "EP-07-150",
+      "Precio": "2757.06",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TEP-07-150",
+      "Precio": "1571.95",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CON-07-250",
+      "Precio": "10539.46",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "EP-07-300",
+      "Precio": "3166.39",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TEP-07-300",
+      "Precio": "1972.63",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "EP-09-450",
+      "Precio": "5260.38",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TEP-09-450",
+      "Precio": "2617.85",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "RSP25",
+      "Precio": "1979.63",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "RSP50",
+      "Precio": "2353.46",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "RSP75",
+      "Precio": "2384.07",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "RSP100",
+      "Precio": "2578.12",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "RSP150",
+      "Precio": "2646.11",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "EMP-09-050",
+      "Precio": "23356.51",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "ATP-09-050",
+      "Precio": "3165.06",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "BDP-07-050",
+      "Precio": "8411.45",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CSP2B-09",
+      "Precio": "833.93",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CP4B-09",
+      "Precio": "1140.64",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CAP-09",
+      "Precio": "1624.26",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TEP-09-050",
+      "Precio": "2085.27",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CUPC",
+      "Precio": "2309.03",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "GSPC",
+      "Precio": "2887.42",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "TPC-07",
+      "Precio": "9336.22",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "CP45PC44",
+      "Precio": "3939.45",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "UTPC44",
+      "Precio": "3986.21",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "UCPC44",
+      "Precio": "4136.39",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "SRVS",
+      "Precio": "1552.51",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "SJPC",
+      "Precio": "2104.79",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "NGPV",
+      "Precio": "6585.50",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "UARPC-12",
+      "Precio": "3909.59",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "SM-230",
+      "Precio": "3464.69",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "SES-200",
+      "Precio": "4994.20",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "SM-280",
+      "Precio": "3998.80",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "SES-250",
+      "Precio": "5332.23",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "SM-330",
+      "Precio": "4626.62",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "SES-300",
+      "Precio": "5477.88",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "SS-100",
+      "Precio": "2072.79",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "SG-100",
+      "Precio": "2285.00",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "SM-480",
+      "Precio": "6718.82",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "SS-150",
+      "Precio": "2355.75",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    },
+    {
+      "CodigoArticulo": "SG-150",
+      "Precio": "2610.40",
+      "Moneda": "ARS",
+      "Unidad": "Un"
+    }
+  ]
+}
