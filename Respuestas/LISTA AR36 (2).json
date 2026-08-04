@@ -1,0 +1,61 @@
+{
+  "filename": "LISTA AR36 (2).pdf",
+  "rows": [],
+  "report": {
+    "total_rows": 0,
+    "valid_rows": 0,
+    "rows_with_issues": 0,
+    "issues": [],
+    "quality_score": 0
+  },
+  "validation": null,
+  "metadata": {
+    "filename": "LISTA AR36 (2).pdf",
+    "type": ".pdf",
+    "pages": 2,
+    "pdf_sources": {
+      "markitdown_chars": 1948,
+      "pdfplumber_chars": 358
+    }
+  },
+  "extraction_method": "pdf_dual",
+  "column_mapping": {},
+  "log": [
+    {
+      "step": "extraction",
+      "status": "running",
+      "detail": "Processing LISTA AR36 (2).pdf",
+      "timestamp": "2026-08-04T15:30:03.636724"
+    },
+    {
+      "step": "extraction",
+      "status": "done",
+      "detail": "Extracted 2377 chars from 2 pages",
+      "timestamp": "2026-08-04T15:30:45.161598"
+    },
+    {
+      "step": "transformation",
+      "status": "running",
+      "detail": "Mapping data to template columns",
+      "timestamp": "2026-08-04T15:30:45.161612"
+    },
+    {
+      "step": "transformation",
+      "status": "done",
+      "detail": "Extracted 0 product rows",
+      "timestamp": "2026-08-04T15:30:45.163711"
+    },
+    {
+      "step": "verification",
+      "status": "running",
+      "detail": "Validating and cleaning data",
+      "timestamp": "2026-08-04T15:30:45.163731"
+    },
+    {
+      "step": "verification",
+      "status": "done",
+      "detail": "Quality: 0% (0/0 valid)",
+      "timestamp": "2026-08-04T15:30:45.163746"
+    }
+  ]
+}
