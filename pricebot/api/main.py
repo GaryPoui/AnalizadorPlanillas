@@ -623,6 +623,29 @@ def _is_alphanumeric_code(code: str) -> bool:
     return bool(code) and any(ch.isalpha() for ch in code) and any(ch.isdigit() for ch in code)
 
 
+def _try_ocr(file_bytes: bytes, num_pages: int) -> str:
+    """OCR fallback for scanned PDFs using pytesseract (BUG-2)."""
+    try:
+        import pytesseract
+        tess_cmd = os.getenv("TESSERACT_CMD", "").strip()
+        if tess_cmd:
+            pytesseract.pytesseract.tesseract_cmd = tess_cmd
+        langs = "spa+eng"
+        pages_text: list[str] = []
+        with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
+            for i, page in enumerate(pdf.pages[:num_pages]):
+                try:
+                    img = page.to_image(resolution=200).original
+                    text = pytesseract.image_to_string(img, lang=langs).strip()
+                    if text:
+                        pages_text.append(f"=== PAGE {i + 1} ===\n{text}")
+                except Exception:
+                    continue
+        return "\n".join(pages_text).strip()
+    except Exception:
+        return ""
+
+
 def _is_valid_product_code(code: str) -> bool:
     """True if code looks like a real product code (not a 6+ digit barcode or price)."""
     code = str(code or "").strip().upper()
@@ -878,6 +901,14 @@ async def agent_extractor(file_bytes: bytes, filename: str, file_type: str) -> d
                 sources.append(f"=== SOURCE: PDFPLUMBER ===\n{pdfplumber_text}")
 
             raw_text = "\n\n".join(sources).strip()
+
+            # Scanned PDF fallback: if almost no text was extracted, try OCR (BUG-2)
+            num_pages = max(metadata.get("pages", 1), 1)
+            if len(raw_text) / num_pages < 1500:
+                ocr_text = _try_ocr(file_bytes, num_pages)
+                if ocr_text:
+                    raw_text = ocr_text
+                    extraction_method = "pdf_ocr"
 
             md_chars = len(md_text)
             plumber_chars = len(pdfplumber_text)
