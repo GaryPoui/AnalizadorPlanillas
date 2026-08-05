@@ -730,6 +730,34 @@
       "Fecha vigencia hasta": ""
     },
     {
+      "Cód. Artículo": "GSE-64/92",
+      "Descripción artículo": "GSE-64/92",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "95",
+      "Desc. Lista": "Lista 95",
+      "Moneda": "ARS",
+      "Unidad": "Un",
+      "Precio": "1454.55",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "GF-16",
+      "Descripción artículo": "GF-16",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "95",
+      "Desc. Lista": "Lista 95",
+      "Moneda": "ARS",
+      "Unidad": "Un",
+      "Precio": "553.4",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
       "Cód. Artículo": "EE64-16-150",
       "Descripción artículo": "4823,25 EE92-16-150",
       "Descripción adicional artículo": "",
@@ -893,6 +921,188 @@
       "Moneda": "ARS",
       "Unidad": "Un",
       "Precio": "50520.72",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "DE45-92-16-150",
+      "Descripción artículo": "DE45-92-16-150",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "95",
+      "Desc. Lista": "Lista 95",
+      "Moneda": "ARS",
+      "Unidad": "Un",
+      "Precio": "32213.21",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "DE45-92-16-300",
+      "Descripción artículo": "DE45-92-16-300",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "95",
+      "Desc. Lista": "Lista 95",
+      "Moneda": "ARS",
+      "Unidad": "Un",
+      "Precio": "39227.55",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "DE45-92-16-450",
+      "Descripción artículo": "DE45-92-16-450",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "95",
+      "Desc. Lista": "Lista 95",
+      "Moneda": "ARS",
+      "Unidad": "Un",
+      "Precio": "46958.59",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "DE45-92-16-600",
+      "Descripción artículo": "DE45-92-16-600",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "95",
+      "Desc. Lista": "Lista 95",
+      "Moneda": "ARS",
+      "Unidad": "Un",
+      "Precio": "56911.84",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "CAE92-16-150",
+      "Descripción artículo": "CAE92-16-150",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "95",
+      "Desc. Lista": "Lista 95",
+      "Moneda": "ARS",
+      "Unidad": "Un",
+      "Precio": "42318.99",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "CAE92-16-300",
+      "Descripción artículo": "CAE92-16-300",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "95",
+      "Desc. Lista": "Lista 95",
+      "Moneda": "ARS",
+      "Unidad": "Un",
+      "Precio": "46271.43",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "CAE92-16-450",
+      "Descripción artículo": "CAE92-16-450",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "95",
+      "Desc. Lista": "Lista 95",
+      "Moneda": "ARS",
+      "Unidad": "Un",
+      "Precio": "50223.87",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "CAE92-16-600",
+      "Descripción artículo": "CAE92-16-600",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "95",
+      "Desc. Lista": "Lista 95",
+      "Moneda": "ARS",
+      "Unidad": "Un",
+      "Precio": "53459.62",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "TDE45-07-150",
+      "Descripción artículo": "TDE45-07-150",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "95",
+      "Desc. Lista": "Lista 95",
+      "Moneda": "ARS",
+      "Unidad": "Un",
+      "Precio": "26408.33",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "TDE45-07-300",
+      "Descripción artículo": "TDE45-07-300",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "95",
+      "Desc. Lista": "Lista 95",
+      "Moneda": "ARS",
+      "Unidad": "Un",
+      "Precio": "38085.56",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "TDE45-09-450",
+      "Descripción artículo": "TDE45-09-450",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "95",
+      "Desc. Lista": "Lista 95",
+      "Moneda": "ARS",
+      "Unidad": "Un",
+      "Precio": "49146.98",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "TDE45-09-600",
+      "Descripción artículo": "TDE45-09-600",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "95",
+      "Desc. Lista": "Lista 95",
+      "Moneda": "ARS",
+      "Unidad": "Un",
+      "Precio": "65056.17",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "BDE-64/92",
+      "Descripción artículo": "BDE-64/92",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "95",
+      "Desc. Lista": "Lista 95",
+      "Moneda": "ARS",
+      "Unidad": "Un",
+      "Precio": "9471.18",
       "Bonif.": "",
       "Fecha vigencia desde": "",
       "Fecha vigencia hasta": ""
@@ -3539,20 +3749,6 @@
       "Moneda": "ARS",
       "Unidad": "Un",
       "Precio": "3022.0",
-      "Bonif.": "",
-      "Fecha vigencia desde": "",
-      "Fecha vigencia hasta": ""
-    },
-    {
-      "Cód. Artículo": "GF-16",
-      "Descripción artículo": "RSE-18-75 | 3022,03",
-      "Descripción adicional artículo": "",
-      "Sinónimo": "",
-      "Cód. Lista": "95",
-      "Desc. Lista": "Lista 95",
-      "Moneda": "ARS",
-      "Unidad": "Un",
-      "Precio": "553.4",
       "Bonif.": "",
       "Fecha vigencia desde": "",
       "Fecha vigencia hasta": ""
@@ -8487,8 +8683,8 @@
     }
   ],
   "report": {
-    "total_rows": 606,
-    "valid_rows": 606,
+    "total_rows": 620,
+    "valid_rows": 620,
     "rows_with_issues": 0,
     "issues": [],
     "quality_score": 100.0
@@ -8513,37 +8709,37 @@
       "step": "extraction",
       "status": "running",
       "detail": "Processing Lista de Precios N° 95 (2).pdf",
-      "timestamp": "2026-08-04T15:30:45.166902"
+      "timestamp": "2026-08-05T16:11:01.574559"
     },
     {
       "step": "extraction",
       "status": "done",
       "detail": "Extracted 91587 chars from 7 pages",
-      "timestamp": "2026-08-04T15:31:11.474314"
+      "timestamp": "2026-08-05T16:11:28.962889"
     },
     {
       "step": "transformation",
       "status": "running",
       "detail": "Mapping data to template columns",
-      "timestamp": "2026-08-04T15:31:11.474340"
+      "timestamp": "2026-08-05T16:11:28.962904"
     },
     {
       "step": "transformation",
       "status": "done",
-      "detail": "Extracted 606 product rows",
-      "timestamp": "2026-08-04T15:31:11.679632"
+      "detail": "Extracted 620 product rows",
+      "timestamp": "2026-08-05T16:11:29.053810"
     },
     {
       "step": "verification",
       "status": "running",
       "detail": "Validating and cleaning data",
-      "timestamp": "2026-08-04T15:31:11.679650"
+      "timestamp": "2026-08-05T16:11:29.053829"
     },
     {
       "step": "verification",
       "status": "done",
-      "detail": "Quality: 100.0% (606/606 valid)",
-      "timestamp": "2026-08-04T15:31:11.686455"
+      "detail": "Quality: 100.0% (620/620 valid)",
+      "timestamp": "2026-08-05T16:11:29.055917"
     }
   ]
 }

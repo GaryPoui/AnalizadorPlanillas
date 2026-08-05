@@ -288,11 +288,47 @@ Los scripts de prueba están en `tests/`. Todos requieren la API corriendo en `l
 
 ---
 
-| Prioridad | Bug/Feature | Impacto estimado |
-|-----------|------------|-----------------|
-| Alta | Lista N°95: 620/1601 filas (38%) — mejorar heurísticas de texto | ~1000 filas extra sin costo |
+| Prioridad | Bug/Feature | Estado |
+|-----------|------------|--------|
+| ✅ Resuelto | LISTA AR36: PDF escaneado — OCR Tesseract | BUG-2 cerrado |
+| Alta | Lista N°95: 620/1601 filas (38%) — mejorar heurísticas | ~1000 filas extra sin costo |
 | Alta | LP MICROCONTROL: 60/1000+ filas — Claude con headers inferidos | +940 filas, costo bajo |
-| Media | LISTA AR36: PDF escaneado — implementar OCR con pytesseract | 0 → N filas, $0 |
+| Media | Tracking tokens/costo en endpoint `/extract` | Observabilidad producción |
+| Baja | asyncio.to_thread() para extracción síncrona de PDFs | BUG-4 |
+
+---
+
+### Sesión 5 — 2026-08-05 · OCR para PDFs escaneados (BUG-2 resuelto)
+
+**Problema**: LISTA AR36 era un PDF escaneado. MarkItDown y pdfplumber solo leen texto vectorial, extrayendo ~2306 chars de encabezados y 0 datos de productos.
+
+**Implementación en `pricebot/api/main.py`**:
+- Nueva función `_try_ocr(file_bytes, num_pages)` — convierte páginas PDF a imagen (200 DPI) via pdfplumber y las procesa con pytesseract (idiomas `spa+eng`)
+- Activación automática cuando `len(raw_text) / páginas < 1500 chars/pág`
+- `extraction_method = "pdf_ocr"` en la respuesta cuando se usa OCR
+- Variable de entorno `TESSERACT_CMD` para configurar la ruta del binario en Windows
+
+**Dependencias adicionales**:
+```powershell
+winget install UB-Mannheim.TesseractOCR           # Tesseract OCR v5.4+
+# Luego descargar spa.traineddata a la carpeta tessdata/
+# Agregar al .env: TESSERACT_CMD=C:\Users\...\Tesseract-OCR\tesseract.exe
+```
+
+**Resultado**:
+
+| Métrica | Sin OCR | Con OCR |
+|---------|--------:|--------:|
+| Filas | 0 | **112** |
+| Tokens | 1.669 | 20.343 |
+| Costo est.* | $0.0084 | $0.2314 |
+| Tiempo | 48s | 130s |
+
+> \* Tarifas Sonnet como referencia. El costo real con Haiku sería ~75% menor.
+
+El alto consumo de tokens (20K) se debe al ruido del OCR — Tesseract introduce caracteres especiales que Claude debe filtrar para encontrar los patrones de precio.
+
+---
 | Media | Tracking de costos por extracción en el endpoint `/extract` | Observabilidad en producción |
 | Baja | BUG-4: `asyncio.to_thread()` para extracción síncrona de PDFs | Timeouts reales |
 

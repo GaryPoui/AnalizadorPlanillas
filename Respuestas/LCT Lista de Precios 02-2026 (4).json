@@ -13766,37 +13766,37 @@
       "step": "extraction",
       "status": "running",
       "detail": "Processing LCT Lista de Precios 02-2026 (4).pdf",
-      "timestamp": "2026-08-04T15:28:22.080680"
+      "timestamp": "2026-08-05T16:07:26.341647"
     },
     {
       "step": "extraction",
       "status": "done",
       "detail": "Extracted 358721 chars from 46 pages",
-      "timestamp": "2026-08-04T15:30:03.233338"
+      "timestamp": "2026-08-05T16:08:51.169585"
     },
     {
       "step": "transformation",
       "status": "running",
       "detail": "Mapping data to template columns",
-      "timestamp": "2026-08-04T15:30:03.233354"
+      "timestamp": "2026-08-05T16:08:51.169629"
     },
     {
       "step": "transformation",
       "status": "done",
       "detail": "Extracted 981 product rows",
-      "timestamp": "2026-08-04T15:30:03.622624"
+      "timestamp": "2026-08-05T16:08:51.602702"
     },
     {
       "step": "verification",
       "status": "running",
       "detail": "Validating and cleaning data",
-      "timestamp": "2026-08-04T15:30:03.622641"
+      "timestamp": "2026-08-05T16:08:51.602723"
     },
     {
       "step": "verification",
       "status": "done",
       "detail": "Quality: 100.0% (981/981 valid)",
-      "timestamp": "2026-08-04T15:30:03.626408"
+      "timestamp": "2026-08-05T16:08:51.607885"
     }
   ]
 }
