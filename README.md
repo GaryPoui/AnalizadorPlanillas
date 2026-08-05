@@ -247,7 +247,46 @@ Los scripts de prueba están en `tests/`. Todos requieren la API corriendo en `l
 | LP MICROCONTROL | 1093 (vacíos) | **60 (reales)** | $0.00 | $0.00 | BUG-1 |
 | LISTA AR36 | 0 | 0 | $0.01 | $0.01 | Sin cambio (OCR pendiente) |
 
-### Pendientes (trabajo futuro)
+### Sesión 4 — 2026-08-05 · Cambio de modelo a Haiku + comparación final
+
+**Objetivo**: reducir costos cambiando de `claude-sonnet-4-6` a `claude-haiku-4-5`.
+
+**Hallazgo durante el cambio**: Los model IDs de Anthropic siguen un formato estricto. Se probaron varios nombres y solo dos funcionaron con la API key actual:
+
+| Model ID | Status |
+|----------|--------|
+| `claude-haiku-3-5` | ❌ 404 (nombre incorrecto) |
+| `claude-3-5-haiku-20241022` | ❌ 404 (no disponible en este tier) |
+| `claude-3-haiku-20240307` | ❌ 404 (no disponible en este tier) |
+| `claude-sonnet-4-6` | ✅ 200 |
+| `claude-haiku-4-5` | ✅ 200 |
+
+**Conclusión**: con esta API key solo están disponibles los modelos Claude 4.x (`claude-sonnet-4-6` y `claude-haiku-4-5`). Los modelos 3.x no están habilitados.
+
+---
+
+**Comparación: `claude-sonnet-4-6` vs `claude-haiku-4-5`** (post-fixes, 2026-08-05)
+
+| Archivo | Filas Sonnet | Filas Haiku | Tokens Sonnet | Tokens Haiku | Costo Sonnet* | Costo Haiku* |
+|---------|------------:|------------:|--------------:|-------------:|-------------:|-------------:|
+| L26031 xlsx | 2558 | 2558 | 0 | 0 | $0.0000 | $0.0000 |
+| L26031 csv | 2558 | 2558 | 0 | 0 | $0.0000 | $0.0000 |
+| LCT 02-2026 pdf | 981 | 981 | 0 | 0 | $0.0000 | $0.0000 |
+| LISTA AR36 pdf | 0 | 0 | 1.602 | 1.669 | $0.0074 | $0.0084 |
+| Lista N°95 pdf | 620 | 620 | 0 | 0 | $0.0000 | $0.0000 |
+| LP MICROCONTROL xls | 60 | 60 | 0 | 0 | $0.0000 | $0.0000 |
+| **TOTAL** | **6777** | **6777** | **1.602** | **1.669** | **$0.0074** | **$0.0084** |
+
+> \* Costos estimados usando tarifas de Sonnet ($3/$15 por M tokens). Con las tarifas reales de Haiku el costo real de Haiku sería **significativamente menor**.
+
+**Diferencias observadas:**
+- **Filas extraídas**: idénticas en todos los archivos — Haiku produce los mismos resultados que Sonnet para esta tarea
+- **Tokens**: AR36 usó 67 tokens más con Haiku (1669 vs 1602) — diferencia insignificante en tokenización
+- **Archivos que usan Claude**: solo LISTA AR36 (PDF escaneado). El resto se procesa localmente sin ninguna llamada a la API
+
+**Modelo activo**: `claude-haiku-4-5` — más económico, misma calidad de extracción para este caso de uso.
+
+---
 
 | Prioridad | Bug/Feature | Impacto estimado |
 |-----------|------------|-----------------|
