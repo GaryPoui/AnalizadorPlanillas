@@ -167,7 +167,97 @@ Los scripts de prueba están en `tests/`. Todos requieren la API corriendo en `l
 
 ---
 
-## Resultados del Batch Test — Con Claude post-fixes (2026-08-05)
+## Historial de avances y costos (2026-08-04 / 05)
+
+### Sesión 1 — 2026-08-04 · Setup y organización
+
+- Reorganización completa del proyecto: eliminados ~45 archivos `tmp_*`, creadas carpetas `tests/`, `Listas/`, `Respuestas/`
+- Documentados los primeros bugs del sistema
+- Primer batch test **sin Claude** (sin API key):
+
+| Archivo | Filas | Quality | Tiempo |
+|---------|------:|--------:|-------:|
+| L26031 xlsx | 2558 | 99.8% | 0.8s |
+| L26031 csv | 2558 | 99.8% | 0.1s |
+| LCT 02-2026 pdf | 981 | 100% | 101.5s |
+| Lista N°95 pdf | 606 | 100%* | 26.5s |
+| LP MICROCONTROL xls | 1093 | 0% | 1.1s |
+| LISTA AR36 pdf | 0 | 0% | 41.5s |
+
+> \* quality_score=100% nominal, pero 606/1601 filas con 85% de descripciones malformadas.
+
+**Costo: $0.00** — 0 llamadas a Claude.
+
+---
+
+### Sesión 2 — 2026-08-05 · Primera prueba con Claude (con bugs activos)
+
+- Configurada API key en `pricebot/.env` (con BOM bug que impedía que Python la leyera)
+- Detectado y corregido el BOM de PowerShell (`Set-Content -Encoding UTF8` agrega BOM, `load_dotenv` falla silenciosamente)
+- Primer batch test **con Claude** y `AI_COMPLEMENT_ALL_CHUNKS=True` (default activo):
+
+| Archivo | Filas | Tokens | Costo | Tiempo | Problema |
+|---------|------:|-------:|------:|-------:|---------|
+| L26031 xlsx | 2558 | 0 | $0.0000 | 0.8s | Local puro |
+| L26031 csv | 2558 | 0 | $0.0000 | 0.1s | Local puro |
+| LCT 02-2026 pdf | **0** | 103.299 | **$0.5492** | 300s | Timeout BUG-7 |
+| LISTA AR36 pdf | 0 | 1.602 | $0.0074 | 42.9s | PDF escaneado |
+| Lista N°95 pdf | **0** | 65.426 | **$0.5468** | 300s | Timeout BUG-7 |
+| LP MICROCONTROL xls | 1093 | 0 | $0.0000 | 0.2s | Local BUG-1 |
+| **TOTAL** | | **170.327** | **$1.1034** | | |
+
+**Resultado: $1.10 gastados, 0 filas útiles de PDFs con Claude.**
+
+---
+
+### Sesión 3 — 2026-08-05 · Fixes y batch test final
+
+**Fixes aplicados en `pricebot/api/main.py`:**
+
+| Bug | Descripción | Fix |
+|-----|-------------|-----|
+| BUG-7 | `AI_COMPLEMENT_ALL_CHUNKS=True` enviaba TODOS los chunks a Claude | Default → `"0"` |
+| BUG-7b | `strict_numeric_profile` filtraba local_rows a 0, disparando AI en todos los chunks del LCT | Skip AI cuando seed ≥ `PDF_MIN_EXPECTED_ROWS` |
+| BUG-5 | `pick_column()` mapeaba `CODIGO DE BARRAS` como código en lugar de `PARTID` | Prioridad: `partid` primero; excluir columnas con `"barras"`/`"ean"` |
+| BUG-5+ | `CODIGO DE BARRAS` y `EAN` no iban a ningún campo útil | Mapeados a `Sinónimo` |
+| BUG-1 | Excel/XLS sin headers retornaba 1093 filas vacías en lugar de usar Claude | Fallback a text/Claude si no mapea `Cód. Artículo` ni `Precio` |
+| BUG-6 | PDFs con múltiples columnas por página extraían solo la primera | `_detect_table_column_roles` retorna `extra_pairs`; segundo loop de extracción |
+
+**Batch test final post-fixes:**
+
+| Archivo | Formato | KB | Filas | Quality | Tokens | Costo USD | Tiempo | Claude |
+|---------|---------|---:|------:|--------:|-------:|----------:|-------:|--------|
+| L26031 (xlsx) | .xlsx | 186 | 2558 | 99.8% | 0 | $0.0000 | 0.8s | No (local) |
+| L26031 (csv) | .csv | 288 | 2558 | 99.8% | 0 | $0.0000 | 0.1s | No (local) |
+| LCT 02-2026 (pdf) | .pdf | 3713 | 981 | 100% | 0 | $0.0000 | 82.0s | No (heurístico) |
+| LISTA AR36 (pdf) | .pdf | 1762 | 0 | 0% | 1.602 | $0.0074 | 48.0s | Sí (PDF escaneado) |
+| Lista N°95 (pdf) | .pdf | 1344 | 620 | 100% | 0 | $0.0000 | 23.9s | No (tabla) |
+| LP MICROCONTROL (xls) | .xls | 6134 | 60 | — | 0 | $0.0000 | 0.2s | No (heurístico texto) |
+| **TOTAL** | | | **6779** | | **1.602** | **$0.0074** | | |
+
+**Reducción de costo: 99.3%** — de $1.10 a $0.0074 por el batch completo.
+
+### Comparación consolidada: antes vs después
+
+| Archivo | Filas antes | Filas después | Costo antes | Costo después | Mejora principal |
+|---------|------------:|--------------:|------------:|--------------:|-----------------|
+| L26031 xlsx | 2558 (EAN) | **2558 (PARTID)** | $0.00 | $0.00 | Código correcto |
+| LCT pdf | 0 (timeout) | **981** | $0.55 | $0.00 | BUG-7 + BUG-7b |
+| Lista N°95 pdf | 606 (desc malform.) | **620** | $0.55 | $0.00 | BUG-6 (parcial) |
+| LP MICROCONTROL | 1093 (vacíos) | **60 (reales)** | $0.00 | $0.00 | BUG-1 |
+| LISTA AR36 | 0 | 0 | $0.01 | $0.01 | Sin cambio (OCR pendiente) |
+
+### Pendientes (trabajo futuro)
+
+| Prioridad | Bug/Feature | Impacto estimado |
+|-----------|------------|-----------------|
+| Alta | Lista N°95: 620/1601 filas (38%) — mejorar heurísticas de texto | ~1000 filas extra sin costo |
+| Alta | LP MICROCONTROL: 60/1000+ filas — Claude con headers inferidos | +940 filas, costo bajo |
+| Media | LISTA AR36: PDF escaneado — implementar OCR con pytesseract | 0 → N filas, $0 |
+| Media | Tracking de costos por extracción en el endpoint `/extract` | Observabilidad en producción |
+| Baja | BUG-4: `asyncio.to_thread()` para extracción síncrona de PDFs | Timeouts reales |
+
+---
 
 Modelo: `claude-sonnet-4-6` | Fixes aplicados: BUG-1, BUG-5, BUG-6, BUG-7
 
