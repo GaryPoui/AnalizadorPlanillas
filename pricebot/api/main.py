@@ -46,7 +46,7 @@ app.add_middleware(
 )
 
 # Anthropic (Claude) configuration
-CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-6")
+CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-haiku-3-5")
 MARKITDOWN = MarkItDown()
 
 
