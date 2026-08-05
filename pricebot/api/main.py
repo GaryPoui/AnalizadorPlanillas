@@ -164,7 +164,7 @@ TEMPLATE_COLUMNS = [
 
 TRANSFORM_CACHE_MAX_ITEMS = max(int(os.getenv("TRANSFORM_CACHE_MAX_ITEMS", "512")), 32)
 TRANSFORM_CACHE: dict[str, dict] = {}
-AI_COMPLEMENT_ALL_CHUNKS = os.getenv("AI_COMPLEMENT_ALL_CHUNKS", "1") == "1"
+AI_COMPLEMENT_ALL_CHUNKS = os.getenv("AI_COMPLEMENT_ALL_CHUNKS", "0") == "1"
 PDF_MIN_EXPECTED_ROWS = max(int(os.getenv("PDF_MIN_EXPECTED_ROWS", "80")), 10)
 PDF_RECOVERY_MAX_CHUNKS = max(int(os.getenv("PDF_RECOVERY_MAX_CHUNKS", "12")), 1)
 
@@ -669,7 +669,20 @@ def _detect_table_column_roles(rows: list[list[str]]) -> dict[str, int]:
     price_col = next((c for c in price_candidates if c != code_col and price_score[c] > 0), -1)
     desc_candidates = [i for i in range(num_cols) if i != code_col and i != price_col]
     desc_col = max(desc_candidates, key=lambda x: desc_score[x]) if desc_candidates else -1
-    return {"code": code_col, "price": price_col, "description": desc_col}
+
+    # Detect extra code+price pairs for multi-column layouts (multiple products per row)
+    extra_pairs: list[tuple[int, int]] = []
+    used_cols: set[int] = {code_col, price_col}
+    for i in range(num_cols):
+        if i in used_cols or code_score[i] < 2:
+            continue
+        for j in (i + 1, i + 2, i - 1):
+            if j < 0 or j >= num_cols or j in used_cols or price_score[j] < 2:
+                continue
+            extra_pairs.append((i, j))
+            used_cols.update({i, j})
+            break
+    return {"code": code_col, "price": price_col, "description": desc_col, "extra_pairs": extra_pairs}
 
 
 def extract_rows_from_pdf_tables(
@@ -698,6 +711,7 @@ def extract_rows_from_pdf_tables(
             code_col = cols["code"]
             price_col = cols["price"]
             desc_col = cols["description"]
+            extra_pairs = cols.get("extra_pairs", [])
 
             first_cell = norm[0][code_col] if code_col < len(norm[0]) else ""
             data_start = 0 if _is_valid_product_code(first_cell) else 1
@@ -755,6 +769,34 @@ def extract_rows_from_pdf_tables(
                 r["Moneda"] = default_currency
                 r["Unidad"] = "Un"
                 all_rows.append(r)
+
+            # Second pass: extract from extra column pairs (multi-column layouts, BUG-6)
+            for extra_code_col, extra_price_col in extra_pairs:
+                for row in norm[data_start:]:
+                    if len(row) <= extra_code_col:
+                        continue
+                    code = str(row[extra_code_col] if extra_code_col < len(row) else "").strip().upper()
+                    if not code or not _is_valid_product_code(code):
+                        continue
+                    price_str = ""
+                    if 0 <= extra_price_col < len(row):
+                        price_str = _normalize_price_token(str(row[extra_price_col] or ""))
+                        try:
+                            if float(price_str) <= 3:
+                                price_str = ""
+                        except Exception:
+                            price_str = ""
+                    if not price_str:
+                        continue
+                    r = _empty_template_row()
+                    r["Cód. Artículo"] = code
+                    r["Precio"] = price_str
+                    r["Descripción artículo"] = code
+                    r["Cód. Lista"] = list_code
+                    r["Desc. Lista"] = list_desc
+                    r["Moneda"] = default_currency
+                    r["Unidad"] = "Un"
+                    all_rows.append(r)
 
     deduped: list[dict] = []
     seen: set = set()
@@ -1133,10 +1175,18 @@ async def agent_transformer(
             return {"rows": [], "column_mapping": {}}
 
         columns = list(structured_rows[0].keys())
-        code_col = pick_column(columns, ["codigo", "cod", "partid", "sku", "item", "articulo", "ean"])
+        code_col = pick_column(columns, ["partid", "part id", "cod art", "sku", "item"])
+        if code_col is None:
+            # Match "codigo"/"articulo" only when not "codigo de barras" or EAN (BUG-5)
+            code_col = next(
+                (c for c in columns
+                 if any(p in normalize_key(c) for p in ["articulo", "codigo"])
+                 and "barras" not in normalize_key(c) and "ean" not in normalize_key(c)),
+                None,
+            )
         desc_col = pick_column(columns, ["descripcion", "producto", "detalle", "articulo", "nombre"])
         add_col = pick_column(columns, ["adicional", "familia", "rubro", "linea", "modelo", "detalle2"])
-        syn_col = pick_column(columns, ["sinonimo", "marca", "alias"])
+        syn_col = pick_column(columns, ["sinonimo", "marca", "alias", "barras", "ean", "barcode"])
         list_col = pick_column(columns, ["cod lista", "lista", "list code"])
         list_desc_col = pick_column(columns, ["desc lista", "lista desc", "list name"])
         currency_col = pick_column(columns, ["moneda", "currency", "divisa"])
@@ -1231,7 +1281,11 @@ async def agent_transformer(
 
     structured_rows = raw_data.get("structured_rows") or []
     if structured_rows and raw_data.get("metadata", {}).get("type") in {".csv", ".xlsx", ".xls", ".xlsm"}:
-        return transform_structured_rows(structured_rows)
+        result = transform_structured_rows(structured_rows)
+        mapping_vals = set(result.get("column_mapping", {}).values())
+        # Fall through to text/Claude path when column identification fails (BUG-1)
+        if "Cód. Artículo" in mapping_vals or "Precio" in mapping_vals:
+            return result
 
     raw_text = raw_data.get("raw_text", "")
     if not raw_text.strip():
@@ -1362,6 +1416,10 @@ async def agent_transformer(
             all_rows.extend(local_rows)
 
             if not ai_enabled:
+                continue
+
+            # Skip AI when numeric-profile seed already covers the list (BUG-7 / LCT case)
+            if strict_numeric_profile and len(strict_rows_seed) >= PDF_MIN_EXPECTED_ROWS:
                 continue
 
             # Complement with AI on all chunks by default to maximize recall.

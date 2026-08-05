@@ -167,9 +167,80 @@ Los scripts de prueba están en `tests/`. Todos requieren la API corriendo en `l
 
 ---
 
-## Resultados del Batch Test (sin Claude — modo local puro)
+## Resultados del Batch Test — Con Claude post-fixes (2026-08-05)
 
-Ejecutado sobre `Listas/` con `tests/batch_test_listas.py`. Tokens = 0 en todos porque no hay API key.
+Modelo: `claude-sonnet-4-6` | Fixes aplicados: BUG-1, BUG-5, BUG-6, BUG-7
+
+| Archivo | Formato | Filas | Tokens | Costo USD | Tiempo | Estado |
+|---------|---------|------:|-------:|----------:|-------:|--------|
+| L26031 (xlsx) | .xlsx | 2558 | 0 | $0.0000 | 0.8s | ✅ Código = PARTID (BUG-5 fixed) |
+| L26031 (csv) | .csv | 2558 | 0 | $0.0000 | 0.1s | ✅ Igual |
+| LCT 02-2026 | .pdf | 981 | **0** | **$0.0000** | 82s | ✅ Sin Claude (BUG-7 fixed) |
+| LISTA AR36 | .pdf | 0 | 1.602 | $0.0074 | 48s | ❌ PDF escaneado — requiere OCR |
+| Lista N°95 | .pdf | **620** | 0 | $0.0000 | 24s | ⬆️ +14 filas (BUG-6 partial fix) |
+| LP MICROCONTROL | .xls | **60** | 0 | $0.0000 | 0.2s | ⬆️ 60 filas reales (BUG-1 fixed) |
+| **TOTAL** | | | **1.602** | **$0.0074** | | |
+
+> **Costo total: $0.0074** — vs $1.10 antes de los fixes (reducción del 99.3%)
+
+---
+
+## Fixes aplicados en `pricebot/api/main.py` (2026-08-05)
+
+| Bug | Fix | Archivo / línea |
+|-----|-----|----------------|
+| BUG-7 | `AI_COMPLEMENT_ALL_CHUNKS` default `"1"` → `"0"` | línea 167 |
+| BUG-7b | Saltar AI cuando `strict_numeric_profile=True` y seed ≥ `PDF_MIN_EXPECTED_ROWS` | `agent_transformer()` |
+| BUG-5 | `pick_column` prioriza `partid` y excluye columnas con `"barras"`/`"ean"` | `transform_structured_rows()` |
+| BUG-5+ | `CODIGO DE BARRAS` y `EAN` se mapean al campo `Sinónimo` | `transform_structured_rows()` |
+| BUG-1 | Fallback a text/Claude cuando el mapeo de columnas no encuentra `Cód. Artículo` ni `Precio` | `agent_transformer()` |
+| BUG-6 | `_detect_table_column_roles()` retorna pares extra; `extract_rows_from_pdf_tables()` extrae múltiples productos por fila | ambas funciones |
+
+---
+
+Modelo: `claude-sonnet-4-6` | Tarifas: input $3/M · output $15/M tokens
+
+| Archivo | Formato | Filas | Tokens | Costo USD | Tiempo | Notas |
+|---------|---------|------:|-------:|----------:|-------:|-------|
+| L26031 (xlsx) | .xlsx | 2558 | 0 | $0.0000 | 0.8s | Local puro (pandas). BUG-5 activo |
+| L26031 (csv) | .csv | 2558 | 0 | $0.0000 | 0.1s | Local puro (pandas). BUG-5 activo |
+| LCT 02-2026 | .pdf | **0** | 103.299 | **$0.5492** | 300s ⚠️ | Timeout. El heurístico ya daba 981 filas correctas sin Claude |
+| LISTA AR36 | .pdf | 0 | 1.602 | $0.0074 | 42.9s | PDF escaneado — Claude tampoco puede leerlo sin Vision |
+| Lista N°95 | .pdf | **0** | 65.426 | **$0.5468** | 300s ⚠️ | Timeout. El heurístico daba 606 filas |
+| LP MICROCONTROL | .xls | 1093 | 0 | $0.0000 | 0.2s | Local puro. BUG-1 activo (quality=0%) |
+| **TOTAL** | | **5709** | **170.327** | **$1.1034** | ~650s | |
+
+> ⚠️ **Problema crítico identificado**: Los PDFs grandes (LCT 3.7MB, Lista N°95 1.3MB) con `AI_COMPLEMENT_ALL_CHUNKS=True` envían TODOS los chunks a Claude, consumen todos los tokens en 300s y devuelven 0 filas por el timeout de asyncio (que no puede interrumpir el código síncrono).
+
+---
+
+## Resultados del Batch Test — Sin Claude (2026-08-04)
+
+Todos los archivos procesados localmente sin API key. Referencia de comparación.
+
+| Archivo | Formato | Filas | Quality | Estado | Tiempo |
+|---------|---------|------:|--------:|--------|-------:|
+| L26031 (xlsx) | .xlsx | 2558 | 99.8% | ❌ BUG-5: código = EAN, no PARTID | 0.8s |
+| L26031 (csv) | .csv | 2558 | 99.8% | ❌ BUG-5: mismo problema | 0.1s |
+| LCT 02-2026 | .pdf | 981 | 100.0% | ✅ Extracción correcta sin Claude | 101.5s |
+| Lista N°95 | .pdf | 606 | 100.0% | ❌ BUG-3 + BUG-6: 38% recall + 85% desc malformadas | 26.5s |
+| LP MICROCONTROL | .xls | 1093 | 0.0% | ❌ BUG-1: sin headers (pendiente Claude) | 1.1s |
+| LISTA AR36 | .pdf | 0 | 0.0% | ❌ BUG-2: PDF escaneado (pendiente Claude) | 41.5s |
+
+---
+
+## Nuevo Bug identificado en tests con Claude
+
+### BUG-7 · `AI_COMPLEMENT_ALL_CHUNKS=True` causa timeouts en PDFs grandes + 0 filas devueltas
+**Síntoma**: LCT (3.7MB) y Lista N°95 (1.3MB) consumen 103K y 65K tokens respectivamente, alcanzan el timeout de 300s en el test, y devuelven 0 filas — peor que sin Claude.
+
+**Causa raíz**: El flag `AI_COMPLEMENT_ALL_CHUNKS=True` (default) fuerza que TODOS los chunks del PDF sean enviados a Claude aunque el heurístico ya extrajo bien los datos. Para PDFs grandes (muchos chunks × ~5s/llamada API = >300s), el tiempo total supera el timeout. Además, el timeout de asyncio no puede cortar las llamadas en curso (BUG-4), lo que resulta en el orquestador devolviendo las filas acumuladas hasta el corte — que en el test llegan vacías.
+
+**Costo desperdiciado**: $0.55 en LCT y $0.55 en Lista N°95 para obtener 0 filas.
+
+**Solución**: Para PDFs donde el heurístico ya extrajo ≥N filas por chunk (número configurable), no enviar esos chunks a Claude. Reservar Claude solo para chunks débiles, o desactivar `AI_COMPLEMENT_ALL_CHUNKS` por defecto y sólo activarlo con env var explícita.
+
+---
 
 | Archivo | Formato | Filas | Quality | Estado | Tiempo |
 |---------|---------|------:|--------:|--------|-------:|
@@ -342,7 +413,7 @@ code_col = pick_column(columns, ["partid", "cod articulo", "cod. articulo", "sku
 - [ ] **BUG-4** — Envolver extracción síncrona en `asyncio.to_thread()` para que el timeout funcione.
 - [ ] **BUG-5** — Corregir orden de patrones en `pick_column()`: priorizar `partid` antes que `codigo`.
 - [ ] **BUG-6** — Usar bounding boxes de pdfplumber para alinear columnas en tablas PDF complejas.
-- [ ] **FEAT** — Tracking de costos por extracción: devolver `input_tokens`, `output_tokens`, `cost_usd` en cada response de `/extract` y guardar historial en log.
+- [ ] **BUG-7** — Desactivar `AI_COMPLEMENT_ALL_CHUNKS` por defecto; llamar Claude solo en chunks débiles (< N filas locales) para evitar timeouts y gasto innecesario en PDFs grandes.
 - [ ] **FEAT** — Mejorar detección de patrones específicos del proveedor LCT.
 
 ---
