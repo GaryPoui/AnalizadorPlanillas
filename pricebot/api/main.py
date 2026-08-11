@@ -182,6 +182,11 @@ _CODE_BLACKLIST = frozenset({
     "ALUMINIO", "COBRE", "BRONCE", "HIERRO", "ACERO", "PVC", "POLIETILENO",
     "SIN", "POR", "CON", "DEL", "LOS", "LAS",
     "ISO9001", "QM15", "IP23", "IP24", "IEC",
+    # LCT tool model names (captured as codes by word-coord; real code is numeric 4xxx)
+    "PH-6", "HT-240U", "HT-240C", "HM-12CB", "CO-12CB", "CO-400", "CO-630",
+    "CO-IP", "HH-IP", "HEC-240", "HEC-400", "MHEC-240", "MHEC-240S",
+    # Norm/spec labels that appear in product table headers
+    "IEC-6", "APTAS", "LY-468",
 })
 
 # Price pattern: $? optional, also handle OCR-spaced digits
@@ -1596,22 +1601,50 @@ async def agent_transformer(
 
     deduped = list(deduped_by_key.values())
 
-    # Second pass: targeted removal of word-coord artifacts in PDFs (BUG-8).
-    # Only for PDFs: when the same code appears more than once and one version
-    # has a $ sign in the description (fragmented price mixed into desc by the
-    # word-coord extractor), remove that noisy row.
+    # Second pass: targeted removal of ghost rows in PDFs (BUG-8 + Sonnet audit).
+    # Three rules, applied only to PDFs:
+    #   R1 – duplicate code + $ in desc → fragmented price artifact from word-coord
+    #   R2 – duplicate code + desc==code → word-coord fallback (real desc exists elsewhere)
+    #   R3 – model-name code already captured under its numeric code (LCT tool section)
     if raw_data.get("metadata", {}).get("type") == ".pdf":
         _price_in_desc_re = re.compile(r'\$')
+        # Count per code and track which codes have at least one real description
         _code_dup_count: dict[str, int] = {}
+        _code_has_real_desc: set[str] = set()
         for _r in deduped:
             _c = str(_r.get("Cód. Artículo", "")).strip()
+            _d = str(_r.get("Descripción artículo", "")).strip()
             if _c:
                 _code_dup_count[_c] = _code_dup_count.get(_c, 0) + 1
-        deduped = [
-            r for r in deduped
-            if _code_dup_count.get(str(r.get("Cód. Artículo", "")).strip(), 0) == 1
-            or not _price_in_desc_re.search(str(r.get("Descripción artículo", "")))
-        ]
+                if _d and _d.lower() != _c.lower():
+                    _code_has_real_desc.add(_c)
+        # Build set of numeric-code rows (code is all digits) to detect model-name ghosts
+        _numeric_desc_prefixes: set[str] = set()
+        for _r in deduped:
+            _c = str(_r.get("Cód. Artículo", "")).strip()
+            _d = str(_r.get("Descripción artículo", "")).strip()
+            if _c.isdigit():
+                # Store the first token of the description as a potential model-name prefix
+                _first_token = _d.split()[0] if _d else ""
+                if _first_token:
+                    _numeric_desc_prefixes.add(_first_token.upper())
+
+        def _is_pdf_ghost(r: dict) -> bool:
+            code = str(r.get("Cód. Artículo", "")).strip()
+            desc = str(r.get("Descripción artículo", "")).strip()
+            n = _code_dup_count.get(code, 0)
+            # R1: duplicate code + $ in description
+            if n > 1 and _price_in_desc_re.search(desc):
+                return True
+            # R2: duplicate code + desc==code (word-coord fallback, real desc exists)
+            if n > 1 and desc.lower() == code.lower() and code in _code_has_real_desc:
+                return True
+            # R3: non-numeric code whose value appears as first word of a numeric-code row's desc
+            if not code.isdigit() and code.upper() in _numeric_desc_prefixes:
+                return True
+            return False
+
+        deduped = [r for r in deduped if not _is_pdf_ghost(r)]
 
     recovery_applied = False
     recovery_added = 0
