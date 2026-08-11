@@ -646,6 +646,135 @@ def _try_ocr(file_bytes: bytes, num_pages: int) -> str:
         return ""
 
 
+def _extract_rows_from_word_coords(
+    page,
+    list_code: str = "",
+    list_desc: str = "",
+    default_currency: str = "ARS",
+) -> list[dict]:
+    """Supplement table detection using word bounding-box coordinates (BUG-3)."""
+    try:
+        words = page.extract_words(x_tolerance=3, y_tolerance=3, keep_blank_chars=False)
+    except Exception:
+        return []
+    if not words:
+        return []
+
+    lines: dict[int, list] = {}
+    for w in words:
+        bucket = round(float(w.get("top", 0)) / 5) * 5
+        lines.setdefault(bucket, []).append(w)
+
+    price_re = re.compile(r"^\$?\s*\d{1,3}(?:\.\d{3})*[,\.]\d{2}$")
+    rows = []
+    for bucket in sorted(lines):
+        line_words = sorted(lines[bucket], key=lambda w: float(w.get("x0", 0)))
+        texts = [w["text"].strip() for w in line_words if w["text"].strip()]
+        if len(texts) < 2:
+            continue
+        code = next((t for t in texts if _is_valid_product_code(t)), None)
+        if not code:
+            continue
+        price_str = ""
+        for t in reversed(texts):
+            if price_re.match(t):
+                candidate = _normalize_price_token(t)
+                try:
+                    if float(candidate) > 3:
+                        price_str = candidate
+                        break
+                except Exception:
+                    pass
+        if not price_str:
+            continue
+        code_idx = next((i for i, t in enumerate(texts) if t == code), 0)
+        rev_price_idx = next((i for i, t in enumerate(reversed(texts)) if price_re.match(t)), 0)
+        price_idx = len(texts) - 1 - rev_price_idx
+        desc_parts = [
+            t for t in texts[code_idx + 1:price_idx]
+            if not _is_valid_product_code(t) and not price_re.match(t)
+        ]
+        r = _empty_template_row()
+        r["Cód. Artículo"] = code
+        r["Precio"] = price_str
+        r["Descripción artículo"] = " ".join(desc_parts).strip() or code
+        r["Cód. Lista"] = list_code
+        r["Desc. Lista"] = list_desc
+        r["Moneda"] = default_currency
+        r["Unidad"] = "Un"
+        rows.append(r)
+    return rows
+
+
+def _extract_pdf_sync(file_bytes: bytes) -> dict:
+    """All synchronous PDF work in one call — enables asyncio.to_thread() timeout (BUG-4)."""
+    md_text = ""
+    pdfplumber_text = ""
+    pdf_raw_tables: list = []
+    pdf_word_rows: list = []
+    pages = 0
+
+    try:
+        result = MARKITDOWN.convert(io.BytesIO(file_bytes))
+        md_text = (result.markdown or "").strip()
+    except Exception:
+        pass
+
+    try:
+        with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
+            pages = len(pdf.pages)
+            pages_text = []
+            for i, page in enumerate(pdf.pages):
+                text = (page.extract_text() or "").strip()
+                tables = page.extract_tables() or []
+                if tables:
+                    pdf_raw_tables.append((i + 1, tables))
+                table_lines = []
+                for table in tables:
+                    for row in table or []:
+                        if row:
+                            table_lines.append(" | ".join(str(c or "") for c in row))
+                block = f"=== PAGE {i+1} ===\n{text}"
+                if table_lines:
+                    block += "\n" + "\n".join(table_lines)
+                pages_text.append(block)
+                pdf_word_rows.extend(_extract_rows_from_word_coords(page))
+            pdfplumber_text = "\n".join(pages_text).strip()
+    except Exception:
+        pass
+
+    sources = []
+    if md_text:
+        sources.append(f"=== SOURCE: MARKITDOWN ===\n=== PAGE 1 ===\n{md_text}")
+    if pdfplumber_text:
+        sources.append(f"=== SOURCE: PDFPLUMBER ===\n{pdfplumber_text}")
+    raw_text = "\n\n".join(sources).strip()
+
+    if md_text and pdfplumber_text:
+        extraction_method = "pdf_dual"
+    elif md_text:
+        extraction_method = "pdf_markitdown_only"
+    else:
+        extraction_method = "pdf_pdfplumber_only"
+
+    num_pages = max(pages, 1)
+    if len(raw_text) / num_pages < 1500:
+        ocr_text = _try_ocr(file_bytes, num_pages)
+        if ocr_text:
+            raw_text = ocr_text
+            extraction_method = "pdf_ocr"
+
+    return {
+        "raw_text": raw_text,
+        "pdf_raw_tables": pdf_raw_tables,
+        "pdf_word_rows": pdf_word_rows,
+        "pages": pages,
+        "md_chars": len(md_text),
+        "plumber_chars": len(pdfplumber_text),
+        "extraction_method": extraction_method,
+    }
+
+
 def _is_valid_product_code(code: str) -> bool:
     """True if code looks like a real product code (not a 6+ digit barcode or price)."""
     code = str(code or "").strip().upper()
@@ -846,6 +975,7 @@ async def agent_extractor(file_bytes: bytes, filename: str, file_type: str) -> d
     extraction_method = "unknown"
     structured_rows = []
     pdf_raw_tables: list = []
+    pdf_word_rows: list = []
     metadata = {"filename": filename, "type": ext, "pages": 0}
 
     def normalize_df_to_records(df: pd.DataFrame) -> list[dict]:
@@ -862,71 +992,18 @@ async def agent_extractor(file_bytes: bytes, filename: str, file_type: str) -> d
 
     try:
         if ext in [".pdf"]:
-            md_text = ""
-            pdfplumber_text = ""
-
-            # Always attempt MarkItDown and pdfplumber, then combine for robustness.
-            try:
-                result = MARKITDOWN.convert(io.BytesIO(file_bytes))
-                md_text = (result.markdown or "").strip()
-            except Exception:
-                md_text = ""
-
-            try:
-                with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
-                    metadata["pages"] = len(pdf.pages)
-                    pages_text = []
-                    for i, page in enumerate(pdf.pages):
-                        text = (page.extract_text() or "").strip()
-                        tables = page.extract_tables() or []
-                        if tables:
-                            pdf_raw_tables.append((i + 1, tables))
-                        table_lines = []
-                        for table in tables:
-                            for row in table or []:
-                                if row:
-                                    table_lines.append(" | ".join(str(c or "") for c in row))
-                        block = f"=== PAGE {i+1} ===\n{text}"
-                        if table_lines:
-                            block += "\n" + "\n".join(table_lines)
-                        pages_text.append(block)
-                    pdfplumber_text = "\n".join(pages_text).strip()
-            except Exception:
-                pdfplumber_text = ""
-
-            sources = []
-            if md_text:
-                sources.append(f"=== SOURCE: MARKITDOWN ===\n=== PAGE 1 ===\n{md_text}")
-            if pdfplumber_text:
-                sources.append(f"=== SOURCE: PDFPLUMBER ===\n{pdfplumber_text}")
-
-            raw_text = "\n\n".join(sources).strip()
-
-            # Scanned PDF fallback: if almost no text was extracted, try OCR (BUG-2)
-            num_pages = max(metadata.get("pages", 1), 1)
-            if len(raw_text) / num_pages < 1500:
-                ocr_text = _try_ocr(file_bytes, num_pages)
-                if ocr_text:
-                    raw_text = ocr_text
-                    extraction_method = "pdf_ocr"
-
-            md_chars = len(md_text)
-            plumber_chars = len(pdfplumber_text)
+            sync_result = await asyncio.to_thread(_extract_pdf_sync, file_bytes)
+            raw_text = sync_result["raw_text"]
+            pdf_raw_tables = sync_result["pdf_raw_tables"]
+            pdf_word_rows = sync_result["pdf_word_rows"]
+            metadata["pages"] = sync_result["pages"]
             metadata["pdf_sources"] = {
-                "markitdown_chars": md_chars,
-                "pdfplumber_chars": plumber_chars,
+                "markitdown_chars": sync_result["md_chars"],
+                "pdfplumber_chars": sync_result["plumber_chars"],
             }
-
             if not raw_text:
                 raise HTTPException(status_code=500, detail="PDF extraction produced empty text")
-
-            if md_chars and plumber_chars:
-                extraction_method = "pdf_dual"
-            elif md_chars:
-                extraction_method = "pdf_markitdown_only"
-            else:
-                extraction_method = "pdf_pdfplumber_only"
-
+            extraction_method = sync_result["extraction_method"]
             if not metadata["pages"]:
                 metadata["pages"] = max(raw_text.count("=== PAGE "), 1)
 
@@ -1035,6 +1112,7 @@ async def agent_extractor(file_bytes: bytes, filename: str, file_type: str) -> d
         "raw_text": raw_text,
         "structured_rows": structured_rows,
         "pdf_raw_tables": pdf_raw_tables,
+        "pdf_word_rows": pdf_word_rows,
         "metadata": metadata,
         "char_count": len(raw_text),
         "extraction_method": extraction_method,
@@ -1381,6 +1459,18 @@ async def agent_transformer(
             local_rows_all.extend(table_rows)
             merged_mapping["pdf_table_code"] = "Cód. Artículo"
             merged_mapping["pdf_table_price"] = "Precio"
+
+    # Word-coordinate rows supplement table detection for missed multi-column products (BUG-3)
+    pdf_word_rows = raw_data.get("pdf_word_rows") or []
+    if pdf_word_rows and raw_data.get("metadata", {}).get("type") == ".pdf":
+        for row in pdf_word_rows:
+            row["Cód. Lista"] = row.get("Cód. Lista") or list_code
+            row["Desc. Lista"] = row.get("Desc. Lista") or list_desc
+            row["Moneda"] = row.get("Moneda") or default_currency
+        all_rows.extend(pdf_word_rows)
+        local_rows_all.extend(pdf_word_rows)
+        merged_mapping["pdf_word_code"] = "Cód. Artículo"
+        merged_mapping["pdf_word_price"] = "Precio"
 
     ai_enabled = bool(os.getenv("ANTHROPIC_API_KEY", "").strip())
     ai_errors = 0
