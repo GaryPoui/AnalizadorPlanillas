@@ -298,6 +298,68 @@ Los scripts de prueba están en `tests/`. Todos requieren la API corriendo en `l
 
 ---
 
+### Sesión 7 — 2026-08-11 · BUG-8 fix completo + limpieza de filas basura (auditoría Sonnet)
+
+#### Batch test final (modelo `claude-haiku-4-5`)
+
+| Archivo | Filas | Quality | Tokens | Costo | Tiempo | Método |
+|---------|------:|--------:|-------:|------:|-------:|--------|
+| L26031 xlsx | 2558 | 99.8% | 0 | $0.00 | 1.3s | direct_structured |
+| L26031 csv | 2558 | 99.8% | 0 | $0.00 | 0.1s | direct_structured |
+| LCT 02-2026 pdf | **903** | 100% | 0 | $0.00 | 109s | pdf_dual |
+| LISTA AR36 pdf | ~97–115 | — | 21.143 | $0.2434 | 138s | pdf_ocr |
+| Lista N°95 pdf | **620** | 100% | 0 | $0.00 | 31s | pdf_dual |
+| LP MICROCONTROL xls | 60 | — | 0 | $0.00 | 0.2s | direct_structured |
+| **TOTAL** | | | **21.143** | **$0.2434** | | |
+
+#### Progresión LCT (limpieza acumulada)
+
+| Etapa | Filas | Cambio | Motivo |
+|-------|------:|-------:|--------|
+| Sesión 6 (post BUG-3) | 1065 | base | +84 filas word-coord |
+| BUG-8 fix (blacklist + `$` filter) | 923 | −142 | CODIGO/Aluminio/Bronce/PVC bloqueados |
+| Ghost cleanup R2/R3 (Sesión 7) | **903** | −20 | HT-240U/CO-12CB/etc. eliminados |
+
+#### Cambios en código (commits `506d82b` y `69b931f`)
+
+**`_CODE_BLACKLIST` ampliada** (`main.py` línea ~180):
+- Se agregaron nombres de modelos de herramientas LCT: `PH-6`, `HT-240U`, `HT-240C`, `HM-12CB`, `CO-12CB`, `CO-400`, `CO-630`, `CO-IP`, `HH-IP`, `HEC-240`, `HEC-400`, `MHEC-240`, `MHEC-240S`
+- Labels de normas/specs: `IEC-6`, `APTAS`, `LY-468`
+- Estas palabras nunca pueden ser códigos de producto válidos
+
+**Nueva función `_is_pdf_ghost()`** en `agent_transformer()` post-dedup (PDF-only):
+- **R1**: código duplicado + `$` en descripción → precio fragmentado del word-coord
+- **R2**: código duplicado + `desc == código` → fallback sin descripción real, existe versión mejor
+- **R3**: código alfanumérico que aparece como primera palabra de una fila con código numérico → nombre de modelo capturado como código primario
+
+#### Auditoría externa del LCT (Sonnet 4.5, 2026-08-11)
+
+Se hizo una comparación manual del JSON vs el PDF LCT. Hallazgos principales:
+
+**Gaps sistemáticos (pendientes — Paso 2):**
+- Páginas 22-24 y 34 — herramientas manuales: ~37 productos completamente ausentes (LY-10, LY-16, HX-50, WS-16, etc.)
+- Página 16 — Termi-Plast: ~34 productos faltantes (A2–A22, B17–B30, C1–C18)
+- UCA aluminio (códigos 2200–2212): 13 productos ausentes
+
+**Errores de precio puntuales (pendientes — Paso 2):**
+- `4325` (DPH-8): precio truncado $972,95 en lugar de $24.972,95
+- `3032` (B17): precio mezclado con código vecino
+- `3021` (B3): duplicado con datos basura
+
+**Resuelto en esta sesión:**
+- ~30 filas basura eliminadas (HT-240U, CO-12CB, MHEC-240, PKR-20, PRA-1500 duplicados, etc.)
+- Código `6219` corregido: ahora tiene 1 sola fila con precio `37447.55` (antes: 2 filas, una con precio fragmentado `47.55`)
+
+#### Pendiente — Paso 2 (requiere archivo de correcciones de Sonnet)
+
+| Tipo | Cantidad | Acción |
+|------|--------:|--------|
+| Productos faltantes (páginas 16, 22-24, 34) | ~127 | Patch manual |
+| Errores de precio | 3 | Corrección puntual |
+| Filas basura restantes (QM15, ISO9001, etc.) | ~14 | Patch manual |
+
+---
+
 ### Sesión 6 — 2026-08-11 · Resultados post BUG-3/BUG-4 + hallazgo de ruido en word-coords
 
 **Batch test ejecutado con todos los fixes aplicados (BUG-1/2/3/4/5/6/7):**
@@ -612,14 +674,17 @@ code_col = pick_column(columns, ["partid", "cod articulo", "cod. articulo", "sku
 
 ## Roadmap
 
-- [ ] **BUG-1** — Fallback a Claude cuando `transform_structured_rows` no mapea código ni precio.
-- [ ] **BUG-2** — Agregar OCR con pytesseract para PDFs escaneados; escalar a Claude Vision si OCR falla.
-- [ ] **BUG-3** — Mejorar heurísticas de extracción de PDF para aumentar recall sin Claude.
-- [ ] **BUG-4** — Envolver extracción síncrona en `asyncio.to_thread()` para que el timeout funcione.
-- [ ] **BUG-5** — Corregir orden de patrones en `pick_column()`: priorizar `partid` antes que `codigo`.
-- [ ] **BUG-6** — Usar bounding boxes de pdfplumber para alinear columnas en tablas PDF complejas.
-- [ ] **BUG-7** — Desactivar `AI_COMPLEMENT_ALL_CHUNKS` por defecto; llamar Claude solo en chunks débiles (< N filas locales) para evitar timeouts y gasto innecesario en PDFs grandes.
-- [ ] **FEAT** — Mejorar detección de patrones específicos del proveedor LCT.
+- [x] ~~**BUG-1**~~ — Fallback a Claude cuando `transform_structured_rows` no mapea código ni precio. ✅ Resuelto Sesión 3
+- [x] ~~**BUG-2**~~ — OCR con pytesseract para PDFs escaneados. ✅ Resuelto Sesión 5
+- [ ] **BUG-3** — Recall LCT: ~127 productos faltantes en páginas 16, 22-24, 34. Requiere patch manual (Paso 2).
+- [x] ~~**BUG-4**~~ — `asyncio.to_thread()` para extracción síncrona de PDFs. ✅ Resuelto Sesión 6
+- [x] ~~**BUG-5**~~ — Prioridad en `pick_column()`: `partid` antes que `codigo de barras`. ✅ Resuelto Sesión 3
+- [x] ~~**BUG-6**~~ — Bounding boxes / multi-columna PDF. ✅ Resuelto Sesión 3 (parcial), Sesión 6
+- [x] ~~**BUG-7**~~ — `AI_COMPLEMENT_ALL_CHUNKS` causa timeouts. ✅ Resuelto Sesión 3
+- [x] ~~**BUG-8**~~ — Word-coord noise (CODIGO/Aluminio/precios fragmentados). ✅ Resuelto Sesión 7
+- [ ] **PASO-2** — Patch LCT: aplicar correcciones de auditoría Sonnet (~127 faltantes + 3 precios + ~14 basura).
+- [ ] **FEAT** — Tracking de tokens/costo en endpoint `/extract`.
+- [ ] **FEAT** — LP MICROCONTROL: extracción completa (actualmente 60/~100 productos).
 
 ---
 
