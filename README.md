@@ -298,7 +298,47 @@ Los scripts de prueba están en `tests/`. Todos requieren la API corriendo en `l
 
 ---
 
-### Sesión 5 — 2026-08-05 · OCR para PDFs escaneados (BUG-2 resuelto)
+### Sesión 6 — 2026-08-11 · Resultados post BUG-3/BUG-4 + hallazgo de ruido en word-coords
+
+**Batch test ejecutado con todos los fixes aplicados (BUG-1/2/3/4/5/6/7):**
+
+| Archivo | Filas | Quality | Tokens | Costo | Tiempo |
+|---------|------:|--------:|-------:|------:|-------:|
+| L26031 xlsx | 2558 | 99.8% | 0 | $0.00 | 0.8s |
+| L26031 csv | 2558 | 99.8% | 0 | $0.00 | 0.1s |
+| LCT 02-2026 pdf | **1065** | 100% | 0 | $0.00 | ~85s |
+| LISTA AR36 pdf | 117 | — | ~21K | ~$0.24 | ~132s |
+| Lista N°95 pdf | 623 | 100% | 0 | $0.00 | ~24s |
+| LP MICROCONTROL xls | 60 | — | 0 | $0.00 | 0.2s |
+
+**LCT pasó de 981 → 1065 filas** (+84) gracias a `_extract_rows_from_word_coords` (BUG-3 fix).
+**asyncio.to_thread** (BUG-4) permite que el timeout funcione correctamente.
+
+---
+
+### Nuevo problema detectado — BUG-8 · Ruido en extracción por coordenadas (word-coords)
+
+**Síntoma**: La función `_extract_rows_from_word_coords` introduce filas con datos incorrectos en el LCT JSON:
+
+```json
+{ "Cód. Artículo": "6219", "Descripción artículo": "185 185 $ 3 7 4", "Precio": "47.55" }
+{ "Cód. Artículo": "CODIGO", "Descripción artículo": "CODIGO", "Precio": "3009.0" }
+{ "Cód. Artículo": "Aluminio", "Descripción artículo": "99,5% 120 120 $ 2 1 0", "Precio": "35.22" }
+```
+
+**Causa**: El algoritmo de bounding boxes toma como "código" cualquier palabra que pase `_is_valid_product_code()`. En páginas con layouts complejos (multi-columna, tablas con encabezados tipográficos, materiales en celda) extrae:
+- Palabras de encabezado: `CODIGO`, `PRECIO`, `REFERENCIA`
+- Descriptores de material: `Aluminio`, `Bronce`, `Cobre`, `PVC`
+- Duplicados de códigos reales con precio fragmentado (ej. `6219` con precio `47.55` en lugar de `37447.55`)
+
+**Impacto**: Quality score reporta 100% (verificador no detecta estos errores), pero los datos son incorrectos para las ~84 filas extras. El sistema deduplica por `(código, precio)` — como el precio es diferente, los duplicados malos coexisten con los buenos.
+
+**Solución propuesta**:
+1. Filtrar códigos que sean solo palabras genéricas del dominio (`CODIGO`, `PRECIO`, `Aluminio`, etc.)
+2. Validar que el precio extraído sea consistente con el rango de precios del PDF (para LCT todos los precios >100 ARS)
+3. Usar umbral de confianza: solo aceptar filas word-coord donde código Y precio estén en la misma "zona" del PDF sin saltar entre columnas
+
+---
 
 **Problema**: LISTA AR36 era un PDF escaneado. MarkItDown y pdfplumber solo leen texto vectorial, extrayendo ~2306 chars de encabezados y 0 datos de productos.
 
