@@ -175,6 +175,15 @@ CODE_PRICE_RE = re.compile(rf"({CODE_TOKEN_RE})\s+({PRICE_TOKEN_RE})")
 CODE_PRICE_ANYWHERE_RE = re.compile(rf"({CODE_TOKEN_RE}).{{0,80}}?({PRICE_TOKEN_RE})")
 CODE_ONLY_RE = re.compile(rf"\b({CODE_TOKEN_RE})\b", flags=re.IGNORECASE)
 PRICE_ONLY_RE = re.compile(rf"\b({PRICE_TOKEN_RE})\b")
+
+# Words that are never valid product codes (headers, materials, common words)
+_CODE_BLACKLIST = frozenset({
+    "CODIGO", "REFERENCIA", "PRECIO", "DESCRIPCION", "MODELO", "DETALLE",
+    "ALUMINIO", "COBRE", "BRONCE", "HIERRO", "ACERO", "PVC", "POLIETILENO",
+    "SIN", "POR", "CON", "DEL", "LOS", "LAS",
+    "ISO9001", "QM15", "IP23", "IP24", "IEC",
+})
+
 # Price pattern: $? optional, also handle OCR-spaced digits
 ITEM_LINE_RE = re.compile(r"^\s*(?P<item_code>\d{4,5})\b.*?(?P<price>\$?\s*\d[\d\s]*\d?[,.]\d{2}|\$\s*\d{4,7})")
 NUMERIC_ITEM_PROFILE_RE = re.compile(r"^\s*\d{4,5}\b.*?\$?\s*\d[\d\s]*\d?[,.]\d{2}", re.IGNORECASE)
@@ -779,6 +788,8 @@ def _is_valid_product_code(code: str) -> bool:
     """True if code looks like a real product code (not a 6+ digit barcode or price)."""
     code = str(code or "").strip().upper()
     if not code:
+        return False
+    if code in _CODE_BLACKLIST:
         return False
     if code.isdigit():
         return 4 <= len(code) <= 5
@@ -1584,6 +1595,23 @@ async def agent_transformer(
             deduped_by_key[key] = normalized_row
 
     deduped = list(deduped_by_key.values())
+
+    # Second pass: targeted removal of word-coord artifacts in PDFs (BUG-8).
+    # Only for PDFs: when the same code appears more than once and one version
+    # has a $ sign in the description (fragmented price mixed into desc by the
+    # word-coord extractor), remove that noisy row.
+    if raw_data.get("metadata", {}).get("type") == ".pdf":
+        _price_in_desc_re = re.compile(r'\$')
+        _code_dup_count: dict[str, int] = {}
+        for _r in deduped:
+            _c = str(_r.get("Cód. Artículo", "")).strip()
+            if _c:
+                _code_dup_count[_c] = _code_dup_count.get(_c, 0) + 1
+        deduped = [
+            r for r in deduped
+            if _code_dup_count.get(str(r.get("Cód. Artículo", "")).strip(), 0) == 1
+            or not _price_in_desc_re.search(str(r.get("Descripción artículo", "")))
+        ]
 
     recovery_applied = False
     recovery_added = 0
