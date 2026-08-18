@@ -8711,37 +8711,37 @@
       "step": "extraction",
       "status": "running",
       "detail": "Processing Lista de Precios N° 95 (2).pdf",
-      "timestamp": "2026-08-18T14:44:21.291684"
+      "timestamp": "2026-08-18T15:42:48.884013"
     },
     {
       "step": "extraction",
       "status": "done",
       "detail": "Extracted 91587 chars from 7 pages",
-      "timestamp": "2026-08-18T14:44:49.134429"
+      "timestamp": "2026-08-18T15:43:30.210073"
     },
     {
       "step": "transformation",
       "status": "running",
       "detail": "Mapping data to template columns",
-      "timestamp": "2026-08-18T14:44:49.134442"
+      "timestamp": "2026-08-18T15:43:30.210088"
     },
     {
       "step": "transformation",
       "status": "done",
       "detail": "Extracted 620 product rows",
-      "timestamp": "2026-08-18T14:44:49.226788"
+      "timestamp": "2026-08-18T15:43:30.326021"
     },
     {
       "step": "verification",
       "status": "running",
       "detail": "Validating and cleaning data",
-      "timestamp": "2026-08-18T14:44:49.226807"
+      "timestamp": "2026-08-18T15:43:30.326040"
     },
     {
       "step": "verification",
       "status": "done",
       "detail": "Quality: 100.0% (620/620 valid)",
-      "timestamp": "2026-08-18T14:44:49.229054"
+      "timestamp": "2026-08-18T15:43:30.330700"
     }
   ]
 }

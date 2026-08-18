@@ -875,6 +875,39 @@ def extract_rows_from_pdf_tables(
             if len(norm) < 2:
                 continue
 
+            # Detect transposed single-column tables: CODE / MODEL / DESC / $ PRICE
+            # Common in tool/product catalogs where each column = one product.
+            num_cols = max(len(r) for r in norm) if norm else 1
+            if num_cols == 1 and len(norm) >= 2:
+                flat = [r[0] for r in norm if r]
+                # Find a numeric code at the start and a price at the end
+                code_candidate = flat[0] if flat else ""
+                if _is_valid_product_code(code_candidate) and code_candidate.isdigit():
+                    price_candidate = ""
+                    desc_parts = []
+                    for cell in flat[1:]:
+                        m_price = price_scan_re.search(cell)
+                        if m_price and not price_candidate:
+                            price_candidate = _normalize_price_token(m_price.group())
+                            try:
+                                if float(price_candidate) <= 3:
+                                    price_candidate = ""
+                            except Exception:
+                                price_candidate = ""
+                        elif not m_price:
+                            desc_parts.append(cell)
+                    if price_candidate:
+                        r = _empty_template_row()
+                        r["Cód. Artículo"] = code_candidate
+                        r["Precio"] = price_candidate
+                        r["Descripción artículo"] = " ".join(desc_parts).strip() or code_candidate
+                        r["Cód. Lista"] = list_code
+                        r["Desc. Lista"] = list_desc
+                        r["Moneda"] = default_currency
+                        r["Unidad"] = "Un"
+                        all_rows.append(r)
+                        continue  # skip standard column-role detection for this table
+
             cols = _detect_table_column_roles(norm)
             code_col = cols["code"]
             price_col = cols["price"]
@@ -1633,9 +1666,13 @@ async def agent_transformer(
             code = str(r.get("Cód. Artículo", "")).strip()
             desc = str(r.get("Descripción artículo", "")).strip()
             n = _code_dup_count.get(code, 0)
-            # R1: duplicate code + $ in description
+            # R1: duplicate code + $ in desc that is a price fragment (< 5 alpha chars).
+            # Conservative: skip rows whose desc has real text (paired-table descriptions
+            # like "SCA 10 10 5/16 2200 UCA 10 10 45 $ 708,30" have many alpha chars).
             if n > 1 and _price_in_desc_re.search(desc):
-                return True
+                alpha_chars = sum(c.isalpha() for c in desc)
+                if alpha_chars < 5:
+                    return True
             # R2: duplicate code + desc==code (word-coord fallback, real desc exists)
             if n > 1 and desc.lower() == code.lower() and code in _code_has_real_desc:
                 return True

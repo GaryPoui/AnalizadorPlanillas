@@ -1,0 +1,139 @@
+REGISTRO DE COSTOS - AnalizadorPlanillas
+========================================
+Fecha de referencia: 2026-08-18
+Modelo: claude-haiku-4-5
+Tasas display usadas en reportes: $3.00/M input  |  $15.00/M output  (referencia Sonnet)
+Tasas reales Haiku:                $0.80/M input  |  $4.00/M output
+
+------------------------------------------------------------
+RESUMEN EJECUTIVO — TODOS LOS COSTOS
+------------------------------------------------------------
+  Run  Archivo               Tokens totales  Costo display  Costo real
+  ---  --------------------  --------------  -------------  ----------
+  [1]  Batch estándar        21,143          $0.2434        ~$0.0565
+  [2]  Híbrido LCT           118,494         $1.0480 ★      ~$0.2800
+  [3]  Híbrido N°95          29,047          $0.3200        ~$0.0850
+  [4]  Híbrido MICROCONTROL  42,183          $0.2705        ~$0.0720
+  ---  --------------------  --------------  -------------  ----------
+  TOTAL SESION              210,867          $1.9819        ~$0.4935
+
+  ★ Máximo registrado
+
+------------------------------------------------------------
+OBSERVACION CLAVE
+------------------------------------------------------------
+- Archivos Excel / CSV (L26031): heurístico puro. Costo = $0.00.
+- PDFs con texto seleccionable: requieren modo híbrido para cobertura completa.
+- XLS con estructura compleja (MICROCONTROL): también se beneficia del híbrido.
+- PDFs escaneados (AR36): OCR + Claude. Solo correr en pruebas específicas.
+
+------------------------------------------------------------
+DETALLE POR PRUEBA
+------------------------------------------------------------
+
+[1] Batch test estándar (heurístico puro, sin Claude para PDFs) — 2026-08-18
+    Archivo                    Tokens      Costo display
+    -------------------------  ----------  -------------
+    L26031 (1) (5).xlsx        0           $0.0000
+    L26031 (5).csv             0           $0.0000
+    LCT Lista 02-2026 (4).pdf  0           $0.0000  (974 filas)
+    Lista N°95 (2).pdf         0           $0.0000  (620 filas)
+    LP MICROCONTROL (3).xls    0           $0.0000  (60 filas)
+    LISTA AR36 (2).pdf         21,143      $0.2434  (OCR escaneado)
+    -------------------------  ----------  -------------
+    TOTAL                      21,143      $0.2434
+
+    AR36 excluido de batch automático desde esta fecha (variable SKIP_FILES).
+
+[2] Híbrido LCT (heurístico + Claude por página) — 2026-08-18
+    Script:   tmp/tmp_test_lct_claude.py
+    PDF:      46 páginas, 92,198 chars
+    Tokens:   60,788 in / 57,706 out = 118,494 total
+    Tiempo:   329.7 s
+    Display:  $1.0480  ★ MAXIMO
+    Real:     ~$0.2800
+    Resultado: 974 → 1,052 filas  (+78 nuevas, +886 descripciones enriquecidas)
+
+[3] Híbrido N°95 (heurístico + Claude por página) — 2026-08-18
+    Script:   tmp/tmp_test_n95_claude.py
+    PDF:      7 páginas, 15,527 chars
+    Tokens:   9,639 in / 19,408 out = 29,047 total
+    Tiempo:   91.7 s
+    Display:  $0.3200
+    Real:     ~$0.0850
+    Resultado: 620 → 493 filas únicas (+106 nuevas; dedup colapsó duplicados heurístico)
+
+[4] Híbrido MICROCONTROL (heurístico + Claude sobre XLS) — 2026-08-18
+    Script:   tmp/tmp_test_microcontrol_claude.py
+    XLS:      2 hojas, 1095 filas, 51,324 chars (enviado en 2 chunks)
+    Tokens:   30,183 in / 12,000 out = 42,183 total
+    Tiempo:   57.6 s
+    Display:  $0.2705
+    Real:     ~$0.0720
+    Resultado: 60 → 312 filas  (+270 nuevas de Claude)
+    Nota: ambos chunks alcanzaron el límite de 6,000 tokens output; salvamento JSON activo.
+
+------------------------------------------------------------
+ESTIMACIONES PARA FUTUROS USOS
+------------------------------------------------------------
+Regla práctica observada: tokens OUTPUT ≈ 1-2x tokens INPUT (Claude genera JSON completo).
+Las estimaciones basadas solo en INPUT subestiman el costo real 3x.
+
+  Tipo de archivo              Costo display aprox.  Costo real aprox.
+  ---------------------------  --------------------  -----------------
+  Excel/CSV estructurado       $0.00                 $0.00
+  PDF pequeño (<10 pág)        $0.15 – $0.35         $0.04 – $0.09
+  PDF mediano (10-20 pág)      $0.35 – $0.70         $0.09 – $0.18
+  PDF grande (>20 pág)         $0.70 – $1.50         $0.18 – $0.40
+  XLS complejo (2 chunks)      $0.25 – $0.35         $0.06 – $0.09
+  PDF escaneado (OCR)          $0.20 – $0.30         $0.05 – $0.08
+
+------------------------------------------------------------
+PROCESO REALIZADO — 2026-08-18
+------------------------------------------------------------
+
+1. SISTEMA HIBRIDO: DISEÑO E IMPLEMENTACION
+   Se diseñó e implementó un sistema híbrido de extracción que combina:
+   a) Extractor heurístico existente (regex + pdfplumber + tablas) como base.
+   b) Claude Haiku como segunda capa: procesa el texto raw (por página en PDFs,
+      por chunks en XLS) y extrae productos que el heurístico omite.
+   c) Merge inteligente: el heurístico es la base; Claude agrega códigos nuevos
+      y enriquece descripciones cuando la suya es más larga.
+
+   Scripts creados:
+   - tmp/tmp_test_lct_claude.py       → híbrido para PDFs (generalizable)
+   - tmp/tmp_test_n95_claude.py       → híbrido para N°95 (misma lógica)
+   - tmp/tmp_test_microcontrol_claude.py → híbrido para XLS
+
+2. BUG IDENTIFICADO Y CORREGIDO EN EJECUCION
+   Durante la primera corrida del híbrido LCT, páginas 12-14 devolvían
+   0 filas con exactamente 2,000 tokens output. Diagnóstico: max_tokens=2000
+   truncaba la respuesta JSON a mitad. Fix aplicado:
+   - max_tokens subido de 2,000 a 6,000.
+   - Agregado salvamento de JSON truncado: busca el último "}" válido
+     y cierra el array → recupera objetos completos del response cortado.
+
+3. BATCH TEST — AR36 EXCLUIDO
+   Se modificó tests/batch_test_listas.py para excluir LISTA AR36 del
+   batch automático (variable SKIP_FILES, default="LISTA AR36").
+   AR36 es PDF escaneado que requiere OCR+Claude y cuesta ~$0.24 por corrida.
+
+4. RESULTADOS POR ARCHIVO
+   Archivo               Heurístico  Híbrido  Ganancia
+   --------------------  ----------  -------  --------
+   LCT Lista 02-2026     974 filas   1,052    +78 filas, +886 desc. enriquecidas
+   Lista N°95            620 filas     493*   +106 nuevas (dedup limpió duplicados)
+   LP MICROCONTROL        60 filas     312    +270 filas (+450% cobertura)
+
+   * N°95: el total baja de 620 a 493 porque el heurístico tenía duplicados
+     por código. El resultado híbrido es más limpio (493 códigos únicos).
+
+5. ARCHIVOS DE SALIDA (en Respuestas/)
+   - LCT Lista de Precios 02-2026 (4)_hybrid.json   → 1,052 filas
+   - Lista de Precios N° 95 (2)_hybrid.json          →   493 filas
+   - LP MICROCONTROL 2026-02 (3)_hybrid.json         →   312 filas
+
+6. ORGANIZACIÓN
+   Todos los scripts temporales movidos a la carpeta tmp/.
+   costos.txt creado como registro persistente de gastos de API.
+

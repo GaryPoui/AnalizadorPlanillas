@@ -143,12 +143,18 @@ async def run() -> None:
     files = sorted(LISTAS_DIR.glob("*"))
     files = [f for f in files if f.is_file()]
 
+    # Files to skip (variable OCR quality, used only for specific OCR tests)
+    SKIP_FILES = set(os.getenv("SKIP_FILES", "LISTA AR36").split(","))
+    files = [f for f in files if not any(skip.strip() in f.name for skip in SKIP_FILES if skip.strip())]
+
     if not files:
         print(f"No se encontraron archivos en {LISTAS_DIR}")
         sys.exit(1)
 
     print(f"PriceBot Batch Test — modelo: {main.CLAUDE_MODEL}")
     print(f"Tarifas: input=${INPUT_RATE}/M  output=${OUTPUT_RATE}/M")
+    if SKIP_FILES:
+        print(f"Omitidos (SKIP_FILES): {', '.join(s for s in SKIP_FILES if s.strip())}")
     print(f"Procesando {len(files)} archivo(s) desde {LISTAS_DIR.name}/\n")
 
     results = []

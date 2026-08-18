@@ -1,0 +1,681 @@
+[
+  {
+    "code": "3000",
+    "model": "A2",
+    "desc": "Terminal Termi-Plast A2",
+    "price": "112.69",
+    "page": 16
+  },
+  {
+    "code": "3001",
+    "model": "A3",
+    "desc": "Terminal Termi-Plast A3",
+    "price": "164.82",
+    "page": 16
+  },
+  {
+    "code": "3002",
+    "model": "A4",
+    "desc": "Terminal Termi-Plast A4",
+    "price": "167.44",
+    "page": 16
+  },
+  {
+    "code": "3003",
+    "model": "A5",
+    "desc": "Terminal Termi-Plast A5",
+    "price": "261.62",
+    "page": 16
+  },
+  {
+    "code": "3004",
+    "model": "A6",
+    "desc": "Terminal Termi-Plast A6",
+    "price": "218.22",
+    "page": 16
+  },
+  {
+    "code": "3005",
+    "model": "A7",
+    "desc": "Terminal Termi-Plast A7",
+    "price": "257.34",
+    "page": 16
+  },
+  {
+    "code": "3006",
+    "model": "A9",
+    "desc": "Terminal Termi-Plast A9",
+    "price": "148.29",
+    "page": 16
+  },
+  {
+    "code": "3007",
+    "model": "A10",
+    "desc": "Terminal Termi-Plast A10",
+    "price": "152.22",
+    "page": 16
+  },
+  {
+    "code": "3008",
+    "model": "A11",
+    "desc": "Terminal Termi-Plast A11",
+    "price": "165.53",
+    "page": 16
+  },
+  {
+    "code": "3009",
+    "model": "A12",
+    "desc": "Terminal Termi-Plast A12",
+    "price": "162.44",
+    "page": 16
+  },
+  {
+    "code": "3010",
+    "model": "A13",
+    "desc": "Terminal Termi-Plast A13",
+    "price": "171.48",
+    "page": 16
+  },
+  {
+    "code": "3011",
+    "model": "A14",
+    "desc": "Terminal Termi-Plast A14",
+    "price": "225.71",
+    "page": 16
+  },
+  {
+    "code": "3012",
+    "model": "A15",
+    "desc": "Terminal Termi-Plast A15",
+    "price": "142.94",
+    "page": 16
+  },
+  {
+    "code": "3013",
+    "model": "A16",
+    "desc": "Terminal Termi-Plast A16",
+    "price": "188.13",
+    "page": 16
+  },
+  {
+    "code": "3014",
+    "model": "A17",
+    "desc": "Terminal Termi-Plast A17",
+    "price": "188.13",
+    "page": 16
+  },
+  {
+    "code": "3015",
+    "model": "A18",
+    "desc": "Terminal Termi-Plast A18",
+    "price": "300.86",
+    "page": 16
+  },
+  {
+    "code": "3016",
+    "model": "A19",
+    "desc": "Terminal Termi-Plast A19",
+    "price": "130.93",
+    "page": 16
+  },
+  {
+    "code": "3017",
+    "model": "A20",
+    "desc": "Terminal Termi-Plast A20",
+    "price": "428.82",
+    "page": 16
+  },
+  {
+    "code": "3018",
+    "model": "A21",
+    "desc": "Terminal Termi-Plast A21",
+    "price": "534.06",
+    "page": 16
+  },
+  {
+    "code": "3019",
+    "model": "A22",
+    "desc": "Terminal Termi-Plast A22",
+    "price": "168.51",
+    "page": 16
+  },
+  {
+    "code": "3020",
+    "model": "B2",
+    "desc": "Terminal Termi-Plast B2",
+    "price": "221.07",
+    "page": 16
+  },
+  {
+    "code": "3021",
+    "model": "B3",
+    "desc": "Terminal Termi-Plast B3",
+    "price": "228.68",
+    "page": 16
+  },
+  {
+    "code": "3022",
+    "model": "B4",
+    "desc": "Terminal Termi-Plast B4",
+    "price": "234.63",
+    "page": 16
+  },
+  {
+    "code": "3023",
+    "model": "B5",
+    "desc": "Terminal Termi-Plast B5",
+    "price": "305.5",
+    "page": 16
+  },
+  {
+    "code": "3024",
+    "model": "B6",
+    "desc": "Terminal Termi-Plast B6",
+    "price": "284.33",
+    "page": 16
+  },
+  {
+    "code": "3025",
+    "model": "B7",
+    "desc": "Terminal Termi-Plast B7",
+    "price": "296.46",
+    "page": 16
+  },
+  {
+    "code": "3026",
+    "model": "B9",
+    "desc": "Terminal Termi-Plast B9",
+    "price": "185.16",
+    "page": 16
+  },
+  {
+    "code": "3027",
+    "model": "B10",
+    "desc": "Terminal Termi-Plast B10",
+    "price": "185.16",
+    "page": 16
+  },
+  {
+    "code": "3028",
+    "model": "B11",
+    "desc": "Terminal Termi-Plast B11",
+    "price": "194.08",
+    "page": 16
+  },
+  {
+    "code": "3029",
+    "model": "B14",
+    "desc": "Terminal Termi-Plast B14",
+    "price": "176.12",
+    "page": 16
+  },
+  {
+    "code": "3030",
+    "model": "B15",
+    "desc": "Terminal Termi-Plast B15",
+    "price": "213.44",
+    "page": 16
+  },
+  {
+    "code": "3031",
+    "model": "B16",
+    "desc": "Terminal Termi-Plast B16",
+    "price": "246.76",
+    "page": 16
+  },
+  {
+    "code": "3032",
+    "model": "B17",
+    "desc": "Terminal Termi-Plast B17",
+    "price": "161.02",
+    "page": 16
+  },
+  {
+    "code": "3033",
+    "model": "B18",
+    "desc": "Terminal Termi-Plast B18",
+    "price": "203.11",
+    "page": 16
+  },
+  {
+    "code": "3034",
+    "model": "B19",
+    "desc": "Terminal Termi-Plast B19",
+    "price": "203.11",
+    "page": 16
+  },
+  {
+    "code": "3035",
+    "model": "B20",
+    "desc": "Terminal Termi-Plast B20",
+    "price": "300.86",
+    "page": 16
+  },
+  {
+    "code": "3036",
+    "model": "B21",
+    "desc": "Terminal Termi-Plast B21",
+    "price": "586.75",
+    "page": 16
+  },
+  {
+    "code": "3037",
+    "model": "B22",
+    "desc": "Terminal Termi-Plast B22",
+    "price": "595.66",
+    "page": 16
+  },
+  {
+    "code": "3038",
+    "model": "B23",
+    "desc": "Terminal Termi-Plast B23",
+    "price": "346.05",
+    "page": 16
+  },
+  {
+    "code": "3039",
+    "model": "B24",
+    "desc": "Terminal Termi-Plast B24",
+    "price": "229.04",
+    "page": 16
+  },
+  {
+    "code": "3041",
+    "model": "B26",
+    "desc": "Terminal Termi-Plast B26",
+    "price": "364.01",
+    "page": 16
+  },
+  {
+    "code": "3042",
+    "model": "B27",
+    "desc": "Terminal Termi-Plast B27",
+    "price": "255.2",
+    "page": 16
+  },
+  {
+    "code": "3043",
+    "model": "B28",
+    "desc": "Terminal Termi-Plast B28",
+    "price": "466.16",
+    "page": 16
+  },
+  {
+    "code": "3044",
+    "model": "B30",
+    "desc": "Terminal Termi-Plast B30",
+    "price": "231.65",
+    "page": 16
+  },
+  {
+    "code": "3045",
+    "model": "C1",
+    "desc": "Terminal Termi-Plast C1",
+    "price": "413.72",
+    "page": 16
+  },
+  {
+    "code": "3046",
+    "model": "C2",
+    "desc": "Terminal Termi-Plast C2",
+    "price": "416.81",
+    "page": 16
+  },
+  {
+    "code": "3047",
+    "model": "C3",
+    "desc": "Terminal Termi-Plast C3",
+    "price": "416.81",
+    "page": 16
+  },
+  {
+    "code": "3048",
+    "model": "C4",
+    "desc": "Terminal Termi-Plast C4",
+    "price": "436.31",
+    "page": 16
+  },
+  {
+    "code": "3049",
+    "model": "C5",
+    "desc": "Terminal Termi-Plast C5",
+    "price": "601.73",
+    "page": 16
+  },
+  {
+    "code": "3050",
+    "model": "C6",
+    "desc": "Terminal Termi-Plast C6",
+    "price": "586.75",
+    "page": 16
+  },
+  {
+    "code": "3051",
+    "model": "C7",
+    "desc": "Terminal Termi-Plast C7",
+    "price": "767.26",
+    "page": 16
+  },
+  {
+    "code": "3052",
+    "model": "C9",
+    "desc": "Terminal Termi-Plast C9",
+    "price": "406.23",
+    "page": 16
+  },
+  {
+    "code": "3053",
+    "model": "C10",
+    "desc": "Terminal Termi-Plast C10",
+    "price": "406.23",
+    "page": 16
+  },
+  {
+    "code": "3054",
+    "model": "C11",
+    "desc": "Terminal Termi-Plast C11",
+    "price": "421.21",
+    "page": 16
+  },
+  {
+    "code": "3055",
+    "model": "C12",
+    "desc": "Terminal Termi-Plast C12",
+    "price": "488.99",
+    "page": 16
+  },
+  {
+    "code": "3056",
+    "model": "C13",
+    "desc": "Terminal Termi-Plast C13",
+    "price": "398.73",
+    "page": 16
+  },
+  {
+    "code": "3057",
+    "model": "C14",
+    "desc": "Terminal Termi-Plast C14",
+    "price": "553.57",
+    "page": 16
+  },
+  {
+    "code": "3058",
+    "model": "C15",
+    "desc": "Terminal Termi-Plast C15",
+    "price": "203.11",
+    "page": 16
+  },
+  {
+    "code": "3059",
+    "model": "C16",
+    "desc": "Terminal Termi-Plast C16",
+    "price": "203.11",
+    "page": 16
+  },
+  {
+    "code": "3060",
+    "model": "C17",
+    "desc": "Terminal Termi-Plast C17",
+    "price": "361.04",
+    "page": 16
+  },
+  {
+    "code": "3061",
+    "model": "C18",
+    "desc": "Terminal Termi-Plast C18",
+    "price": "406.23",
+    "page": 16
+  },
+  {
+    "code": "4033",
+    "model": "LY-10",
+    "desc": "A criquet para terminales sin aislación 1,5 - 10 mm2",
+    "price": "136261.14",
+    "page": 22
+  },
+  {
+    "code": "4072",
+    "model": "LY-16",
+    "desc": "Identación para terminales sin aislación 2,5 - 16 mm2",
+    "price": "71926.7",
+    "page": 22
+  },
+  {
+    "code": "4315",
+    "model": "LY-35",
+    "desc": "Cabezal tipo revolver Identación 10 - 35 mm2",
+    "price": "347837.53",
+    "page": 22
+  },
+  {
+    "code": "4038",
+    "model": "HX-50",
+    "desc": "Compresión hexagonal de 6 - 50 mm2",
+    "price": "172119.33",
+    "page": 22
+  },
+  {
+    "code": "4312",
+    "model": "LY-120",
+    "desc": "Identación de 10 - 120 mm2",
+    "price": "540540.06",
+    "page": 22
+  },
+  {
+    "code": "4039",
+    "model": "HX-150",
+    "desc": "Compresión hexagonal de 25 - 150 mm2",
+    "price": "359885.88",
+    "page": 22
+  },
+  {
+    "code": "4040",
+    "model": "HX-240",
+    "desc": "Compresión hexagonal 120 - 240 mm2",
+    "price": "1095751.92",
+    "page": 22
+  },
+  {
+    "code": "4032",
+    "model": "LY-03C",
+    "desc": "A criquet para terminales preaislados de 0,25 - 6 mm2",
+    "price": "136261.14",
+    "page": 23
+  },
+  {
+    "code": "4074",
+    "model": "LY-35C",
+    "desc": "Comp. S/aislación 10-50mm2 ovalada: Preaislados 10-35mm2",
+    "price": "640654.17",
+    "page": 23
+  },
+  {
+    "code": "4035",
+    "model": "LY-04WF",
+    "desc": "A criquet para punteras tubulares 0,5 - 4 mm2",
+    "price": "136261.14",
+    "page": 23
+  },
+  {
+    "code": "4036",
+    "model": "LY-16WF",
+    "desc": "A criquet para punteras tubulares 6 - 16 mm2",
+    "price": "136261.14",
+    "page": 23
+  },
+  {
+    "code": "4075",
+    "model": "LY-35WF",
+    "desc": "A criquet para punteras tubulares 10 - 35 mm2",
+    "price": "173423.27",
+    "page": 23
+  },
+  {
+    "code": "4332",
+    "model": "LY-95WF",
+    "desc": "A criquet para punteras tubulares 50 - 95 mm2",
+    "price": "403183.65",
+    "page": 23
+  },
+  {
+    "code": "4333",
+    "model": "LY-150WF",
+    "desc": "A criquet para punteras tubulares 120 - 150 mm2",
+    "price": "498481.6",
+    "page": 23
+  },
+  {
+    "code": "4310",
+    "model": "ES-10WF",
+    "desc": "Para punteras tubulares CTN, CT (0,75-10 mm2), CTD (0,75-6 mm2).",
+    "price": "63706.51",
+    "page": 23
+  },
+  {
+    "code": "4034",
+    "model": "LY-03B",
+    "desc": "A criquet para terminales de latón doble compresión",
+    "price": "136261.14",
+    "page": 23
+  },
+  {
+    "code": "4037",
+    "model": "LY-05H",
+    "desc": "A criquet para terminales coaxil RG 6/58/59/62",
+    "price": "136261.14",
+    "page": 23
+  },
+  {
+    "code": "4057",
+    "model": "LY-518G",
+    "desc": "Para terminales F - RG 59/6",
+    "price": "113963.86",
+    "page": 23
+  },
+  {
+    "code": "4306",
+    "model": "LY-468",
+    "desc": "A criquet p/term. de telefonía y computación RJ-9/RJ-11/RJ-45",
+    "price": "243486.27",
+    "page": 24
+  },
+  {
+    "code": "4334",
+    "model": "LY-5684A",
+    "desc": "Para terminales de telefonía y computación RJ-9/RJ-11/RJ-45",
+    "price": "84942.01",
+    "page": 24
+  },
+  {
+    "code": "4335",
+    "model": "LY-5684B",
+    "desc": "Para terminales de telefonía y computación RJ-9/RJ-11/RJ-45",
+    "price": "41621.58",
+    "page": 24
+  },
+  {
+    "code": "4303",
+    "model": "LY-5D",
+    "desc": "Kit de herramientas a criquet con matrices intercambiables. Para compresión de terminales preaislados, de latón, sin aislación y punteras tubulares.",
+    "price": "384008.67",
+    "page": 24
+  },
+  {
+    "code": "4031",
+    "model": "LY-7",
+    "desc": "Transversal 0,1 - 6 mm2 (Comprime terminales preaislados)",
+    "price": "76925.61",
+    "page": 24
+  },
+  {
+    "code": "4055",
+    "model": "LY-700",
+    "desc": "Tipo persiano 1 - 4mm2",
+    "price": "41971.35",
+    "page": 24
+  },
+  {
+    "code": "4319",
+    "model": "WS-16",
+    "desc": "Frontal 0,75 - 16mm2",
+    "price": "133783.66",
+    "page": 24
+  },
+  {
+    "code": "4318",
+    "model": "LY-6",
+    "desc": "Frontal 0,2 - 6mm2",
+    "price": "28030.86",
+    "page": 24
+  },
+  {
+    "code": "4051",
+    "model": "LY-25-3",
+    "desc": "Circular y longitudinal Ø 28 - 35mm",
+    "price": "73400.23",
+    "page": 24
+  },
+  {
+    "code": "4052",
+    "model": "LY-25-4",
+    "desc": "Circular y longitudinal Ø 35 - 50mm",
+    "price": "20582.1",
+    "page": 24
+  },
+  {
+    "code": "4053",
+    "model": "LY-25-9",
+    "desc": "Circular y longitudinal Ø 4,5 - 25mm (240mm2)",
+    "price": "82328.41",
+    "page": 24
+  },
+  {
+    "code": "4056",
+    "model": "PG-5",
+    "desc": "Circular y longitud. Ø>25mm (240mm2) Profundidad corte: 0-5 mm",
+    "price": "166041.57",
+    "page": 24
+  },
+  {
+    "code": "4054",
+    "model": "LY-332",
+    "desc": "Coaxil cuerpo plástico P/RG-58/59/62 /6",
+    "price": "50837.79",
+    "page": 24
+  },
+  {
+    "code": "4076",
+    "model": "HM-5",
+    "desc": "Compresión de terminales 1,5 - 10 mm2",
+    "price": "64587.88",
+    "page": 34
+  },
+  {
+    "code": "4101",
+    "model": "HM-3",
+    "desc": "Cabezal tipo revolver Identación 10 - 35 mm2",
+    "price": "1513177.68",
+    "page": 34
+  },
+  {
+    "code": "4100",
+    "model": "HM-2",
+    "desc": "Identación de 10 - 120 mm2",
+    "price": "2132873.69",
+    "page": 34
+  },
+  {
+    "code": "4103",
+    "model": "HM-C",
+    "desc": "Corte de conductores de cobre y aluminio 2.5 - 185 mm2",
+    "price": "1921733.15",
+    "page": 34
+  },
+  {
+    "code": "4030",
+    "model": "HM-1",
+    "desc": "Identación de terminales con o sin aislación, alicate, pelacables.",
+    "price": "70668.95",
+    "page": 34
+  }
+]

@@ -1,0 +1,3086 @@
+{
+  "filename": "LP MICROCONTROL 2026-02 (3).xls",
+  "rows": [
+    {
+      "Cód. Artículo": "2026",
+      "Descripción artículo": ",,LISTA MICRO CONTROL -02,,,, VIGENCIA: 06-04",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "2026.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "1000",
+      "Descripción artículo": ",,TE06-,Tarugo espyga 6 (x 1000u),c/u $,.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "33666.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "2200",
+      "Descripción artículo": ",MP ,Botella Crystal Gel - volumen 2.2 Lts.,c/u u$s,225,x unid.,",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "2200.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "90034",
+      "Descripción artículo": ",KSC L,\"Diám. nominal 3/4\"\" - mm x 1.25 mm\",c/u u$s,1.55,x 25 unid.,",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "19.05",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "90078",
+      "Descripción artículo": ",KSC L,\"Diám. nominal 7/8\"\" - mm x 1.25 mm\",c/u u$s,1.83,x 25 unid.,",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "22.22",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "90100",
+      "Descripción artículo": ",KSC L,\"Diám. nominal 1\"\" - mm x 1.25 mm\",c/u u$s,2.37,x 25 unid.,",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "25.4",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "90110",
+      "Descripción artículo": ",KSC L,\"Diám. nominal 1 1/4\"\" mm x 1.25 mm\",c/u u$s,3.46,x 10 unid.,",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "31.75",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "90112",
+      "Descripción artículo": ",KSC L,\"Diám. nominal 1 1/2\"\" mm x 1.60 mm\",c/u u$s,5.85,x 5 unid.,",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "38.1",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "90200",
+      "Descripción artículo": ",KSC L,\"Diám. nominal 2\"\" - mm x 1.60 mm\",c/u u$s,8.95,x 3 unid.,",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "50.8",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "45010",
+      "Descripción artículo": ",KSC L,\"Diám. nominal 5/8\"\", ( mm)\",c/u u$s,1.34,x 25 unid.,",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "15.87",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "45034",
+      "Descripción artículo": ",KSC L,\"Diám. nominal 3/4\"\", ( mm)\",c/u u$s,1.55,x 25 unid.,",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "19.05",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "45078",
+      "Descripción artículo": ",KSC L,\"Diám. nominal 7/8\"\", ( mm)\",c/u u$s,1.83,x 25 unid.,",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "22.22",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "45100",
+      "Descripción artículo": ",KSC L,\"Diám. nominal 1\"\", ( mm)\",c/u u$s,2.37,x 25 unid.,",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "25.4",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "45110",
+      "Descripción artículo": ",KSC L,\"Diám. nominal 1 1/4\"\", ( mm)\",c/u u$s,3.46,x 10 unid.,",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "31.75",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "45112",
+      "Descripción artículo": ",KSC L,\"Diám. nominal 1 1/2\"\", ( mm) \",c/u u$s,5.85,x 5 unid.,",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "38.1",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "45200",
+      "Descripción artículo": ",KSC L,\"Diám. nominal 2\"\", ( mm)\",c/u u$s,8.95,x 3 unid.,",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "50.8",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "TPY05",
+      "Descripción artículo": ",,-,Tarugo py 5 (x u),c/u $,10455.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "1000.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "TPY06",
+      "Descripción artículo": ",,TPY06TOR-,Tarugo py 6 + torn (x 100u),c/u $,6896.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "100.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "TPY08",
+      "Descripción artículo": ",,TPY08CT-,Tarugo py 8 c/tope (x 500u),c/u $,17630.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "500.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "TPY10",
+      "Descripción artículo": ",,TPY10TOR-,Tarugo py 10 + torn (x 25u),c/u $,6377.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "25.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "TE05",
+      "Descripción artículo": ",,-,Tarugo espyga 5 (x u),c/u $,53863.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "1000.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "TE06",
+      "Descripción artículo": ",,-,Tarugo espyga 6 (x u),c/u $,33666.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "1000.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "TE08",
+      "Descripción artículo": ",,-,Tarugo espyga 8 (x 500u),c/u $,25895.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "500.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "TE10",
+      "Descripción artículo": ",,-,Tarugo espyga 10 (x 250u),c/u $,23015.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "250.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "TESPYRAL-0050",
+      "Descripción artículo": ",,,Tarugo espyral (x 50u),c/u $,.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "7356.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "TESPYRAL-0250",
+      "Descripción artículo": ",,,Tarugo espyral (x 250u),c/u $,.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "33132.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "PYRALTOR-0050",
+      "Descripción artículo": ",,TESPYRALTOR-0050,Tarugo espyral + torn (x 50u),c/u $,.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "9412.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "TSCPY06",
+      "Descripción artículo": ",,-,Tarugo syntor clavo py 6 (x 100u),c/u $,3795.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "100.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "TSCPY08",
+      "Descripción artículo": ",,-,Tarugo syntor clavo py 8 (x 100u),c/u $,7787.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "100.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "TSG12",
+      "Descripción artículo": ",,TSG12PY06-,Tarugo syntor grampa dø 12 py 6 (x 100u),c/u $,4080.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "100.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "TSG34",
+      "Descripción artículo": ",,TSG34PY08-,Tarugo syntor grampa dø 34 py 8 (x 100u),c/u $,12087.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "100.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "TSG508",
+      "Descripción artículo": ",,TSG508PY08-,Tarugo syntor grampa dø 58 py 8 (x 100u),c/u $,11146.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "100.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "SPRPY06",
+      "Descripción artículo": ",,TSPRPY06-,Tarugo syntor precinto py 6 (x 100u),c/u $,3913.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "100.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "SPRPY08",
+      "Descripción artículo": ",,TSPRPY08-,Tarugo syntor precinto py 8 (x 100u),c/u $,8122.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "100.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "TUBOP07",
+      "Descripción artículo": ",,TUBOP07B-,tubo py p/pared 7 blanco (x 500u),c/u $,50342.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "500.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "TUBOP08",
+      "Descripción artículo": ",,TUBOP08B-,tubo py p/pared 8 blanco (x 500u),c/u $,50342.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "500.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "GPY05",
+      "Descripción artículo": ",,GPY05B-,Grampyta py 5 blanco (x 50u),c/u $,2284.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "50.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "GPY08",
+      "Descripción artículo": ",,GPY08B-,Grampyta py 8 blanco (x 50u),c/u $,2387.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "50.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "GPY06",
+      "Descripción artículo": ",,GPY06CN-,Grampyta py 6 coaxil negro (x 50u),c/u $,2855.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "50.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "GC1925",
+      "Descripción artículo": ",,GC1925G-,Grampa clampy 19-25 (x 25u),c/u $,11592.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "25.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "GC2532",
+      "Descripción artículo": ",,GC2532G-,Grampa clampy 25-32 (x 25u),c/u $,14486.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "25.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "GC3240",
+      "Descripción artículo": ",,GC3240G-,Grampa clampy 32-40 (x 25u),c/u $,23160.0,x bolsa",
+      "Descripción adicional artículo": "",
+      "Sinónimo": "",
+      "Cód. Lista": "MICRO",
+      "Desc. Lista": "Lista MICRO",
+      "Moneda": "USD",
+      "Unidad": "Un",
+      "Precio": "25.0",
+      "Bonif.": "",
+      "Fecha vigencia desde": "",
+      "Fecha vigencia hasta": ""
+    },
+    {
+      "Cód. Artículo": "MP 103",
+      "Descripción artículo": "Botella MP One (Twist&Go) - 300 volumen 0.300 Lts.",
+      "Precio": "44.1",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MP 106",
+      "Descripción artículo": "Botella MP One (Twist&Go) - 600 volumen 0.600 Lts.",
+      "Precio": "63.8",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MP 0050",
+      "Descripción artículo": "Botella MP Gel - 050 volumen 0.5 Lts.",
+      "Precio": "63.8",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MP 0100",
+      "Descripción artículo": "Botella MP Gel - 100 volumen 1 Lts.",
+      "Precio": "103.95",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MP 1000",
+      "Descripción artículo": "Bidón MP Gel - 1000 volumen 10 Lts.",
+      "Precio": "854.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MP 2200",
+      "Descripción artículo": "Botella Crystal Gel - 2200 volumen 2.2 Lts.",
+      "Precio": "225.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "RE 0100",
+      "Descripción artículo": "Botella Resil Gel - 100 volumen 1 Lts.",
+      "Precio": "92.9",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FL 9500",
+      "Descripción artículo": "Gel lubricante pasa cables - volumen 0.95 Lts.",
+      "Precio": "18.2",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "SH 0125",
+      "Descripción artículo": "Tamaño 0, c/ borne p/ cable hasta 10 mm2",
+      "Precio": "19.65",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "SH 0315",
+      "Descripción artículo": "Tamaño 0, c/ borne p/ cable hasta 1,5 mm2",
+      "Precio": "18.5",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "SH 0150",
+      "Descripción artículo": "Tamaño 1, c/ borne p/ cable hasta 35 mm2",
+      "Precio": "23.5",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "SH 0325",
+      "Descripción artículo": "Tamaño 1, c/ borne p/ cable hasta 2,5 mm2",
+      "Precio": "23.25",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "SH 0306",
+      "Descripción artículo": "Tamaño 2, c/ borne p/ cable hasta 6 mm2",
+      "Precio": "36.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "SH 0506",
+      "Descripción artículo": "Tamaño 3, c/ borne p/ cable hasta 6 mm2",
+      "Precio": "45.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "SH 0516",
+      "Descripción artículo": "Tamaño 4, c/ borne p/ cable hasta 16 mm2",
+      "Precio": "57.5",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "SH 0506WS",
+      "Descripción artículo": "Tamaño 4, c/ borne p/ cable hasta 6 mm2",
+      "Precio": "67.85",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "SH 0525WS",
+      "Descripción artículo": "Tamaño 5, c/ borne p/ cable hasta 25 mm2",
+      "Precio": "108.85",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "SH 0406",
+      "Descripción artículo": "Tamaño 2, con separador de cable",
+      "Precio": "28.55",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "SH 1406",
+      "Descripción artículo": "Tamaño 2, sin separador de cable",
+      "Precio": "28.1",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "SH 0410",
+      "Descripción artículo": "Tamaño 3, con separador de cable",
+      "Precio": "32.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "SH 1410",
+      "Descripción artículo": "Tamaño 3, sin separador de cable",
+      "Precio": "30.9",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "SH 0416",
+      "Descripción artículo": "Tamaño 4, con separador de cable",
+      "Precio": "47.9",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "SH 1416",
+      "Descripción artículo": "Tamaño 4, sin separador de cable",
+      "Precio": "46.8",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "GNB 01",
+      "Descripción artículo": "Empalme versátil aislado en gel 36,2 x 32,8 x 22 mm",
+      "Precio": "5.06",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "GNB 02",
+      "Descripción artículo": "Empalme versátil aislado en gel 42,6 x 32,8 x 22 mm",
+      "Precio": "6.82",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "GNB 03",
+      "Descripción artículo": "Empalme versátil aislado en gel 56,9 x 32,8 x 22 mm",
+      "Precio": "7.3",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MJB 01",
+      "Descripción artículo": "Medida 1 26 x 33 x 23 mm",
+      "Precio": "3.95",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MJB 02",
+      "Descripción artículo": "Medida 2 34 x 33 x 23 mm",
+      "Precio": "5.38",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MJB 03",
+      "Descripción artículo": "Medida 3 46 x 33 x 23 mm",
+      "Precio": "6.64",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "SBOX 2",
+      "Descripción artículo": "Conector 2 vias p/ cable hasta/ 4 mm²",
+      "Precio": "0.6",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "SBOX 3",
+      "Descripción artículo": "Conector 3 vias p/ cable hasta/ 4 mm²",
+      "Precio": "0.72",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "SBOX 5",
+      "Descripción artículo": "Conector 5 vias p/ cable hasta/ 4 mm²",
+      "Precio": "1.05",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FSN 040",
+      "Descripción artículo": "Diám. Nominal 40 mm",
+      "Precio": "2.53",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FSN 050",
+      "Descripción artículo": "Diám. Nominal 50 mm",
+      "Precio": "3.27",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FSN 063",
+      "Descripción artículo": "Diám. Nominal 63 mm",
+      "Precio": "4.12",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FSN 110",
+      "Descripción artículo": "Diám. Nominal 110 mm",
+      "Precio": "8.89",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FSN 160",
+      "Descripción artículo": "Diám. Nominal 160 mm",
+      "Precio": "14.23",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CFSN 040",
+      "Descripción artículo": "Para flexible subt. diám. Nominal 40 mm",
+      "Precio": "1.78",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CFSN 050",
+      "Descripción artículo": "Para flexible subt. diám. Nominal 50 mm",
+      "Precio": "2.29",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CFSN 063",
+      "Descripción artículo": "Para flexible subt. diám. Nominal 63 mm",
+      "Precio": "2.95",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CFSN 110",
+      "Descripción artículo": "Para flexible subt. diám. Nominal 110 mm",
+      "Precio": "7.63",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CFSN 160",
+      "Descripción artículo": "Para flexible subt. diám. Nominal 160 mm",
+      "Precio": "15.91",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "AFSN 040",
+      "Descripción artículo": "Para flexible subt. diám. Nominal 40 mm",
+      "Precio": "1.5",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "AFSN 050",
+      "Descripción artículo": "Para flexible subt. diám. Nominal 50 mm",
+      "Precio": "1.73",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "AFSN 063",
+      "Descripción artículo": "Para flexible subt. diám. Nominal 63 mm",
+      "Precio": "1.96",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "AFSN 110",
+      "Descripción artículo": "Para flexible subt. diám. Nominal 110 mm",
+      "Precio": "4.45",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "AFSN 160",
+      "Descripción artículo": "Para flexible subt. diám. Nominal 160 mm",
+      "Precio": "6.22",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "TFSN 040",
+      "Descripción artículo": "Para flexible subt. diám. Nominal 40 mm",
+      "Precio": "0.47",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "TFSN 050",
+      "Descripción artículo": "Para flexible subt. diám. Nominal 50 mm",
+      "Precio": "0.51",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "TFSN 063",
+      "Descripción artículo": "Para flexible subt. diám. Nominal 63 mm",
+      "Precio": "0.61",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "TFSN 110",
+      "Descripción artículo": "Para flexible subt. diám. Nominal 110 mm",
+      "Precio": "1.03",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "TFSN 160",
+      "Descripción artículo": "Para flexible subt. diám. Nominal 160 mm",
+      "Precio": "1.26",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MA 15",
+      "Descripción artículo": "Malla de advertencia - Ancho 15 cm",
+      "Precio": "0.68",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MA 30",
+      "Descripción artículo": "Malla de advertencia - Ancho 30 cm",
+      "Precio": "1.35",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MF 38",
+      "Descripción artículo": "Diám. nominal 3/8\"",
+      "Precio": "3.8",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MF 50",
+      "Descripción artículo": "Diám. nominal 1/2\"",
+      "Precio": "4.16",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MF 75",
+      "Descripción artículo": "Diám. nominal 3/4\"",
+      "Precio": "5.2",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MF 100",
+      "Descripción artículo": "Diám. nominal 1\"",
+      "Precio": "6.98",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MF 125",
+      "Descripción artículo": "Diám. nominal 1 1/4\"",
+      "Precio": "13.25",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MF 150",
+      "Descripción artículo": "Diám. nominal 1 1/2\"",
+      "Precio": "14.55",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MF 200",
+      "Descripción artículo": "Diám. nominal 2\"",
+      "Precio": "20.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MF 250",
+      "Descripción artículo": "Diám. nominal 2 1/2\"",
+      "Precio": "46.2",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MF 300",
+      "Descripción artículo": "Diám. nominal 3\"",
+      "Precio": "56.2",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MF 400",
+      "Descripción artículo": "Diám. nominal 4\"",
+      "Precio": "79.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "EF 38",
+      "Descripción artículo": "Diám. nominal 3/8\"",
+      "Precio": "3.25",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "EF 50",
+      "Descripción artículo": "Diám. nominal 1/2\"",
+      "Precio": "3.56",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "EF 75",
+      "Descripción artículo": "Diám. nominal 3/4\"",
+      "Precio": "4.3",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "EF 100",
+      "Descripción artículo": "Diám. nominal 1\"",
+      "Precio": "6.28",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "EF 125",
+      "Descripción artículo": "Diám. nominal 1 1/4\"",
+      "Precio": "9.28",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "EF 150",
+      "Descripción artículo": "Diám. nominal 1 1/2\"",
+      "Precio": "11.08",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "EF 200",
+      "Descripción artículo": "Diám. nominal 2\"",
+      "Precio": "14.78",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MFH 38",
+      "Descripción artículo": "Diám. nominal 3/8\"",
+      "Precio": "5.28",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MFH 50",
+      "Descripción artículo": "Diám. nominal 1/2\"",
+      "Precio": "5.5",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MFH 75",
+      "Descripción artículo": "Diám. nominal 3/4\"",
+      "Precio": "8.3",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MFH 100",
+      "Descripción artículo": "Diám. nominal 1\"",
+      "Precio": "9.85",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MFH 125",
+      "Descripción artículo": "Diám. nominal 1 1/4\"",
+      "Precio": "18.95",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MFH 150",
+      "Descripción artículo": "Diám. nominal 1 1/2\"",
+      "Precio": "20.95",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MFH 200",
+      "Descripción artículo": "Diám. nominal 2\"",
+      "Precio": "29.85",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FT 31",
+      "Descripción artículo": "Rosca NPT/BSP-T 1/2\" - p/caño 3/8\"",
+      "Precio": "3.85",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FT 32",
+      "Descripción artículo": "Rosca NPT/BSP-T 1/2\" - p/caño 1/2\"",
+      "Precio": "3.85",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FT 33",
+      "Descripción artículo": "Rosca NPT/BSP-T 3/4\" - p/caño 3/4\"",
+      "Precio": "5.1",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FT 34",
+      "Descripción artículo": "Rosca NPT/BSP-T 1\" - p/caño 1\"",
+      "Precio": "7.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FT 35",
+      "Descripción artículo": "Rosca NPT/BSP-T 1 1/4\" - p/caño 1 1/4\"",
+      "Precio": "19.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FT 36",
+      "Descripción artículo": "Rosca NPT/BSP-T 1 1/2\" - p/caño 1 1/2\"",
+      "Precio": "19.5",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FT 37",
+      "Descripción artículo": "Rosca NPT/BSP-T 2\" - p/caño 2\"",
+      "Precio": "26.8",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FT 38/N",
+      "Descripción artículo": "Rosca NPT 2 1/2\" - p/caño 2 ½\"",
+      "Precio": "63.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FT 38/W",
+      "Descripción artículo": "Rosca BSP-T 2 1/2\" - p/caño 2 ½\"",
+      "Precio": "63.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FT 39/N",
+      "Descripción artículo": "Rosca NPT 3\" - p/caño 3\"",
+      "Precio": "70.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FT 39/W",
+      "Descripción artículo": "Rosca BSP-T 3\" - p/caño 3\"",
+      "Precio": "70.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FT 40/N",
+      "Descripción artículo": "Rosca NPT 4\" - p/caño 4\"",
+      "Precio": "105.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FT 40/W",
+      "Descripción artículo": "Rosca BSP-T 4\" - p/caño 4\"",
+      "Precio": "105.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FTX 31",
+      "Descripción artículo": "Rosca NPT/BSP-T 1/2\" - p/caño 3/8\"",
+      "Precio": "3.85",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FTX 32",
+      "Descripción artículo": "Rosca NPT/BSP-T 1/2\" - p/caño 1/2\"",
+      "Precio": "3.85",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FTX 33",
+      "Descripción artículo": "Rosca NPT/BSP-T 3/4\" - p/caño 3/4\"",
+      "Precio": "5.1",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FTX 34",
+      "Descripción artículo": "Rosca NPT/BSP-T 1\" - p/caño 1\"",
+      "Precio": "7.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FTX 35",
+      "Descripción artículo": "Rosca NPT/BSP-T 1 1/4\" - p/caño 1 1/4\"",
+      "Precio": "19.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FTX 36",
+      "Descripción artículo": "Rosca NPT/BSP-T 1 1/2\" - p/caño 1 1/2\"",
+      "Precio": "19.5",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FTX 37",
+      "Descripción artículo": "Rosca NPT/BSP-T 2\" - p/caño 2\"",
+      "Precio": "26.8",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CEF 50",
+      "Descripción artículo": "Para caño 1/2\"",
+      "Precio": "1.98",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CEF 75",
+      "Descripción artículo": "Para caño 3/4\"",
+      "Precio": "2.52",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CEF 100",
+      "Descripción artículo": "Para caño 1\"",
+      "Precio": "3.05",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FT 41",
+      "Descripción artículo": "Rosca NPT/BSP-T 1/2\" - p/caño 3/8\"",
+      "Precio": "10.45",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FT 42",
+      "Descripción artículo": "Rosca NPT/BSP-T 1/2\" - p/caño 1/2\"",
+      "Precio": "10.45",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FT 43",
+      "Descripción artículo": "Rosca NPT/BSP-T 3/4\" - p/caño 3/4\"",
+      "Precio": "10.92",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FT 44",
+      "Descripción artículo": "Rosca NPT/BSP-T 1\" - p/caño 1\"",
+      "Precio": "13.5",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FTX 41",
+      "Descripción artículo": "Rosca NPT/BSP-T 1/2\" - p/caño 3/8\"",
+      "Precio": "10.45",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FTX 42",
+      "Descripción artículo": "Rosca NPT/BSP-T 1/2\" - p/caño 1/2\"",
+      "Precio": "10.45",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FTX 43",
+      "Descripción artículo": "Rosca NPT/BSP-T 3/4\" - p/caño 3/4\"",
+      "Precio": "10.92",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FTX 44",
+      "Descripción artículo": "Rosca NPT/BSP-T 1\" - p/caño 1\"",
+      "Precio": "13.5",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FT 51",
+      "Descripción artículo": "Rosca NPT/BSP-T 1/2\" - p/caño 3/8\"",
+      "Precio": "10.45",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FT 52",
+      "Descripción artículo": "Rosca NPT/BSP-T 1/2\" - p/caño 1/2\"",
+      "Precio": "10.45",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FT 53",
+      "Descripción artículo": "Rosca NPT/BSP-T 3/4\" - p/caño 3/4\"",
+      "Precio": "10.92",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FT 54",
+      "Descripción artículo": "Rosca NPT/BSP-T 1\" - p/caño 1\"",
+      "Precio": "13.5",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FT 55",
+      "Descripción artículo": "Rosca NPT/BSP-T 1 1/4\" - p/caño 1 1/4\"",
+      "Precio": "35.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FT 56",
+      "Descripción artículo": "Rosca NPT/BSP-T 1 1/2\" - p/caño 1 1/2\"",
+      "Precio": "38.5",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FT 57",
+      "Descripción artículo": "Rosca NPT/BSP-T 2\" - p/caño 2\"",
+      "Precio": "43.8",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FTX 51",
+      "Descripción artículo": "Rosca NPT/BSP-T 1/2\" - p/caño 3/8\"",
+      "Precio": "10.45",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FTX 52",
+      "Descripción artículo": "Rosca NPT/BSP-T 1/2\" - p/caño 1/2\"",
+      "Precio": "10.45",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FTX 53",
+      "Descripción artículo": "Rosca NPT/BSP-T 3/4\" - p/caño 3/4\"",
+      "Precio": "10.92",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FTX 54",
+      "Descripción artículo": "Rosca NPT/BSP-T 1\" - p/caño 1\"",
+      "Precio": "13.5",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FTX 55",
+      "Descripción artículo": "Rosca NPT/BSP-T 1 1/4\" - p/caño 1 1/4\"",
+      "Precio": "35.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FTX 56",
+      "Descripción artículo": "Rosca NPT/BSP-T 1 1/2\" - p/caño 1 1/2\"",
+      "Precio": "38.5",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FTX 57",
+      "Descripción artículo": "Rosca NPT/BSP-T 2\" - p/caño 2\"",
+      "Precio": "43.8",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "TCA 50",
+      "Descripción artículo": "Rosca NPT/BSP-T 1/2\" - p/caño 3/8\" y 1/2\"",
+      "Precio": "0.62",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "TCA 75",
+      "Descripción artículo": "Rosca NPT/BSP-T 3/4\" – p/caño 3/4\"",
+      "Precio": "0.97",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "TCA 100",
+      "Descripción artículo": "Rosca NPT/BSP-T 1\" - p/caño 1\"",
+      "Precio": "1.01",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "TCA 125",
+      "Descripción artículo": "Rosca NPT/BSP-T 1 1/4\" – p/caño 1 1/4\"",
+      "Precio": "1.98",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "TCA 150",
+      "Descripción artículo": "Rosca NPT/BSP-T 1 1/2\" – p/caño 1 1/2\"",
+      "Precio": "2.1",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "TCA 200",
+      "Descripción artículo": "Rosca NPT/BSP-T 2\" – p/caño 2\"",
+      "Precio": "2.8",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "TCA 250/N",
+      "Descripción artículo": "Rosca 2 1/2\" NPT",
+      "Precio": "5.12",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "TCA 250/W",
+      "Descripción artículo": "Rosca 2 1/2\" BSP-T",
+      "Precio": "5.12",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "TCA 300/N",
+      "Descripción artículo": "Rosca 3\" NPT",
+      "Precio": "5.91",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "TCA 300/W",
+      "Descripción artículo": "Rosca 3\" BSP-T",
+      "Precio": "5.91",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "TCA 400/N",
+      "Descripción artículo": "Rosca 4\" NPT",
+      "Precio": "7.85",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "TCA 400/W",
+      "Descripción artículo": "Rosca 4\" BSP-T",
+      "Precio": "7.85",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FC 31",
+      "Descripción artículo": "Para caño 3/8\"",
+      "Precio": "13.28",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FC 32",
+      "Descripción artículo": "Para caño 1/2\"",
+      "Precio": "13.28",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FC 33",
+      "Descripción artículo": "Para caño 3/4\"",
+      "Precio": "15.5",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FC 34",
+      "Descripción artículo": "Para caño 1\"",
+      "Precio": "19.3",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FC 35",
+      "Descripción artículo": "Para caño 1 1/4\"",
+      "Precio": "34.48",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FC 36",
+      "Descripción artículo": "Para caño 1 1/2\"",
+      "Precio": "36.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FC 37",
+      "Descripción artículo": "Para caño 2\"",
+      "Precio": "44.1",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "FCX 31",
+      "Descripción artículo": "Para caño 3/8\"",
+      "Precio": "13.28",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "DM 034 X",
+      "Descripción artículo": "Tipo \"X\", uso interior, rosca 3/4\"",
+      "Precio": "4.38",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "DM 100 X",
+      "Descripción artículo": "Tipo \"X\", uso interior, rosca 1\"",
+      "Precio": "5.85",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "DM 112 X",
+      "Descripción artículo": "Tipo \"X\", uso interior, rosca 1 1/2\"",
+      "Precio": "12.9",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "DM 200 X",
+      "Descripción artículo": "Tipo \"X\", uso interior, rosca 2\"",
+      "Precio": "16.5",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "DMT 012 X",
+      "Descripción artículo": "Tipo \"X\", uso exterior, rosca 1/2\"",
+      "Precio": "4.98",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "DMT 034 X",
+      "Descripción artículo": "Tipo \"X\", uso exterior, rosca 3/4\"",
+      "Precio": "4.98",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "DMT 100 X",
+      "Descripción artículo": "Tipo \"X\", uso exterior, rosca 1\"",
+      "Precio": "6.98",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "DMT 112 X",
+      "Descripción artículo": "Tipo \"X\", uso exterior, rosca 1 1/2\"",
+      "Precio": "14.3",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "DMT 200 X",
+      "Descripción artículo": "Tipo \"X\", uso exterior, rosca 2\"",
+      "Precio": "18.55",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MR 012 ST",
+      "Descripción artículo": "Sin Tapa, uso interior, rosca 1/2\"",
+      "Precio": "10.18",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MR 034 ST",
+      "Descripción artículo": "Sin Tapa, uso interior, rosca 3/4\"",
+      "Precio": "10.18",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MR 100 ST",
+      "Descripción artículo": "Sin Tapa, uso interior, rosca 1\"",
+      "Precio": "10.18",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MR 012",
+      "Descripción artículo": "Uso interior, rosca 1/2\"",
+      "Precio": "11.85",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MR 034",
+      "Descripción artículo": "Uso interior, rosca 3/4\"",
+      "Precio": "11.85",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MR 100",
+      "Descripción artículo": "Uso interior, rosca 1\"",
+      "Precio": "11.85",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MRT 012",
+      "Descripción artículo": "Uso exterior, rosca 1/2\"",
+      "Precio": "14.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MRT 034",
+      "Descripción artículo": "Uso exterior, rosca 3/4\"",
+      "Precio": "14.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MRT 100",
+      "Descripción artículo": "Uso exterior, rosca 1\"",
+      "Precio": "14.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CE 012 ST",
+      "Descripción artículo": "Sin Tapa, uso interior, rosca 1/2\"",
+      "Precio": "7.4",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CE 034 ST",
+      "Descripción artículo": "Sin Tapa, uso interior, rosca 3/4\"",
+      "Precio": "7.4",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CE 100 ST",
+      "Descripción artículo": "Sin Tapa, uso interior, rosca 1\"",
+      "Precio": "7.4",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CE 012",
+      "Descripción artículo": "Uso interior, rosca 1/2\"",
+      "Precio": "9.68",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CE 034",
+      "Descripción artículo": "Uso interior, rosca 3/4\"",
+      "Precio": "9.68",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CE 100",
+      "Descripción artículo": "Uso interior, rosca 1\"",
+      "Precio": "9.68",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CET 012",
+      "Descripción artículo": "Uso exterior, rosca 1/2\"",
+      "Precio": "11.32",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CET 034",
+      "Descripción artículo": "Uso exterior, rosca 3/4\"",
+      "Precio": "11.32",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CET 100",
+      "Descripción artículo": "Uso exterior, rosca 1\"",
+      "Precio": "11.32",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CDT 10",
+      "Descripción artículo": "Uso exterior, 10x10, sin agujeros",
+      "Precio": "12.05",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CDT 10-012",
+      "Descripción artículo": "Uso exterior, 10x10, c/4 agujeros 1/2\"",
+      "Precio": "12.32",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CDT 10-034",
+      "Descripción artículo": "Uso exterior, 10x10, c/4 agujeros 3/4\"",
+      "Precio": "12.32",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CDT 10-100",
+      "Descripción artículo": "Uso exterior, 10x10, c/4 agujeros 1\"",
+      "Precio": "12.32",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CDT 13",
+      "Descripción artículo": "Uso exterior, 13x10, sin agujeros",
+      "Precio": "21.12",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CDT 13-TM",
+      "Descripción artículo": "Uso exterior, 13x10, sin agujeros, c/ tapa calada",
+      "Precio": "21.12",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CDT 13-012",
+      "Descripción artículo": "Uso exterior, 13x10, c/4 agujeros 1/2\"",
+      "Precio": "21.58",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CDT 13-034",
+      "Descripción artículo": "Uso exterior, 13x10, c/4 agujeros 3/4\"",
+      "Precio": "21.58",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CDT 13-100",
+      "Descripción artículo": "Uso exterior, 13x10, c/4 agujeros 1\"",
+      "Precio": "21.58",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CDT 15",
+      "Descripción artículo": "Uso exterior, 15x15, sin agujeros",
+      "Precio": "31.18",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CDT 15-112",
+      "Descripción artículo": "Uso exterior, 15x15, c/4 agujeros 1 1/2\"",
+      "Precio": "31.88",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CDT 20",
+      "Descripción artículo": "Uso exterior, 20x20, sin agujeros",
+      "Precio": "46.06",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CDT 30",
+      "Descripción artículo": "Uso exterior, 30x30, sin agujeros",
+      "Precio": "108.8",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "CDT 40",
+      "Descripción artículo": "Uso exterior, 40x40, sin agujeros",
+      "Precio": "230.95",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "TE",
+      "Descripción artículo": "Torre para bastidor",
+      "Precio": "12.7",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "VDM 012",
+      "Descripción artículo": "Junta p/caja DM 012 y DM 034",
+      "Precio": "0.86",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "VDM 100",
+      "Descripción artículo": "Junta p/caja DM 100",
+      "Precio": "1.35",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "VDM 112",
+      "Descripción artículo": "Junta p/caja DM 112",
+      "Precio": "2.2",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "VDM 200",
+      "Descripción artículo": "Junta p/caja DM 200",
+      "Precio": "2.25",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "VD CE",
+      "Descripción artículo": "Junta p/caja CE",
+      "Precio": "1.64",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "VDM MR",
+      "Descripción artículo": "Junta p/caja MR",
+      "Precio": "2.42",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "TDM 012",
+      "Descripción artículo": "Tapa ciega p/caja DM 012 y DM 034",
+      "Precio": "1.82",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "TDM 012-1",
+      "Descripción artículo": "Tapa calada p/1 RJ 11 o RJ 45 p/DM 012 y 034",
+      "Precio": "1.82",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "TDM 012-2",
+      "Descripción artículo": "Tapa calada p/2 RJ 11 o RJ 45 p/DM 012 y 034",
+      "Precio": "1.82",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "TCE",
+      "Descripción artículo": "Tapa ciega p/caja CE",
+      "Precio": "2.18",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "TMR",
+      "Descripción artículo": "Tapa ciega p/caja MR",
+      "Precio": "2.46",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "SM 1-45",
+      "Descripción artículo": "Bastidor para 1 RJ 11 o RJ 45, marca AMP",
+      "Precio": "1.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "SM 2-45",
+      "Descripción artículo": "Bastidor para 1 RJ 11 o RJ 45, marca AMP",
+      "Precio": "1.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MT 012",
+      "Descripción artículo": "Tapón 1/2\"",
+      "Precio": "0.32",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MT 034",
+      "Descripción artículo": "Tapón 3/4\"",
+      "Precio": "0.32",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MT 100",
+      "Descripción artículo": "Tapón 1\"",
+      "Precio": "0.32",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MT 112",
+      "Descripción artículo": "Tapón 1 1/2\"",
+      "Precio": "0.47",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "MT 200",
+      "Descripción artículo": "Tapón 2\"",
+      "Precio": "0.47",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "NM 012",
+      "Descripción artículo": "Tapón 1/2\"",
+      "Precio": "0.57",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "NM 034",
+      "Descripción artículo": "Tapón 3/4\"",
+      "Precio": "0.57",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "NM 100",
+      "Descripción artículo": "Tapón 1\"",
+      "Precio": "0.57",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "BM 034-012",
+      "Descripción artículo": "Reducción de 3/4\" a 1/2\"",
+      "Precio": "1.01",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "BM 100-012",
+      "Descripción artículo": "Reducción de 1\" a 1/2\"",
+      "Precio": "1.36",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "BM 100-034",
+      "Descripción artículo": "Reducción de 1\" a 3/4\"",
+      "Precio": "1.36",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "BM 112-100",
+      "Descripción artículo": "Reducción de 1 1/2\" a 1\"",
+      "Precio": "2.46",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "BM 112-110",
+      "Descripción artículo": "Reducción de 1 1/2\" a 1 1/4\"",
+      "Precio": "2.46",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "BM 200-110",
+      "Descripción artículo": "Reducción de 2\" a 1 1/4\"",
+      "Precio": "3.8",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "BM 200-112",
+      "Descripción artículo": "Reducción de 2\" a 1 1/2\"",
+      "Precio": "4.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "SA",
+      "Descripción artículo": "Suspensión articulada 3/4\"",
+      "Precio": "21.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UM 010 L",
+      "Descripción artículo": "Uso interior, para caño 5/8\"",
+      "Precio": "0.63",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UM 034 L",
+      "Descripción artículo": "Uso interior, para caño 3/4\"",
+      "Precio": "0.81",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UM 078 L",
+      "Descripción artículo": "Uso interior, para caño 7/8\"",
+      "Precio": "1.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UM 100 L",
+      "Descripción artículo": "Uso interior, para caño 1\"",
+      "Precio": "1.0",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UM 110 L",
+      "Descripción artículo": "Uso interior, para caño 1 1/4\"",
+      "Precio": "1.29",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UM 112 L",
+      "Descripción artículo": "Uso interior, para caño 1 1/2\"",
+      "Precio": "1.96",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UM 200 L",
+      "Descripción artículo": "Uso interior, para caño 2\"",
+      "Precio": "3.25",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UMT 034 L",
+      "Descripción artículo": "Uso exterior, para caño 3/4\"",
+      "Precio": "1.03",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UMT 078 L",
+      "Descripción artículo": "Uso exterior, para caño 7/8\"",
+      "Precio": "1.35",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UMT 100 L",
+      "Descripción artículo": "Uso exterior, para caño 1\"",
+      "Precio": "1.35",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UMT 110 L",
+      "Descripción artículo": "Uso exterior, para caño 1 1/4\"",
+      "Precio": "1.63",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UMT 112 L",
+      "Descripción artículo": "Uso exterior, para caño 1 1/2\"",
+      "Precio": "2.54",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UMT 200 L",
+      "Descripción artículo": "Uso exterior, para caño 2\"",
+      "Precio": "4.05",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UC 010 L",
+      "Descripción artículo": "Uso interior, para caño 5/8\"",
+      "Precio": "0.85",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UC 034 L",
+      "Descripción artículo": "Uso interior, para caño 3/4\"",
+      "Precio": "1.1",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UC 078 L",
+      "Descripción artículo": "Uso interior, para caño 7/8\"",
+      "Precio": "1.4",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UC 100 L",
+      "Descripción artículo": "Uso interior, para caño 1\"",
+      "Precio": "1.67",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UC 110 L",
+      "Descripción artículo": "Uso interior, para caño 1 1/4\"",
+      "Precio": "2.29",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UC 112 L",
+      "Descripción artículo": "Uso interior, para caño 1 1/2\"",
+      "Precio": "3.78",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UC 200 L",
+      "Descripción artículo": "Uso interior, para caño 2\"",
+      "Precio": "5.08",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UCT 034 L",
+      "Descripción artículo": "Uso exterior, para caño 3/4\"",
+      "Precio": "1.46",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UCT 078 L",
+      "Descripción artículo": "Uso exterior, para caño 7/8\"",
+      "Precio": "1.77",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UCT 100 L",
+      "Descripción artículo": "Uso exterior, para caño 1\"",
+      "Precio": "2.17",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UCT 110 L",
+      "Descripción artículo": "Uso exterior, para caño 1 1/4\"",
+      "Precio": "2.98",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UCT 112 L",
+      "Descripción artículo": "Uso exterior, para caño 1 1/2\"",
+      "Precio": "4.52",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UCT 200 L",
+      "Descripción artículo": "Uso exterior, para caño 2\"",
+      "Precio": "6.36",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UR 010 L",
+      "Descripción artículo": "Uso interior, para caño 5/8\"",
+      "Precio": "1.03",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UR 034 L",
+      "Descripción artículo": "Uso interior, para caño 3/4\"",
+      "Precio": "1.27",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UR 078 L",
+      "Descripción artículo": "Uso interior, para caño 7/8\"",
+      "Precio": "1.67",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UR 100 L",
+      "Descripción artículo": "Uso interior, para caño 1\"",
+      "Precio": "1.85",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UR 110 L",
+      "Descripción artículo": "Uso interior, para caño 1 1/4\"",
+      "Precio": "2.47",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UR 112 L",
+      "Descripción artículo": "Uso interior, para caño 1 1/2\"",
+      "Precio": "3.78",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UR 200 L",
+      "Descripción artículo": "Uso interior, para caño 2\"",
+      "Precio": "6.04",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "URT 034 L",
+      "Descripción artículo": "Uso exterior, para caño 3/4\"",
+      "Precio": "1.85",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "URT 078 L",
+      "Descripción artículo": "Uso exterior, para caño 7/8\"",
+      "Precio": "2.33",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "URT 100 L",
+      "Descripción artículo": "Uso exterior, para caño 1\"",
+      "Precio": "2.65",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "URT 110 L",
+      "Descripción artículo": "Uso exterior, para caño 1 1/4\"",
+      "Precio": "3.44",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "URT 112 L",
+      "Descripción artículo": "Uso exterior, para caño 1 1/2\"",
+      "Precio": "5.15",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "URT 200 L",
+      "Descripción artículo": "Uso exterior, para caño 2\"",
+      "Precio": "8.38",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UL 010 L",
+      "Descripción artículo": "Uso interior, para caño 5/8\"",
+      "Precio": "2.14",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UL 034 L",
+      "Descripción artículo": "Uso interior, para caño 3/4\"",
+      "Precio": "2.62",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UL 078 L",
+      "Descripción artículo": "Uso interior, para caño 7/8\"",
+      "Precio": "3.24",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UL 100 L",
+      "Descripción artículo": "Uso interior, para caño 1\"",
+      "Precio": "4.44",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "UL 110 L",
+      "Descripción artículo": "Uso interior, para caño 1 1/4\"",
+      "Precio": "7.6",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "ULT 034 L",
+      "Descripción artículo": "Uso exterior, para caño 3/4\"",
+      "Precio": "3.38",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "ULT 078 L",
+      "Descripción artículo": "Uso exterior, para caño 7/8\"",
+      "Precio": "4.08",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "ULT 100 L",
+      "Descripción artículo": "Uso exterior, para caño 1\"",
+      "Precio": "5.82",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "ULT 110 L",
+      "Descripción artículo": "Uso exterior, para caño 1 1/4\"",
+      "Precio": "9.6",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "BC 010 L",
+      "Descripción artículo": "Para caño 5/8\"",
+      "Precio": "0.8",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "BC 034 L",
+      "Descripción artículo": "Para caño 3/4\"",
+      "Precio": "1.08",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "BC 078 L",
+      "Descripción artículo": "Para caño 7/8\"",
+      "Precio": "1.19",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "BC 100 L",
+      "Descripción artículo": "Para caño 1\"",
+      "Precio": "1.38",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "BC 110 L",
+      "Descripción artículo": "Para caño 1 1/4\"",
+      "Precio": "2.65",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "BC 112 L",
+      "Descripción artículo": "Para caño 1 1/2\"",
+      "Precio": "3.05",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "BC 200 L",
+      "Descripción artículo": "Para caño 2\"",
+      "Precio": "4.58",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    },
+    {
+      "Cód. Artículo": "BT 010 L",
+      "Descripción artículo": "Para caño 5/8\"",
+      "Precio": "1.26",
+      "Cód. Lista": "MICROCONTROL",
+      "Desc. Lista": "LP MICROCONTROL 2026-02",
+      "Moneda": "ARS",
+      "Sinónimo": ""
+    }
+  ],
+  "report": {
+    "total_rows": 60,
+    "valid_rows": 60,
+    "rows_with_issues": 0,
+    "issues": [],
+    "quality_score": 100.0
+  },
+  "validation": null,
+  "metadata": {
+    "filename": "LP MICROCONTROL 2026-02 (3).xls",
+    "type": ".xls",
+    "pages": 0
+  },
+  "extraction_method": "hybrid_heuristic_claude",
+  "column_mapping": {
+    "heuristic_code": "Cód. Artículo",
+    "heuristic_price": "Precio",
+    "heuristic_list_code": "Cód. Lista",
+    "heuristic_list_desc": "Desc. Lista"
+  },
+  "log": [
+    {
+      "step": "extraction",
+      "status": "running",
+      "detail": "Processing LP MICROCONTROL 2026-02 (3).xls",
+      "timestamp": "2026-08-18T15:43:30.344805"
+    },
+    {
+      "step": "extraction",
+      "status": "done",
+      "detail": "Extracted 54239 chars from 0 pages",
+      "timestamp": "2026-08-18T15:43:30.537304"
+    },
+    {
+      "step": "transformation",
+      "status": "running",
+      "detail": "Mapping data to template columns",
+      "timestamp": "2026-08-18T15:43:30.537315"
+    },
+    {
+      "step": "transformation",
+      "status": "done",
+      "detail": "Extracted 60 product rows",
+      "timestamp": "2026-08-18T15:43:30.578946"
+    },
+    {
+      "step": "verification",
+      "status": "running",
+      "detail": "Validating and cleaning data",
+      "timestamp": "2026-08-18T15:43:30.578964"
+    },
+    {
+      "step": "verification",
+      "status": "done",
+      "detail": "Quality: 100.0% (60/60 valid)",
+      "timestamp": "2026-08-18T15:43:30.579227"
+    }
+  ],
+  "claude_tokens": {
+    "input": 30183,
+    "output": 12000,
+    "cost_usd": 0.270549
+  }
+}

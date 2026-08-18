@@ -298,6 +298,85 @@ Los scripts de prueba están en `tests/`. Todos requieren la API corriendo en `l
 
 ---
 
+### Sesión 9 — 2026-08-18 · Sistema híbrido heurístico + Claude por archivo
+
+#### Contexto
+Continuación de la sesión 8 el mismo día. Objetivo: mejorar cobertura de extracción usando Claude como capa complementaria al heurístico, sin reemplazarlo.
+
+#### Mejoras al extractor (sin costo de API)
+
+Antes de activar Claude se mejoraron dos puntos del extractor heurístico en `pricebot/api/main.py`:
+
+| Mejora | Descripción | Impacto en LCT |
+|--------|-------------|---------------|
+| R1 conservativo | El filtro de filas fantasma R1 pasó de "tiene $ en desc" a "tiene $ en desc Y menos de 5 chars alfabéticos". Evita eliminar filas legítimas de tablas paired (SCA/UCA con desc tipo `SCA 10 10 5/16 2200 UCA...`) | Recupera filas válidas de paired-tables |
+| Tabla transpuesta | `extract_rows_from_pdf_tables()` ahora detecta tablas de 1 columna donde la primera celda es código numérico y extrae como producto transpuesto | +71 filas naturales |
+
+**LCT con solo heurístico**: 903 → **974 filas** (sin ningún costo de API).
+
+#### AR36 excluido de batch automático
+
+`tests/batch_test_listas.py` modificado: variable `SKIP_FILES` (default `"LISTA AR36"`) excluye archivos costosos del batch estándar. AR36 es PDF escaneado que consume ~$0.24 por corrida y produce datos de baja calidad.
+
+#### Sistema híbrido — diseño e implementación
+
+Se diseñaron scripts standalone en `tmp/` que:
+1. Cargan la salida heurística como base
+2. Envían el contenido del archivo (página a página para PDFs, chunks para XLS) a Claude
+3. Parsean la respuesta JSON; si el response fue truncado por `max_tokens`, salvan el JSON parcial recuperando todos los objetos completos antes del corte
+4. Mergean: heurístico como base → Claude agrega códigos nuevos y enriquece descripciones cuando las suyas son más largas
+
+**Bug detectado y corregido en ejecución**: `max_tokens=2000` truncaba el JSON en páginas densas (páginas 12-14 del LCT devolvían 0 filas con exactamente 2000 tokens). Fix: `max_tokens` subido a **6000** + salvamento de JSON truncado.
+
+#### Resultados de extracción híbrida
+
+| Archivo | Script | Heurístico | Híbrido | Nuevas | Enriquecidas | Tiempo |
+|---------|--------|:----------:|:-------:|:------:|:------------:|-------:|
+| LCT PDF (46 pág) | `tmp_test_lct_claude.py` | 974 | **1,052** | +78 | 886 | 329.7s |
+| N°95 PDF (7 pág) | `tmp_test_n95_claude.py` | 620 | **493*** | +106 | 138 | 91.7s |
+| MICROCONTROL XLS | `tmp_test_microcontrol_claude.py` | 60 | **312** | +270 | 0 | 57.6s |
+
+> \* N°95 baja de 620 a 493 porque el heurístico tenía códigos duplicados. El híbrido los colapsa en la dedup → resultado más limpio.
+
+#### Costos de la sesión (tasas display Sonnet $3/$15 por M)
+
+| Run | Archivo | Tokens | Costo display | Costo real Haiku |
+|-----|---------|-------:|:-------------:|:----------------:|
+| [1] Batch estándar | AR36 (corrida previa) | 21,143 | $0.2434 | ~$0.057 |
+| [2] Híbrido LCT | PDF 46 pág | 118,494 | $1.0480 ★ | ~$0.280 |
+| [3] Híbrido N°95 | PDF 7 pág | 29,047 | $0.3200 | ~$0.085 |
+| [4] Híbrido MICROCONTROL | XLS 2 chunks | 42,183 | $0.2705 | ~$0.072 |
+| **TOTAL SESIÓN** | | **210,867** | **$1.9819** | **~$0.494** |
+
+★ Máximo registrado. Ver `costos.txt` para detalle completo y estimaciones futuras.
+
+**Regla práctica aprendida**: la estimación de costo basada solo en tokens de INPUT subestima el gasto real 3×. Claude genera JSON completo con descripciones → tokens OUTPUT ≈ 1–2× tokens INPUT.
+
+#### Archivos generados
+
+**Scripts** (en `tmp/`):
+- `tmp_test_lct_claude.py` — híbrido para PDFs (adaptable a cualquier PDF)
+- `tmp_test_n95_claude.py` — híbrido para N°95
+- `tmp_test_microcontrol_claude.py` — híbrido para XLS
+- `json_to_xlsx.py` — convierte cualquier JSON de `Respuestas/` a XLSX ($0.00, sin API)
+
+**Datos** (en `Respuestas/`):
+
+| JSON | XLSX | Filas |
+|------|------|------:|
+| `LCT Lista de Precios 02-2026 (4)_hybrid.json` | `.xlsx` | 1,052 |
+| `Lista de Precios N° 95 (2)_hybrid.json` | `.xlsx` | 493 |
+| `LP MICROCONTROL 2026-02 (3)_hybrid.json` | `.xlsx` | 312 |
+| + todos los JSON anteriores | → XLSX | — |
+
+**Documentación**: `costos.txt` — registro persistente de todos los gastos de API con estimaciones para futuros usos.
+
+#### Organización del workspace
+
+Todos los archivos `tmp_*` de sesiones anteriores fueron movidos a la carpeta `tmp/`.
+
+---
+
 ### Sesión 8 — 2026-08-18 · Batch test Sesión 8 + patch LCT páginas faltantes
 
 #### Contexto

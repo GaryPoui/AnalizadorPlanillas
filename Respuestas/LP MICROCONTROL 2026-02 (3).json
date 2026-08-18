@@ -867,37 +867,37 @@
       "step": "extraction",
       "status": "running",
       "detail": "Processing LP MICROCONTROL 2026-02 (3).xls",
-      "timestamp": "2026-08-18T14:44:49.278587"
+      "timestamp": "2026-08-18T15:43:30.344805"
     },
     {
       "step": "extraction",
       "status": "done",
       "detail": "Extracted 54239 chars from 0 pages",
-      "timestamp": "2026-08-18T14:44:49.444874"
+      "timestamp": "2026-08-18T15:43:30.537304"
     },
     {
       "step": "transformation",
       "status": "running",
       "detail": "Mapping data to template columns",
-      "timestamp": "2026-08-18T14:44:49.444884"
+      "timestamp": "2026-08-18T15:43:30.537315"
     },
     {
       "step": "transformation",
       "status": "done",
       "detail": "Extracted 60 product rows",
-      "timestamp": "2026-08-18T14:44:49.485578"
+      "timestamp": "2026-08-18T15:43:30.578946"
     },
     {
       "step": "verification",
       "status": "running",
       "detail": "Validating and cleaning data",
-      "timestamp": "2026-08-18T14:44:49.485593"
+      "timestamp": "2026-08-18T15:43:30.578964"
     },
     {
       "step": "verification",
       "status": "done",
       "detail": "Quality: 100.0% (60/60 valid)",
-      "timestamp": "2026-08-18T14:44:49.485880"
+      "timestamp": "2026-08-18T15:43:30.579227"
     }
   ]
 }

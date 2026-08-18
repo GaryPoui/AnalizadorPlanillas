@@ -1,0 +1,7 @@
+Hojas: 2
+Filas totales: 1095
+Chars texto: 51,276
+Tokens input estimados: 13,119
+Tokens output estimados: 3,000
+Costo real Haiku: USD 0.0225
+Costo display Sonnet: USD 0.0844

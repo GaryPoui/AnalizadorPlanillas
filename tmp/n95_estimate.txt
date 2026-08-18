@@ -1,0 +1,6 @@
+Paginas: 7
+Chars texto: 15,527
+Tokens in estimados: 5,281
+Tokens out estimados (paridad LCT): 5,281
+Costo real Haiku: USD 0.0253
+Costo display Sonnet: USD 0.0951
