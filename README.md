@@ -298,6 +298,55 @@ Los scripts de prueba están en `tests/`. Todos requieren la API corriendo en `l
 
 ---
 
+### Sesión 8 — 2026-08-18 · Batch test Sesión 8 + patch LCT páginas faltantes
+
+#### Contexto
+Sesión enfocada en dos tareas:
+1. **Patch del LCT** (Paso 2): extracción directa de las páginas con layout transpuesto que el extractor normal no procesa
+2. **Batch test completo** con la versión actual del extractor para actualizar todos los JSONs
+
+#### Extracción páginas faltantes del LCT (sin archivo externo)
+
+El PDF tiene texto vectorial en las páginas problemáticas, pero en formato transpuesto (cada columna = un producto con 4 filas: CÓDIGO / MODELO / DESCRIPCIÓN / PRECIO). Se escribió `tmp_extract_missing.py` con un parser específico.
+
+| Páginas | Contenido | Productos extraídos |
+|---------|-----------|-------------------:|
+| 16 | Terminales Preaislados Termi-Plast (A2–A22, B18–B30, C1–C18) | +48 |
+| 22 | Herramientas: LY-10, LY-16, LY-35, HX-50/150/240, LY-120 | +7 |
+| 23 | Herramientas: LY-03C/35C/04WF/16WF/35WF/95WF/150WF, ES-10WF, LY-03B/05H/518G | +11 |
+| 24 | Herramientas: LY-468/5684A/B, LY-5D/7/700, WS-16, LY-6/25-3/4/9, PG-5, LY-332 | +13 |
+| 34 | Herramientas HM: HM-1/2/3/5/C | +5 |
+| — | LY-16C (4073) agregado manualmente (no extraído por layout) | +1 |
+| **Total** | | **+85** |
+
+Correcciones de precio aplicadas:
+- `3021` (B3): desc=`3022`, precio=`$3020` → desc=`B3`, precio=`$228.68`
+- `3032` (B17): precio=`$3033` → `$161.02`
+- `4325` (DPH-8): precio=`$972.95` → `$24972.95`
+
+**LCT resultante**: 903 (extractor) + 85 (patch) = **988 filas**
+
+#### Batch test — versión actual del extractor (2026-08-18)
+
+| Archivo | Filas | Quality | Tokens | Costo | Tiempo | Notas |
+|---------|------:|--------:|-------:|------:|-------:|-------|
+| L26031 xlsx | 2558 | 99.8% | 0 | $0.00 | 0.9s | ✅ Estable |
+| L26031 csv | 2558 | 99.8% | 0 | $0.00 | 0.3s | ✅ Estable |
+| **LCT PDF** | **988** | 100% | 0 | $0.00 | 113s | ✅ 903 extractor + 85 patch manual |
+| LISTA AR36 PDF | 109 | — | 19.685 | $0.2216 | 134.5s | ⚠️ OCR deficiente: 30/109 code=desc, 79 con artefactos OCR |
+| Lista N°95 PDF | 620 | 100% | 0 | $0.00 | 28s | ✅ Estable |
+| LP MICROCONTROL xls | 60 | — | 0 | $0.00 | 0.3s | ✅ Estable |
+| **TOTAL** | | | **19.685** | **$0.2216** | | |
+
+#### AR36 — análisis de calidad (extracción OCR)
+De 109 filas extraídas:
+- **30 malas**: patrón code=desc=precio (ej: código=`2473`, desc=`2473`, precio=`$2473.0`)
+- **79 "buenas"** pero con artefactos OCR: emails, CBU bancarios, texto cortado
+
+El problema es inherente al PDF escaneado. No es resoluble mejorando el extractor sin una fuente de datos limpia. **Excluido de análisis de calidad.**
+
+---
+
 ### Sesión 7 — 2026-08-11 · BUG-8 fix completo + limpieza de filas basura (auditoría Sonnet)
 
 #### Batch test final (modelo `claude-haiku-4-5`)
