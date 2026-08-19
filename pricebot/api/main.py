@@ -255,7 +255,29 @@ _CODE_BLACKLIST = frozenset({
     "CO-IP", "HH-IP", "HEC-240", "HEC-400", "MHEC-240", "MHEC-240S",
     # Norm/spec labels that appear in product table headers
     "IEC-6", "APTAS", "LY-468",
+    # Spanish prepositions / articles that appear in date/header lines
+    "DE", "EL", "LA", "UN", "EN", "AL", "ES", "SE", "SA",
+    "MAYO", "JUNIO", "JULIO", "AGOSTO", "ENERO", "FEBRERO", "MARZO",
+    "ABRIL", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE", "SEPTIEMBRE",
+    # Standalone code fragments that are always prefixes of longer codes
+    "PC",
+    # Descriptive text fragments found in N95-style PDFs
+    "PATENTE", "INVENCI", "ACLARAR", "ACLARA", "CUPLA", "CUPULA",
+    "CENTRAL", "LATERAL", "PLANA", "PEDIR",
 })
+
+# Patterns that identify noise lines (phone numbers, dates, patent text, etc.)
+_NOISE_LINE_RE = re.compile(
+    r"""(?x)
+    [+]\d{2}\s*\d{2}    # phone number anywhere in line: +54 11 ...
+    | \b0800\b           # 0800 number
+    | PATENTE\s+DE       # patent text
+    | \d\s+DE\s+\w+\s+DE\s+\d{4}   # date: "6 DE MAYO DE 2026"
+    | P\s*atente         # "P atente" OCR artifact for patent
+    | Fax\b|Tel[.:]|www\.
+    """,
+    re.IGNORECASE,
+)
 
 # Price pattern: $? optional, also handle OCR-spaced digits
 ITEM_LINE_RE = re.compile(r"^\s*(?P<item_code>\d{4,5})\b.*?(?P<price>\$?\s*\d[\d\s]*\d?[,.]\d{2}|\$\s*\d{4,7})")
@@ -486,6 +508,9 @@ def heuristic_extract_rows(
         line_clean = line.strip()
         if not line_clean:
             continue
+        # Skip phone numbers, date lines, patent text and other PDF noise
+        if _NOISE_LINE_RE.search(line_clean):
+            continue
         matches = CODE_PRICE_RE.findall(line_clean)
         if not matches:
             matches = CODE_PRICE_ANYWHERE_RE.findall(line_clean)
@@ -493,8 +518,11 @@ def heuristic_extract_rows(
             continue
 
         for code, raw_price in matches:
+            # Normalize double-dashes produced by pdfplumber line splits
+            code_norm = re.sub(r'-{2,}', '-', code.strip().upper())
+            if not _is_valid_product_code(code_norm):
+                continue
             row = _empty_template_row()
-            code_norm = code.strip().upper()
             row["Cód. Artículo"] = code_norm
             row["Precio"] = _normalize_price_token(raw_price)
 
@@ -876,6 +904,10 @@ def _is_valid_product_code(code: str) -> bool:
     if code in _CODE_BLACKLIST:
         return False
     if code.isdigit():
+        # Reject year-range numbers (dates in headers) and phone fragments
+        n = int(code)
+        if 1990 <= n <= 2030:
+            return False
         return 4 <= len(code) <= 5
     return bool(re.match(r'^[A-Z][A-Z0-9\-/\.]{1,19}$', code))
 
@@ -1360,10 +1392,10 @@ async def _run_hybrid_pass(
         for item in parsed:
             if not isinstance(item, dict):
                 continue
-            code = str(item.get("code", "")).strip().upper()
-            desc = str(item.get("desc", "")).strip()
+            code  = re.sub(r'-{2,}', '-', str(item.get("code", "")).strip().upper())
+            desc  = str(item.get("desc",  "")).strip()
             price = _norm_hybrid_price(item.get("price"))
-            if not code or not price:
+            if not code or not price or not _is_valid_product_code(code):
                 continue
             r = _empty_template_row()
             r["Cód. Artículo"] = code
