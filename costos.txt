@@ -1,5 +1,84 @@
 REGISTRO DE COSTOS - AnalizadorPlanillas
 ========================================
+Ultima actualización: 2026-08-19
+Modelo: claude-haiku-4-5
+Tasas display: $3.00/M input | $15.00/M output  (referencia Sonnet)
+Tasas reales Haiku: $0.80/M input | $4.00/M output
+
+El log automático completo está en: costs_log.jsonl (una línea JSONL por extracción)
+Para visualizarlo: python tmp/show_costs.py
+
+------------------------------------------------------------
+RESUMEN EJECUTIVO — TODOS LOS COSTOS ACUMULADOS
+------------------------------------------------------------
+  Sesión  Fecha        Archivo / Prueba              Tokens       Display    Real
+  ------  -----------  ----------------------------  -----------  ---------  --------
+  9       2026-08-18   Batch estándar (AR36 OCR)     21,143       $0.2434    ~$0.057
+  9       2026-08-18   Híbrido LCT (46 pág)          118,494      $1.0480 ★  ~$0.280
+  9       2026-08-18   Híbrido N°95 (7 pág)          29,047       $0.3200    ~$0.085
+  9       2026-08-18   Híbrido MICROCONTROL (XLS)    42,183       $0.2705    ~$0.072
+  10      2026-08-19   N°95 debug (hybrid bug)       ~488x2       $0.0092    ~$0.002
+  10      2026-08-19   N°95 bug corregido            45,916       $0.4042    ~$0.108
+  10      2026-08-19   N°95 + garbage fixes          44,439       $0.3820    ~$0.102
+  ------  -----------  ----------------------------  -----------  ---------  --------
+  TOTAL ACUMULADO                                    301,610+     $2.7773    ~$0.706
+
+  ★ Máximo en una sola extracción
+
+------------------------------------------------------------
+OBSERVACION CLAVE
+------------------------------------------------------------
+- Excel/CSV: $0.00 siempre (heurístico puro)
+- PDFs con texto seleccionable: modo híbrido activo por default
+  → costo según tamaño: ~$0.38-$1.05 display por PDF procesado
+- PDFs escaneados (AR36): OCR + Claude, ~$0.24 por corrida (excluido de batch auto)
+
+------------------------------------------------------------
+DETALLE SESIÓN 10 — 2026-08-19
+------------------------------------------------------------
+
+[5] N°95 debug runs (hybrid pass con bug) — 2026-08-19
+    Corridas con bug crítico (pdf_pages no pasaba al transformer)
+    Tokens: ~488 por corrida (solo chunks débiles del path antiguo)
+    Costo: ~$0.005 por corrida  (2 corridas = ~$0.010)
+
+[6] N°95 bug crítico corregido — 2026-08-19
+    Script: tmp/test_n95_api.py
+    Páginas: 7  |  Tokens: 45,916  |  Tiempo: ~90s
+    Display: $0.4042  |  Real: ~$0.108
+    Resultado: 447 filas, spot-checks 9/10
+
+[7] N°95 + garbage codes fix — 2026-08-19
+    Script: tmp/test_n95_api.py
+    Páginas: 7  |  Tokens: 44,439  |  Tiempo: ~90s
+    Display: $0.3820  |  Real: ~$0.102
+    Resultado: 437 filas (-10 garbage eliminados), spot-checks 9/10
+
+------------------------------------------------------------
+DETALLE SESIÓN 9 — 2026-08-18 (referencia)
+------------------------------------------------------------
+
+[1] Batch estándar (AR36):     21,143 tokens  $0.2434  (AR36 excluido desde aquí)
+[2] Híbrido LCT (46 pág):     118,494 tokens  $1.0480 ★  974→1,052 filas
+[3] Híbrido N°95 (7 pág):      29,047 tokens  $0.3200  620→493 filas únicas
+[4] Híbrido MICROCONTROL XLS:  42,183 tokens  $0.2705  60→312 filas
+
+------------------------------------------------------------
+ESTIMACIONES PARA FUTUROS USOS
+------------------------------------------------------------
+Regla: OUTPUT ≈ INPUT. Las estimaciones basadas solo en input subestiman 3x.
+
+  Tipo de archivo              Costo display aprox.  Costo real aprox.
+  ---------------------------  --------------------  -----------------
+  Excel/CSV                    $0.00                 $0.00
+  PDF pequeño (<10 pág)        $0.15–$0.40           $0.04–$0.11
+  PDF mediano (10–20 pág)      $0.40–$0.70           $0.11–$0.19
+  PDF grande (>20 pág)         $0.70–$1.50           $0.19–$0.40
+  XLS complejo (2 chunks)      $0.25–$0.35           $0.07–$0.09
+  PDF escaneado (OCR)          $0.20–$0.30           $0.05–$0.08
+
+Para desactivar hybrid: HYBRID_EXTRACTION=0 en pricebot/.env
+
 Fecha de referencia: 2026-08-18
 Modelo: claude-haiku-4-5
 Tasas display usadas en reportes: $3.00/M input  |  $15.00/M output  (referencia Sonnet)

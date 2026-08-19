@@ -298,6 +298,92 @@ Los scripts de prueba están en `tests/`. Todos requieren la API corriendo en `l
 
 ---
 
+### Sesión 10 — 2026-08-19 · Fixes de extracción PDF, garbage codes, historial versionado
+
+#### Contexto
+Continuación de la sesión 9. Un análisis externo (otra IA comparando el JSON extraído contra el PDF original) reveló problemas estructurales que se resolvieron en esta sesión.
+
+#### Levantamiento de la API
+
+La API fue levantada con uvicorn en modo `--reload`:
+```
+python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload --app-dir pricebot/api
+```
+Documentación de setup completa en `SETUP.md`.
+
+#### Problemas identificados y fixes aplicados
+
+**Bug crítico**: `pdf_pages` y `pdf_page_tables` no se propagaban desde `agent_extractor()` al `agent_transformer()`. El hybrid pass siempre veía 0 páginas → nunca llamaba a Claude → precios truncados nunca se corregían.
+
+**Fix regresiones CODE_TOKEN_RE y PRICE_TOKEN_RE** (causas raíz):
+
+| Problema | Causa raíz | Fix |
+|---------|-----------|-----|
+| `BE64-12-150` extraído como `BE64` | `CODE_TOKEN_RE` solo cubría 1 grupo opcional | Nuevo: `[A-Z][A-Z0-9]{0,7}(?:[-./][A-Z0-9]{1,10}){1,4}` |
+| `17814,76` → `814.76` | `PRICE_TOKEN_RE` requería separador de miles `.` | Agrega `\d{2,7}[,\.]\d{2}` para precios sin separador |
+| Grilla de tabla vacía a Claude | Fix 3 (session 9) enviaba tabla vacia si no habia CODE_PRICE_RE match | Fallback a page_text cuando la grilla no tiene pares código+precio |
+| `440.42` en vez de `49440.42` | Celda de tabla contenía solo fragmento decimal | Hybrid merge: si Claude retorna precio ≥2x el existente, actualiza |
+
+**Garbage codes eliminados**:
+
+`_CODE_BLACKLIST` expandida con preposiciones/artículos español (`DE`, `EL`, `LA`, `UN`, `EN`), meses, fragmentos de código (`PC`), texto descriptivo de PDF (`PATENTE`, `INVENCI`, `ACLARAR`, `CUPLA`).
+
+`_NOISE_LINE_RE` — nuevo filtro de líneas de ruido:
+- Líneas de teléfono: `+54 11 4757 0430 / 0035 / 4552` → bloqueadas
+- Líneas de fecha: `6 DE MAYO DE 2026 1` → bloqueadas
+- Texto de patentes: `P atente M U A R 028465-B` → bloqueadas
+
+Normalización de doble-guión: `CPP45--07-050` → `CPP45-07-050` (pdfplumber artifact).
+
+#### Sistema de historial versionado (nuevo)
+
+Cada extracción guarda automáticamente una copia en `Respuestas/history/`:
+```
+Respuestas/history/{nombre_archivo}_{YYYYMMDD_HHMMSS}.json
+```
+
+Para comparar evolución de un archivo:
+```bash
+python tmp/compare_history.py "Lista N°95"
+```
+
+#### Tracking de costos automático
+
+`costs_log.jsonl` — una línea JSONL por extracción, actualizado automáticamente.
+`tmp/show_costs.py` — muestra el log con totales acumulados.
+
+La respuesta de la API ahora incluye el campo `usage` con tokens y costo:
+```json
+{"usage": {"tokens_in": 44439, "tokens_out": ..., "cost_display": 0.382, "cost_real": 0.10}}
+```
+
+#### Resultados N°95 — evolución en la sesión
+
+| Run | Filas | Tokens | Costo display | Spot-checks |
+|-----|------:|-------:|:-------------:|:-----------:|
+| Pre-sesión (old heuristic) | 620 (muchos errores) | 0 | $0.00 | 4/10 ❌ |
+| Hybrid pass con bug (pdf_pages vacío) | 466 | 488 | $0.005 | 4/10 ❌ |
+| Hybrid OK (bug crítico corregido) | 447 | 45,916 | $0.40 | 9/10 ✓ |
+| + Garbage codes fix | **437** | 44,439 | **$0.38** | **9/10 ✓** |
+
+**Total costo sesión N°95**: ~$0.80 display / ~$0.21 real (Haiku).
+
+Único error restante: `CPE90-64-16-150` → el PDF tiene dos variantes (`-64-` y `-92-`) en la misma línea y Claude toma el primer precio.
+
+#### Archivos nuevos/modificados
+
+| Archivo | Cambio |
+|---------|--------|
+| `pricebot/api/main.py` | Bug crítico + CODE/PRICE_TOKEN_RE + garbage + historial |
+| `SETUP.md` | Guía completa de instalación y uso |
+| `tmp/test_n95_api.py` | Test automatizado con spot-checks |
+| `tmp/compare_history.py` | Comparación histórica de extracciones |
+| `tmp/show_costs.py` | Visualización del log de costos |
+| `costs_log.jsonl` | Log automático de todos los usos de la API |
+| `Respuestas/n95_test_result.json` | Resultado más reciente de N°95 (437 filas) |
+
+---
+
 ### Sesión 9 — 2026-08-18 · Sistema híbrido heurístico + Claude por archivo
 
 #### Contexto
