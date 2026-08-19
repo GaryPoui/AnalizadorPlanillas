@@ -180,6 +180,21 @@ def _append_cost_log(filename: str, usage: dict, rows: int, method: str) -> None
         pass  # never break the main flow due to logging errors
 
 
+HISTORY_DIR = Path(os.getenv("HISTORY_DIR", str(COST_LOG_PATH.parent / "Respuestas" / "history")))
+
+
+def _save_versioned_result(filename: str, result_data: dict) -> None:
+    """Save a timestamped copy of every extraction for historical comparison."""
+    try:
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        safe_stem = re.sub(r'[\\/*?:"<>|]', "_", Path(filename).stem)
+        HISTORY_DIR.mkdir(parents=True, exist_ok=True)
+        dest = HISTORY_DIR / f"{safe_stem}_{ts}.json"
+        dest.write_text(json.dumps(result_data, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception:
+        pass  # never break the main flow
+
+
 # Template columns matching Plantilla_Precios_Compras
 TEMPLATE_COLUMNS = [
     "Cód. Artículo",
@@ -2198,6 +2213,14 @@ async def orchestrator(
     if usage_tracker.get("calls", 0):
         final_method = "hybrid_" + final_method
     _append_cost_log(filename, usage_tracker, len(result["rows"]), final_method)
+    _save_versioned_result(filename, {
+        "filename": filename,
+        "ts": datetime.now().isoformat(timespec="seconds"),
+        "rows": result["rows"],
+        "report": result["report"],
+        "extraction_method": final_method,
+        "usage": cost_info,
+    })
 
     cost_info = {
         "tokens_in":    usage_tracker["input"],
