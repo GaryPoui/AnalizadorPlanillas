@@ -167,6 +167,28 @@ TRANSFORM_CACHE: dict[str, dict] = {}
 AI_COMPLEMENT_ALL_CHUNKS = os.getenv("AI_COMPLEMENT_ALL_CHUNKS", "0") == "1"
 PDF_MIN_EXPECTED_ROWS = max(int(os.getenv("PDF_MIN_EXPECTED_ROWS", "80")), 10)
 PDF_RECOVERY_MAX_CHUNKS = max(int(os.getenv("PDF_RECOVERY_MAX_CHUNKS", "12")), 1)
+# Hybrid mode: per-page (PDF) or per-chunk (XLS) Claude pass after heuristic
+HYBRID_EXTRACTION = os.getenv("HYBRID_EXTRACTION", "1") == "1"
+HYBRID_MAX_TOKENS = max(int(os.getenv("HYBRID_MAX_TOKENS", "6000")), 2000)
+HYBRID_XLS_CHUNK_CHARS = max(int(os.getenv("HYBRID_XLS_CHUNK_CHARS", "25000")), 5000)
+
+# Domain-aware system prompt built from sessions 1-9 experience
+_HYBRID_SYSTEM_PROMPT = (
+    "You extract product entries from Argentine electrical/industrial supplier price lists.\n"
+    "Return ONLY a JSON array. Each object must have:\n"
+    '  "code": product code — 4-5 digit number OR alphanumeric (e.g. SCA-10, UCA-16, HM-12CB, A2, B3)\n'
+    '  "desc": full product description including model name and specifications\n'
+    '  "price": unit price as a plain decimal number (no currency symbols, no spaces)\n'
+    "\n"
+    "Rules:\n"
+    "- Extract ALL products visible on the page/section\n"
+    "- When a page has TWO side-by-side product columns, extract from BOTH columns\n"
+    "- For paired rows (two products on one line), produce two separate objects\n"
+    "- Convert Argentine price format: '1.234,56' → 1234.56; '1 234,56' → 1234.56\n"
+    "- Skip: page headers, section/category titles, subtotals, empty rows\n"
+    "- Known supplier formats: LCT (4-5 digit codes), N°95 (4-5 digit), MICROCONTROL (alphanumeric)\n"
+    "- Return [] if the page/section has no product rows"
+)
 
 # Codes: alphanum with dashes OR pure 4-5 digit (NOT 6+ digit barcodes/prices)
 CODE_TOKEN_RE = r"(?:[A-Z]{1,8}-\d{1,5}(?:-\d{1,5})?|[A-Z]{1,5}\d{2,6}|\d{4,5})"
@@ -782,6 +804,7 @@ def _extract_pdf_sync(file_bytes: bytes) -> dict:
         "raw_text": raw_text,
         "pdf_raw_tables": pdf_raw_tables,
         "pdf_word_rows": pdf_word_rows,
+        "pdf_pages": [p.strip() for p in pages_text],  # per-page text for hybrid pass
         "pages": pages,
         "md_chars": len(md_text),
         "plumber_chars": len(pdfplumber_text),
@@ -1168,6 +1191,109 @@ async def agent_extractor(file_bytes: bytes, filename: str, file_type: str) -> d
     }
 
 
+def _norm_hybrid_price(val: object) -> str:
+    """Normalize a price value returned by Claude in the hybrid pass."""
+    s = re.sub(r"[^\d.,]", "", str(val or ""))
+    if re.search(r"\d\.\d{3},\d", s):  # Argentine format 1.234,56
+        s = s.replace(".", "").replace(",", ".")
+    else:
+        s = s.replace(",", ".")
+    try:
+        return str(round(float(s), 2))
+    except Exception:
+        return ""
+
+
+async def _run_hybrid_pass(
+    raw_data: dict,
+    list_code: str,
+    list_desc: str,
+    default_currency: str,
+) -> list[dict]:
+    """Per-page (PDF) or per-chunk (XLS/CSV) Claude pass. Returns normalized rows."""
+    file_type = raw_data.get("metadata", {}).get("type", "")
+    is_pdf = file_type == ".pdf"
+
+    segments: list[tuple[str, str]] = []  # (text, label)
+
+    if is_pdf:
+        for idx, page_text in enumerate(raw_data.get("pdf_pages", []), 1):
+            clean = page_text.strip()
+            if clean:
+                segments.append((clean, f"page {idx}"))
+    else:
+        raw_text = raw_data.get("raw_text", "").strip()
+        if raw_text:
+            lines = raw_text.splitlines()
+            chunk_lines: list[str] = []
+            chars = 0
+            part = 1
+            for line in lines:
+                chunk_lines.append(line)
+                chars += len(line) + 1
+                if chars >= HYBRID_XLS_CHUNK_CHARS:
+                    segments.append(("\n".join(chunk_lines), f"chunk {part}"))
+                    chunk_lines, chars, part = [], 0, part + 1
+            if chunk_lines:
+                segments.append(("\n".join(chunk_lines), f"chunk {part}"))
+
+    if not segments:
+        return []
+
+    all_rows: list[dict] = []
+    for text, label in segments:
+        try:
+            raw_response = await claude_chat(
+                messages=[{"role": "user", "content": f"{label}:\n{text}"}],
+                system=_HYBRID_SYSTEM_PROMPT,
+                max_tokens=HYBRID_MAX_TOKENS,
+            )
+        except Exception:
+            continue
+
+        raw_response = raw_response.strip()
+        if raw_response.startswith("```"):
+            raw_response = raw_response[raw_response.find("\n") + 1:]
+            raw_response = re.sub(r"```\s*$", "", raw_response).strip()
+
+        parsed: list[dict] = []
+        try:
+            parsed = json.loads(raw_response)
+            if not isinstance(parsed, list):
+                parsed = []
+        except Exception:
+            # Salvage truncated JSON array
+            if "[" in raw_response:
+                last_close = raw_response.rfind("}")
+                if last_close > 0:
+                    try:
+                        salvaged = json.loads(raw_response[:last_close + 1] + "]")
+                        if isinstance(salvaged, list):
+                            parsed = salvaged
+                    except Exception:
+                        pass
+
+        for item in parsed:
+            if not isinstance(item, dict):
+                continue
+            code = str(item.get("code", "")).strip().upper()
+            desc = str(item.get("desc", "")).strip()
+            price = _norm_hybrid_price(item.get("price"))
+            if not code or not price:
+                continue
+            r = _empty_template_row()
+            r["Cód. Artículo"] = code
+            r["Descripción artículo"] = desc
+            r["Precio"] = price
+            r["Cód. Lista"] = list_code
+            r["Desc. Lista"] = list_desc
+            r["Moneda"] = default_currency
+            r["Unidad"] = "Un"
+            all_rows.append(r)
+
+    return all_rows
+
+
 # ─────────────────────────────────────────────
 # AGENT 2: Transformation Agent
 # Maps raw text → template columns
@@ -1413,7 +1539,7 @@ async def agent_transformer(
             text = await claude_chat(
                 messages=[{"role": "user", "content": user_prompt}],
                 system=system_prompt,
-                max_tokens=5000,
+                max_tokens=6000,
             )
         except HTTPException:
             # Graceful degradation: caller can still use local heuristic rows.
@@ -1633,6 +1759,30 @@ async def agent_transformer(
             deduped_by_key[key] = normalized_row
 
     deduped = list(deduped_by_key.values())
+
+    # --- Hybrid pass: per-page/chunk Claude extraction merged into deduped base ---
+    if ai_enabled and HYBRID_EXTRACTION and not validation_mode:
+        hybrid_rows = await _run_hybrid_pass(raw_data, list_code, list_desc, default_currency)
+        if hybrid_rows:
+            deduped_by_code: dict[str, dict] = {
+                str(r.get("Cód. Artículo", "")).strip().upper(): r
+                for r in deduped
+                if str(r.get("Cód. Artículo", "")).strip()
+            }
+            for hr in hybrid_rows:
+                key = str(hr.get("Cód. Artículo", "")).strip().upper()
+                if not key:
+                    continue
+                if key not in deduped_by_code:
+                    deduped_by_code[key] = hr
+                else:
+                    existing_desc = str(deduped_by_code[key].get("Descripción artículo", "")).strip()
+                    new_desc = str(hr.get("Descripción artículo", "")).strip()
+                    if len(new_desc) > len(existing_desc):
+                        deduped_by_code[key]["Descripción artículo"] = new_desc
+            deduped = list(deduped_by_code.values())
+            merged_mapping["hybrid_code"] = "Cód. Artículo"
+            merged_mapping["hybrid_price"] = "Precio"
 
     # Second pass: targeted removal of ghost rows in PDFs (BUG-8 + Sonnet audit).
     # Three rules, applied only to PDFs:
