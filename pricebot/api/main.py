@@ -13,6 +13,7 @@ import hashlib
 import asyncio
 import tempfile
 import unicodedata
+import contextvars
 from pathlib import Path
 from typing import Optional
 from datetime import datetime
@@ -129,6 +130,14 @@ async def claude_chat(messages: list, system: str = "", max_tokens: int = 8000) 
             )
 
         data = resp.json()
+        # Accumulate token usage into the per-request tracker
+        usage = data.get("usage", {})
+        tracker = _request_usage.get()
+        if tracker is not None:
+            tracker["input"]  = tracker.get("input",  0) + int(usage.get("input_tokens",  0) or 0)
+            tracker["output"] = tracker.get("output", 0) + int(usage.get("output_tokens", 0) or 0)
+            tracker["calls"]  = tracker.get("calls",  0) + 1
+
         content_blocks = data.get("content", [])
         texts = []
         for block in content_blocks:
@@ -145,6 +154,31 @@ async def claude_chat(messages: list, system: str = "", max_tokens: int = 8000) 
                 f"Raw: {json.dumps(data)[:600]}"
             ),
         )
+
+def _append_cost_log(filename: str, usage: dict, rows: int, method: str) -> None:
+    """Append one record to the JSONL cost log. Non-blocking best-effort."""
+    try:
+        in_t  = int(usage.get("input",  0))
+        out_t = int(usage.get("output", 0))
+        record = {
+            "ts":            datetime.now().isoformat(timespec="seconds"),
+            "file":          filename,
+            "rows":          rows,
+            "method":        method,
+            "tokens_in":     in_t,
+            "tokens_out":    out_t,
+            "tokens_total":  in_t + out_t,
+            "calls":         int(usage.get("calls", 0)),
+            "cost_display":  round((in_t / 1e6 * _DISPLAY_INPUT_RATE) + (out_t / 1e6 * _DISPLAY_OUTPUT_RATE), 6),
+            "cost_real":     round((in_t / 1e6 * _REAL_INPUT_RATE)    + (out_t / 1e6 * _REAL_OUTPUT_RATE),    6),
+            "model":         CLAUDE_MODEL,
+        }
+        COST_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with COST_LOG_PATH.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(record, ensure_ascii=False) + "\n")
+    except Exception:
+        pass  # never break the main flow due to logging errors
+
 
 # Template columns matching Plantilla_Precios_Compras
 TEMPLATE_COLUMNS = [
@@ -165,6 +199,16 @@ TEMPLATE_COLUMNS = [
 TRANSFORM_CACHE_MAX_ITEMS = max(int(os.getenv("TRANSFORM_CACHE_MAX_ITEMS", "512")), 32)
 TRANSFORM_CACHE: dict[str, dict] = {}
 AI_COMPLEMENT_ALL_CHUNKS = os.getenv("AI_COMPLEMENT_ALL_CHUNKS", "0") == "1"
+
+# Cost tracking — rates used for display (Sonnet reference) and real Haiku rates
+_DISPLAY_INPUT_RATE  = float(os.getenv("INPUT_RATE_PER_M",  "3.0"))   # USD per M tokens
+_DISPLAY_OUTPUT_RATE = float(os.getenv("OUTPUT_RATE_PER_M", "15.0"))
+_REAL_INPUT_RATE     = float(os.getenv("REAL_INPUT_RATE_PER_M",  "0.80"))
+_REAL_OUTPUT_RATE    = float(os.getenv("REAL_OUTPUT_RATE_PER_M",  "4.0"))
+COST_LOG_PATH = Path(os.getenv("COST_LOG_PATH", str(Path(__file__).parent.parent.parent / "costs_log.jsonl")))
+
+# Per-request token accumulator (context-var so concurrent requests don't mix)
+_request_usage: contextvars.ContextVar[dict | None] = contextvars.ContextVar("request_usage", default=None)
 PDF_MIN_EXPECTED_ROWS = max(int(os.getenv("PDF_MIN_EXPECTED_ROWS", "80")), 10)
 PDF_RECOVERY_MAX_CHUNKS = max(int(os.getenv("PDF_RECOVERY_MAX_CHUNKS", "12")), 1)
 # Hybrid mode: per-page (PDF) or per-chunk (XLS) Claude pass after heuristic
@@ -2004,6 +2048,9 @@ async def orchestrator(
     """
     Master agent that coordinates extraction, transformation, and verification.
     """
+    # Start per-request token tracker
+    usage_tracker: dict = {"input": 0, "output": 0, "calls": 0}
+    _usage_token = _request_usage.set(usage_tracker)
     log = []
 
     def log_step(step: str, status: str, detail: str = ""):
@@ -2056,14 +2103,31 @@ async def orchestrator(
         f"Quality: {result['report']['quality_score']}% ({result['report']['valid_rows']}/{result['report']['total_rows']} valid)",
     )
 
+    # Reset context var and persist cost entry
+    _request_usage.reset(_usage_token)
+    final_method = raw_data.get("extraction_method", "unknown")
+    if usage_tracker.get("calls", 0):
+        final_method = "hybrid_" + final_method
+    _append_cost_log(filename, usage_tracker, len(result["rows"]), final_method)
+
+    cost_info = {
+        "tokens_in":    usage_tracker["input"],
+        "tokens_out":   usage_tracker["output"],
+        "tokens_total": usage_tracker["input"] + usage_tracker["output"],
+        "calls":        usage_tracker["calls"],
+        "cost_display": round((usage_tracker["input"] / 1e6 * _DISPLAY_INPUT_RATE) + (usage_tracker["output"] / 1e6 * _DISPLAY_OUTPUT_RATE), 6),
+        "cost_real":    round((usage_tracker["input"] / 1e6 * _REAL_INPUT_RATE)    + (usage_tracker["output"] / 1e6 * _REAL_OUTPUT_RATE),    6),
+    }
+
     return {
         "filename": filename,
         "rows": result["rows"],
         "report": result["report"],
         "validation": validation_report,
         "metadata": raw_data["metadata"],
-        "extraction_method": raw_data.get("extraction_method", "unknown"),
+        "extraction_method": final_method,
         "column_mapping": column_mapping,
+        "usage": cost_info,
         "log": log,
     }
 
