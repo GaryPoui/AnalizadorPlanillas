@@ -1104,6 +1104,8 @@ async def agent_extractor(file_bytes: bytes, filename: str, file_type: str) -> d
     structured_rows = []
     pdf_raw_tables: list = []
     pdf_word_rows: list = []
+    pdf_pages: list = []
+    pdf_page_tables: dict = {}
     metadata = {"filename": filename, "type": ext, "pages": 0}
 
     def normalize_df_to_records(df: pd.DataFrame) -> list[dict]:
@@ -1124,6 +1126,8 @@ async def agent_extractor(file_bytes: bytes, filename: str, file_type: str) -> d
             raw_text = sync_result["raw_text"]
             pdf_raw_tables = sync_result["pdf_raw_tables"]
             pdf_word_rows = sync_result["pdf_word_rows"]
+            pdf_pages = sync_result.get("pdf_pages", [])
+            pdf_page_tables = sync_result.get("pdf_page_tables", {})
             metadata["pages"] = sync_result["pages"]
             metadata["pdf_sources"] = {
                 "markitdown_chars": sync_result["md_chars"],
@@ -1241,6 +1245,8 @@ async def agent_extractor(file_bytes: bytes, filename: str, file_type: str) -> d
         "structured_rows": structured_rows,
         "pdf_raw_tables": pdf_raw_tables,
         "pdf_word_rows": pdf_word_rows,
+        "pdf_pages": pdf_pages,
+        "pdf_page_tables": pdf_page_tables,
         "metadata": metadata,
         "char_count": len(raw_text),
         "extraction_method": extraction_method,
@@ -1288,7 +1294,13 @@ async def _run_hybrid_pass(
                         if row:
                             cells = [str(c or "").strip().replace("\n", " ") for c in row]
                             grid_lines.append(" | ".join(cells))
-                segment = "\n".join(grid_lines)
+                grid_segment = "\n".join(grid_lines)
+                # Only use the table grid if it actually contains code+price pairs.
+                # Otherwise (sparse header-only tables like N95) fall back to page text.
+                if CODE_PRICE_RE.search(grid_segment):
+                    segment = grid_segment
+                else:
+                    segment = page_text.strip()
             else:
                 segment = page_text.strip()
             if segment:
@@ -1852,6 +1864,23 @@ async def agent_transformer(
                     new_desc = str(hr.get("Descripción artículo", "")).strip()
                     if len(new_desc) > len(existing_desc):
                         deduped_by_code[key]["Descripción artículo"] = new_desc
+                    # Fix truncated price: if Claude's price is >=2x larger, the existing is a fragment
+                    try:
+                        existing_p = float(deduped_by_code[key].get("Precio") or 0)
+                        claude_p   = float(hr.get("Precio") or 0)
+                        if claude_p >= existing_p * 2.0:
+                            deduped_by_code[key]["Precio"] = hr["Precio"]
+                    except Exception:
+                        pass
+                    # Fix truncated prices: table cells can contain only the decimal fragment.
+                    # When Claude's price is >=2x larger the existing value is likely truncated.
+                    try:
+                        existing_p = float(deduped_by_code[key].get("Precio") or 0)
+                        claude_p   = float(hr.get("Precio") or 0)
+                        if claude_p >= existing_p * 2.0:
+                            deduped_by_code[key]["Precio"] = hr["Precio"]
+                    except Exception:
+                        pass
             deduped = list(deduped_by_code.values())
             merged_mapping["hybrid_code"] = "Cód. Artículo"
             merged_mapping["hybrid_price"] = "Precio"
