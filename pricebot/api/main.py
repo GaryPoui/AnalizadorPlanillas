@@ -503,10 +503,14 @@ def heuristic_extract_rows(
             except Exception:
                 continue
 
-            # Keep a usable description while avoiding expensive IA for obvious rows.
-            line_without_code_price = re.sub(rf"\b{re.escape(code)}\b", "", line_clean, flags=re.IGNORECASE)
-            line_without_code_price = line_without_code_price.replace(raw_price, "")
-            desc = re.sub(r"\s{2,}", " ", line_without_code_price).strip(" |;-\t")
+            # If the line has multiple code+price pairs it's a parallel-column layout.
+            # Using the remaining text as description would contaminate it with the other product.
+            if len(matches) > 1:
+                desc = ""
+            else:
+                line_without_code_price = re.sub(rf"\b{re.escape(code)}\b", "", line_clean, flags=re.IGNORECASE)
+                line_without_code_price = line_without_code_price.replace(raw_price, "")
+                desc = re.sub(r"\s{2,}", " ", line_without_code_price).strip(" |;-\t")
             row["Descripción artículo"] = desc if desc else code.strip()
 
             row["Cód. Lista"] = list_code
@@ -792,6 +796,7 @@ def _extract_pdf_sync(file_bytes: bytes) -> dict:
     pdfplumber_text = ""
     pdf_raw_tables: list = []
     pdf_word_rows: list = []
+    pdf_page_tables: dict[int, list] = {}  # page_idx (0-based) → list of tables
     pages = 0
 
     try:
@@ -806,9 +811,13 @@ def _extract_pdf_sync(file_bytes: bytes) -> dict:
             pages_text = []
             for i, page in enumerate(pdf.pages):
                 text = (page.extract_text() or "").strip()
+                # Fix split Argentine prices: "49. 440,42" → "49.440,42" (pdfplumber kern gaps)
+                text = re.sub(r'(\d{1,3})\.\s+(\d{3}[,]\d{2})\b', r'\1.\2', text)
+                text = re.sub(r'(\d{1,3})\.\s+(\d{3})\.\s+(\d{3}[,]\d{2})\b', r'\1.\2.\3', text)
                 tables = page.extract_tables() or []
                 if tables:
                     pdf_raw_tables.append((i + 1, tables))
+                    pdf_page_tables[i] = tables
                 table_lines = []
                 for table in tables:
                     for row in table or []:
@@ -849,6 +858,7 @@ def _extract_pdf_sync(file_bytes: bytes) -> dict:
         "pdf_raw_tables": pdf_raw_tables,
         "pdf_word_rows": pdf_word_rows,
         "pdf_pages": [p.strip() for p in pages_text],  # per-page text for hybrid pass
+        "pdf_page_tables": pdf_page_tables,             # per-page raw tables for hybrid pass
         "pages": pages,
         "md_chars": len(md_text),
         "plumber_chars": len(pdfplumber_text),
@@ -1261,10 +1271,26 @@ async def _run_hybrid_pass(
     segments: list[tuple[str, str]] = []  # (text, label)
 
     if is_pdf:
+        page_tables = raw_data.get("pdf_page_tables", {})
         for idx, page_text in enumerate(raw_data.get("pdf_pages", []), 1):
-            clean = page_text.strip()
-            if clean:
-                segments.append((clean, f"page {idx}"))
+            tables = page_tables.get(idx - 1, [])
+            if tables:
+                # Format raw table as a grid so Claude sees columns, not linearized text
+                grid_lines = []
+                for t_i, table in enumerate(tables):
+                    if not table:
+                        continue
+                    if len(tables) > 1:
+                        grid_lines.append(f"[Table {t_i + 1}]")
+                    for row in table:
+                        if row:
+                            cells = [str(c or "").strip().replace("\n", " ") for c in row]
+                            grid_lines.append(" | ".join(cells))
+                segment = "\n".join(grid_lines)
+            else:
+                segment = page_text.strip()
+            if segment:
+                segments.append((segment, f"page {idx}"))
     else:
         raw_text = raw_data.get("raw_text", "").strip()
         if raw_text:
