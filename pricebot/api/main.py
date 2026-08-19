@@ -235,8 +235,10 @@ _HYBRID_SYSTEM_PROMPT = (
 )
 
 # Codes: alphanum with dashes OR pure 4-5 digit (NOT 6+ digit barcodes/prices)
-CODE_TOKEN_RE = r"(?:[A-Z]{1,8}-\d{1,5}(?:-\d{1,5})?|[A-Z]{1,5}\d{2,6}|\d{4,5})"
-PRICE_TOKEN_RE = r"(?:\$\s*)?\d{1,3}(?:\.\d{3})*(?:,\d{2})|(?:\$\s*)?\d{4,7}"
+# CODE_TOKEN_RE: handles pure-letter prefix (TBE-07-150), alnum prefix (BE64-12-150, CPE90-64-16-150), standalone alnum (GCE), numeric (2200)
+CODE_TOKEN_RE = r"(?:[A-Z][A-Z0-9]{0,7}(?:[-./][A-Z0-9]{1,10}){1,4}|[A-Z]{1,5}\d{2,6}|[A-Z]{2,8}|\d{4,5})"
+# PRICE_TOKEN_RE: handles formatted (49.440,42), plain decimal (17814,76), integer-like (49440)
+PRICE_TOKEN_RE = r"(?:\$\s*)?\d{1,3}(?:\.\d{3})*[,\.]\d{2}|(?:\$\s*)?\d{2,7}[,\.]\d{2}|(?:\$\s*)?\d{4,7}"
 CODE_PRICE_RE = re.compile(rf"({CODE_TOKEN_RE})\s+({PRICE_TOKEN_RE})")
 CODE_PRICE_ANYWHERE_RE = re.compile(rf"({CODE_TOKEN_RE}).{{0,80}}?({PRICE_TOKEN_RE})")
 CODE_ONLY_RE = re.compile(rf"\b({CODE_TOKEN_RE})\b", flags=re.IGNORECASE)
@@ -875,7 +877,7 @@ def _is_valid_product_code(code: str) -> bool:
         return False
     if code.isdigit():
         return 4 <= len(code) <= 5
-    return bool(re.match(r'^[A-Z][A-Z0-9\-/]{1,15}$', code))
+    return bool(re.match(r'^[A-Z][A-Z0-9\-/\.]{1,19}$', code))
 
 
 def _detect_table_column_roles(rows: list[list[str]]) -> dict[str, int]:
