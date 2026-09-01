@@ -98,6 +98,9 @@ SESION 11 (2026-09-01) — Resiliencia y calidad verificable
       otro código+precio, precios PDF enteros sospechosos y precios en conflicto
   [x] quality_score ya no ignora códigos inválidos ni precios no numéricos
   [x] Test local: tmp/test_hybrid_timeout.py y tmp/test_verifier_confidence.py
+  [x] Recuperación local autoritativa: pares código+precio encontrados de forma
+      inequívoca en el texto PDF reemplazan fragmentos de tabla/word-coordinates
+  [x] Regresión N°95 ampliada: BE, CPE, TEP, CPP, RSE, GSE, GCE y BRO
 
 ==========================================================
 PENDIENTES / PROXIMOS PASOS

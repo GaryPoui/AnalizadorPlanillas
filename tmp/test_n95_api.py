@@ -13,16 +13,20 @@ CHECKS = [
     ("BE64-12-300",     53486.87),
     ("TBE-07-150",      17814.76),
     ("TBE-07-300",      30240.50),
-    ("CPE90-64-16-150", 24979.47),
+    ("CPE90-64-16-150", 23268.59),
+    ("CPE90-92-16-150", 24979.47),
     ("CAE-64-16-150",   40219.77),
     ("GSE-64/92",       1454.55),
     ("GCE",             2444.71),
     ("RSE-18-75",       3022.03),
     ("BRO-1/2",         894.45),
+    ("CPP45-07-050",    2934.12),
+    ("TEP-09-450",      2617.85),
+    ("TEP-09-600",      3175.54),
 ]
 
 with open(str(PDF), "rb") as f:
-    resp = httpx.post("http://localhost:8000/extract", files={"file": f}, timeout=600)
+    resp = httpx.post("http://127.0.0.1:8000/extract", files={"file": f}, timeout=600)
 
 data = resp.json()
 rows = data.get("rows", [])

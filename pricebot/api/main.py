@@ -1348,6 +1348,25 @@ def _is_fragment_price(price: str) -> bool:
     return value < 1000 or value.is_integer()
 
 
+def _extract_unambiguous_pdf_prices(raw_data: dict) -> dict[str, str]:
+    """Return code-price pairs found exactly once across PDF page text."""
+    candidates: dict[str, set[str]] = {}
+    for page_text in raw_data.get("pdf_pages", []):
+        normalized_page = re.sub(r"-{2,}", "-", str(page_text))
+        for code, raw_price in CODE_PRICE_RE.findall(normalized_page):
+            normalized_code = re.sub(r"-{2,}", "-", code.strip().upper())
+            normalized_price = _normalize_price_token(raw_price)
+            if not _is_valid_product_code(normalized_code):
+                continue
+            try:
+                if float(normalized_price) <= 0:
+                    continue
+            except ValueError:
+                continue
+            candidates.setdefault(normalized_code, set()).add(normalized_price)
+    return {code: next(iter(prices)) for code, prices in candidates.items() if len(prices) == 1}
+
+
 async def _run_hybrid_pass(
     raw_data: dict,
     list_code: str,
@@ -1977,6 +1996,14 @@ async def agent_transformer(
             deduped = list(deduped_by_code.values())
             merged_mapping["hybrid_code"] = "Cód. Artículo"
             merged_mapping["hybrid_price"] = "Precio"
+
+    # Exact inline PDF pairs are authoritative over table/word-coordinate fragments.
+    if raw_data.get("metadata", {}).get("type") == ".pdf":
+        exact_prices = _extract_unambiguous_pdf_prices(raw_data)
+        for row in deduped:
+            code = str(row.get("Cód. Artículo", "")).strip().upper()
+            if code in exact_prices:
+                row["Precio"] = exact_prices[code]
 
     for row in deduped:
         description = str(row.get("Descripción artículo", "")).strip()
