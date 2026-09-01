@@ -1,0 +1,155 @@
+ROADMAP — AnalizadorPlanillas / PriceBot
+=========================================
+Ultima actualizacion: 2026-09-01
+
+==========================================================
+COMO INICIAR EL SISTEMA
+==========================================================
+
+  Opcion A (recomendada):
+    start.bat
+    (doble clic en el Explorador de Windows, o desde cmd)
+
+  Opcion B (PowerShell):
+    C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -File "start.ps1"
+
+  Manual:
+    C:\Users\Pasante\AppData\Local\Python\pythoncore-3.14-64\python.exe -m uvicorn main:app
+      --host 0.0.0.0 --port 8000 --reload
+      --app-dir "c:\Users\Pasante\Desktop\AnalizadorPlanillas\pricebot\api"
+
+  Backend: http://localhost:8000
+  Docs:    http://localhost:8000/docs
+  Frontend: pricebot/frontend/index.html
+
+==========================================================
+LO QUE SE HIZO (por sesion)
+==========================================================
+
+SESION 1-4 (2026-08-04 / 05) — Setup y bugs iniciales
+  [x] Organizacion del proyecto (carpetas Listas/, Respuestas/, tests/)
+  [x] BUG-1: XLS sin headers fallback a Claude
+  [x] BUG-2: OCR para PDFs escaneados (AR36) via pytesseract
+  [x] BUG-3: extraccion por coordenadas de palabras (word-coord)
+  [x] BUG-4: asyncio.to_thread() para evitar timeouts en PDFs grandes
+  [x] BUG-5: prioridad PARTID sobre EAN/barcode en deteccion de columnas
+  [x] BUG-6: tablas multi-columna en PDFs (extra_pairs)
+  [x] BUG-7: AI_COMPLEMENT_ALL_CHUNKS default=0, guard para LCT
+  [x] BUG-8: ghost rows (blacklist + filtros R1/R2/R3)
+  [x] Modelo cambiado a claude-haiku-4-5 (disponible en este tier)
+
+SESION 5-8 (2026-08-11 / 18) — Auditoria y mejoras extractor
+  [x] Auditoria LCT con Claude Sonnet: 66 codigos faltantes identificados
+  [x] R1 conservativo (alpha_chars < 5) — evita falsos positivos en paired tables
+  [x] Soporte tabla transpuesta en extract_rows_from_pdf_tables()
+  [x] Extractor LCT mejorado: 903 -> 974 filas sin patches manuales
+  [x] AR36 excluido de batch automatico (SKIP_FILES en batch_test_listas.py)
+
+SESION 9 (2026-08-18) — Sistema hibrido
+  [x] Sistema hibrido disenado e implementado (por pagina para PDFs, por chunk para XLS)
+  [x] Scripts standalone: tmp/tmp_test_lct_claude.py, tmp_test_n95_claude.py, tmp_test_microcontrol_claude.py
+  [x] Resultados: LCT 974->1052, N95 620->493, MICROCONTROL 60->312
+  [x] Bug fix: max_tokens 2000->6000 + salvamento JSON truncado
+  [x] json_to_xlsx.py: conversion JSON->XLSX sin costo de API
+  [x] costos.txt: registro manual de gastos
+  [x] Todos los JSONs convertidos a XLSX en Respuestas/
+
+SESION 9b (2026-08-18) — Integracion hibrido en API
+  [x] HYBRID_EXTRACTION=1 integrado en agent_transformer() como default
+  [x] _run_hybrid_pass(): funcion modular con prompt orientado a proveedores AR
+  [x] _HYBRID_SYSTEM_PROMPT: system prompt con conocimiento acumulado sesiones 1-9
+  [x] _extract_pdf_sync(): expone pdf_pages y pdf_page_tables
+  [x] transform_chunk max_tokens: 5000 -> 6000
+
+SESION 9c (2026-08-18) — Tracking de costos
+  [x] _request_usage ContextVar: acumula tokens por request (thread-safe)
+  [x] claude_chat(): captura usage de cada respuesta Anthropic
+  [x] _append_cost_log(): escribe JSONL en costs_log.jsonl por cada extraccion
+  [x] orchestrator(): campo 'usage' en la respuesta con tokens y costo
+  [x] SETUP.md: guia completa de instalacion y uso
+
+SESION 10 (2026-08-19) — Fixes de extraccion + garbage codes + historial
+  [x] BUG CRITICO: pdf_pages/pdf_page_tables no pasaban a agent_transformer
+      (hybrid pass veia 0 paginas -> nunca llamaba a Claude)
+  [x] CODE_TOKEN_RE: ahora captura BE64-12-150, CPE90-64-16-150, CAE-64-16-450
+  [x] PRICE_TOKEN_RE: ahora captura precios sin separador de miles (17814,76)
+  [x] _is_valid_product_code: rechaza years (1990-2030) como codigos
+  [x] _CODE_BLACKLIST: expandida con articulos espanol (DE, EL, LA), meses,
+      fragmentos de codigo (PC), texto descriptivo (PATENTE, ACLARAR, CUPLA)
+  [x] _NOISE_LINE_RE: filtra lineas de telefono, fecha, patentes
+  [x] Normalizacion de doble-guion: CPP45--07-050 -> CPP45-07-050
+  [x] Hybrid merge: actualiza precio si Claude >= 2x el existente (truncacion)
+  [x] Grid fallback: usa page_text si la grilla de tabla no tiene pares cod+precio
+  [x] _save_versioned_result(): copia con timestamp en Respuestas/history/
+  [x] tmp/compare_history.py: comparacion historica de extracciones
+  [x] tmp/show_costs.py: visualizador del log de costos
+  [x] start.ps1 + start.bat: inicio del proyecto con un solo comando
+  [x] README.md + SETUP.md: documentacion actualizada
+
+  Resultado N°95: 4/10 -> 9/10 spot-checks correctos
+  Costo sesion N°95: ~$0.80 display / ~$0.21 real
+
+==========================================================
+PENDIENTES / PROXIMOS PASOS
+==========================================================
+
+ALTA PRIORIDAD
+  [ ] CPE90-64-16-150 precio incorrecto: el PDF tiene dos variantes en la misma
+      linea (-64- y -92-), Claude toma el primer precio. Solucion: prompt mas
+      especifico para distinguir variantes de mismo codigo base.
+
+  [ ] Validacion cruzada PDF<->JSON: herramienta que dado un PDF y su JSON
+      extrae metricas de precision (% codigos correctos, % precios correctos)
+      sin requerir revision manual.
+
+MEDIA PRIORIDAD
+  [ ] Fragmentos de codigo en tablas complejas (V-16, 6000 de PC44.44-09-6000):
+      mejorar la deteccion de codigos que son prefijos/sufijos de otros mas largos.
+
+  [ ] AR36 (PDF escaneado): OCR calidad deficiente. Opciones:
+      a) Pre-procesamiento de imagen antes de Tesseract (deskew, binarize)
+      b) Claude Vision directo en lugar de Tesseract
+
+  [ ] Batch test automatico que incluya verificacion de calidad (no solo cantidad
+      de filas) usando costs_log.jsonl + compare_history.py
+
+  [ ] Modo sin API: HYBRID_EXTRACTION=0 en .env para extracciones gratuitas
+      (documentar mas claramente cuando usarlo)
+
+BAJA PRIORIDAD
+  [ ] Docker: actualizar docker-compose.yml con las nuevas variables de entorno
+      (HYBRID_EXTRACTION, COST_LOG_PATH, HISTORY_DIR)
+
+  [ ] Frontend: mostrar campo 'usage' (tokens/costo) en la UI despues de cada extraccion
+
+  [ ] Test de regresion automatico: correr batch y comparar contra historico,
+      alertar si una metrica empeora
+
+==========================================================
+ARCHIVOS CLAVE
+==========================================================
+
+  pricebot/api/main.py       — toda la logica del sistema
+  pricebot/.env              — API key + configuracion (NO commitear claves)
+  SETUP.md                   — guia de instalacion y uso
+  ROADMAP.txt                — este archivo
+  costos.txt                 — registro manual de gastos de API
+  costs_log.jsonl            — log automatico por extraccion
+  tests/batch_test_listas.py — batch test (excluye AR36 por default)
+  tmp/compare_history.py     — comparacion historica de extracciones
+  tmp/show_costs.py          — visualizador de costos acumulados
+  tmp/test_n95_api.py        — test con spot-checks para N°95
+  Respuestas/history/        — versiones históricas de cada extraccion
+
+==========================================================
+VARIABLES DE ENTORNO (pricebot/.env)
+==========================================================
+
+  ANTHROPIC_API_KEY=...          # obligatorio
+  CLAUDE_MODEL=claude-haiku-4-5  # modelo activo
+  TESSERACT_CMD=...              # ruta a tesseract.exe (solo para PDFs escaneados)
+  HYBRID_EXTRACTION=1            # 0 para desactivar (sin costo de API)
+  HYBRID_MAX_TOKENS=6000
+  HYBRID_XLS_CHUNK_CHARS=25000
+  COST_LOG_PATH=costs_log.jsonl
+  HISTORY_DIR=Respuestas/history

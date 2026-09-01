@@ -4,6 +4,38 @@ Sistema multi-agente que recibe archivos de listas de precios de proveedores y l
 
 ---
 
+## Inicio rapido
+
+```bat
+start.bat
+```
+o desde PowerShell:
+```powershell
+C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -File "start.ps1"
+```
+Levanta el backend en `http://localhost:8000` y abre el frontend. Documentacion completa en [SETUP.md](SETUP.md).
+
+---
+
+## Estado actual del sistema (2026-09-01)
+
+| Archivo de prueba | Filas extraidas | Metodo | Costo aprox. |
+|---|---|---|---|
+| L26031 xlsx/csv | 2,558 | heuristico puro | $0.00 |
+| LCT PDF (46 pag) | 1,052 | hybrid | ~$1.05 display |
+| Lista N°95 PDF (7 pag) | 437 | hybrid | ~$0.38 display |
+| LP MICROCONTROL xls | 312 | hybrid | ~$0.27 display |
+| AR36 PDF (escaneado) | ~119 | OCR+Claude | ~$0.24 display |
+
+Verificacion externa (N°95): **9/10 spot-checks correctos**.
+
+### Pendientes conocidos
+- `CPE90-64-16-150` toma el precio de la variante `-64-` cuando el PDF tiene las variantes `-64-` y `-92-` en la misma linea
+- Algunos codigos fragmentados de tablas complejas (`V-16`, `6000`) aun aparecen en ciertos PDFs
+- AR36 (PDF escaneado): calidad de OCR deficiente, excluido de batch automatico
+
+---
+
 ## Arquitectura
 
 ```

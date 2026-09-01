@@ -1,6 +1,25 @@
 # SETUP — AnalizadorPlanillas API
 
-## Qué es
+## Inicio rapido (un solo comando)
+
+**Opcion A — doble clic o desde cmd/bat:**
+```
+start.bat
+```
+
+**Opcion B — desde PowerShell:**
+```powershell
+C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -File "start.ps1"
+```
+
+El script levanta el backend, espera que arranque y abre el frontend en el navegador.
+- Backend: http://localhost:8000
+- Docs API: http://localhost:8000/docs
+- Frontend: `pricebot/frontend/index.html` (se abre automaticamente)
+
+---
+
+## Que es
 
 API REST construida con FastAPI que recibe archivos de listas de precios de proveedores
 (PDF, XLS, XLSX, CSV) y los convierte al formato estándar de 12 columnas
