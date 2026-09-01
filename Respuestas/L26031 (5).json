@@ -35816,35 +35816,133 @@
   ],
   "report": {
     "total_rows": 2558,
-    "valid_rows": 2554,
-    "rows_with_issues": 4,
+    "valid_rows": 0,
+    "rows_with_issues": 2558,
+    "suspicious_rows": 183,
+    "conflicting_price_codes": [],
     "issues": [
       {
-        "row": 1087,
+        "row": 1,
         "issues": [
-          "Missing description"
+          "Invalid product code: '11517065'"
         ]
       },
       {
-        "row": 1088,
+        "row": 2,
         "issues": [
-          "Missing description"
+          "Invalid product code: '11517129'"
         ]
       },
       {
-        "row": 1089,
+        "row": 3,
         "issues": [
-          "Missing description"
+          "Invalid product code: '11517267'"
         ]
       },
       {
-        "row": 1090,
+        "row": 4,
         "issues": [
-          "Missing description"
+          "Invalid product code: '11527040'"
+        ]
+      },
+      {
+        "row": 5,
+        "issues": [
+          "Invalid product code: '11527041'"
+        ]
+      },
+      {
+        "row": 6,
+        "issues": [
+          "Invalid product code: '11527042'"
+        ]
+      },
+      {
+        "row": 7,
+        "issues": [
+          "Invalid product code: '11597211'"
+        ]
+      },
+      {
+        "row": 8,
+        "issues": [
+          "Invalid product code: '12507061'"
+        ]
+      },
+      {
+        "row": 9,
+        "issues": [
+          "Invalid product code: '14517527'"
+        ]
+      },
+      {
+        "row": 10,
+        "issues": [
+          "Invalid product code: '14517528'"
+        ]
+      },
+      {
+        "row": 11,
+        "issues": [
+          "Invalid product code: '14521031'"
+        ]
+      },
+      {
+        "row": 12,
+        "issues": [
+          "Invalid product code: '15000352'"
+        ]
+      },
+      {
+        "row": 13,
+        "issues": [
+          "Invalid product code: '15000502'"
+        ]
+      },
+      {
+        "row": 14,
+        "issues": [
+          "Invalid product code: '15000702'"
+        ]
+      },
+      {
+        "row": 15,
+        "issues": [
+          "Invalid product code: '15000952'"
+        ]
+      },
+      {
+        "row": 16,
+        "issues": [
+          "Invalid product code: '15001202'"
+        ]
+      },
+      {
+        "row": 17,
+        "issues": [
+          "Invalid product code: '15001502'"
+        ]
+      },
+      {
+        "row": 18,
+        "issues": [
+          "Invalid product code: '15001852'"
+        ]
+      },
+      {
+        "row": 19,
+        "issues": [
+          "Invalid product code: '15002402'"
+        ]
+      },
+      {
+        "row": 20,
+        "issues": [
+          "Invalid product code: '15003002'"
         ]
       }
     ],
-    "quality_score": 99.8
+    "quality_score": 0.0
   },
   "validation": null,
   "metadata": {
@@ -35862,42 +35960,50 @@
     "STOCK_UM": "Unidad",
     "UNIT_PRICE": "Precio"
   },
+  "usage": {
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "tokens_total": 0,
+    "calls": 0,
+    "cost_display": 0.0,
+    "cost_real": 0.0
+  },
   "log": [
     {
       "step": "extraction",
       "status": "running",
       "detail": "Processing L26031 (5).csv",
-      "timestamp": "2026-08-18T15:38:34.469449"
+      "timestamp": "2026-09-01T15:52:53.872935"
     },
     {
       "step": "extraction",
       "status": "done",
       "detail": "Extracted 305340 chars from 0 pages",
-      "timestamp": "2026-08-18T15:38:34.590379"
+      "timestamp": "2026-09-01T15:52:53.972972"
     },
     {
       "step": "transformation",
       "status": "running",
       "detail": "Mapping data to template columns",
-      "timestamp": "2026-08-18T15:38:34.590395"
+      "timestamp": "2026-09-01T15:52:53.972989"
     },
     {
       "step": "transformation",
       "status": "done",
       "detail": "Extracted 2558 product rows",
-      "timestamp": "2026-08-18T15:38:34.603839"
+      "timestamp": "2026-09-01T15:52:53.984900"
     },
     {
       "step": "verification",
       "status": "running",
       "detail": "Validating and cleaning data",
-      "timestamp": "2026-08-18T15:38:34.603855"
+      "timestamp": "2026-09-01T15:52:53.984926"
     },
     {
       "step": "verification",
       "status": "done",
-      "detail": "Quality: 99.8% (2554/2558 valid)",
-      "timestamp": "2026-08-18T15:38:34.615200"
+      "detail": "Quality: 0.0% (0/2558 valid)",
+      "timestamp": "2026-09-01T15:52:54.062580"
     }
   ]
 }

@@ -2336,14 +2336,6 @@ async def orchestrator(
     if usage_tracker.get("calls", 0):
         final_method = "hybrid_" + final_method
     _append_cost_log(filename, usage_tracker, len(result["rows"]), final_method)
-    _save_versioned_result(filename, {
-        "filename": filename,
-        "ts": datetime.now().isoformat(timespec="seconds"),
-        "rows": result["rows"],
-        "report": result["report"],
-        "extraction_method": final_method,
-        "usage": cost_info,
-    })
 
     cost_info = {
         "tokens_in":    usage_tracker["input"],
@@ -2353,6 +2345,14 @@ async def orchestrator(
         "cost_display": round((usage_tracker["input"] / 1e6 * _DISPLAY_INPUT_RATE) + (usage_tracker["output"] / 1e6 * _DISPLAY_OUTPUT_RATE), 6),
         "cost_real":    round((usage_tracker["input"] / 1e6 * _REAL_INPUT_RATE)    + (usage_tracker["output"] / 1e6 * _REAL_OUTPUT_RATE),    6),
     }
+    _save_versioned_result(filename, {
+        "filename": filename,
+        "ts": datetime.now().isoformat(timespec="seconds"),
+        "rows": result["rows"],
+        "report": result["report"],
+        "extraction_method": final_method,
+        "usage": cost_info,
+    })
 
     return {
         "filename": filename,

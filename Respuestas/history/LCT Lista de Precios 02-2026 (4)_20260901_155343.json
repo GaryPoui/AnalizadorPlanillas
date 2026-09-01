@@ -1,5 +1,6 @@
 {
   "filename": "LCT Lista de Precios 02-2026 (4).pdf",
+  "ts": "2026-09-01T15:53:43",
   "rows": [
     {
       "Cód. Artículo": "2002",
@@ -13499,26 +13500,7 @@
     ],
     "quality_score": 96.8
   },
-  "validation": null,
-  "metadata": {
-    "filename": "LCT Lista de Precios 02-2026 (4).pdf",
-    "type": ".pdf",
-    "pages": 46,
-    "pdf_sources": {
-      "markitdown_chars": 0,
-      "pdfplumber_chars": 162986
-    }
-  },
   "extraction_method": "pdf_pdfplumber_only",
-  "column_mapping": {
-    "numeric_profile_code": "Cód. Artículo",
-    "numeric_profile_price": "Precio",
-    "numeric_profile_desc": "Descripción artículo",
-    "pdf_table_code": "Cód. Artículo",
-    "pdf_table_price": "Precio",
-    "pdf_word_code": "Cód. Artículo",
-    "pdf_word_price": "Precio"
-  },
   "usage": {
     "tokens_in": 0,
     "tokens_out": 0,
@@ -13526,43 +13508,5 @@
     "calls": 0,
     "cost_display": 0.0,
     "cost_real": 0.0
-  },
-  "log": [
-    {
-      "step": "extraction",
-      "status": "running",
-      "detail": "Processing LCT Lista de Precios 02-2026 (4).pdf",
-      "timestamp": "2026-09-01T15:52:54.112531"
-    },
-    {
-      "step": "extraction",
-      "status": "done",
-      "detail": "Extracted 163013 chars from 46 pages",
-      "timestamp": "2026-09-01T15:53:43.132145"
-    },
-    {
-      "step": "transformation",
-      "status": "running",
-      "detail": "Mapping data to template columns",
-      "timestamp": "2026-09-01T15:53:43.132159"
-    },
-    {
-      "step": "transformation",
-      "status": "done",
-      "detail": "Extracted 954 product rows",
-      "timestamp": "2026-09-01T15:53:43.562841"
-    },
-    {
-      "step": "verification",
-      "status": "running",
-      "detail": "Validating and cleaning data",
-      "timestamp": "2026-09-01T15:53:43.562872"
-    },
-    {
-      "step": "verification",
-      "status": "done",
-      "detail": "Quality: 96.8% (923/954 valid)",
-      "timestamp": "2026-09-01T15:53:43.575620"
-    }
-  ]
+  }
 }
