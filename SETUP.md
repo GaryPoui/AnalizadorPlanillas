@@ -74,7 +74,7 @@ TESSERACT_CMD=C:\Users\...\Tesseract-OCR\tesseract.exe  # opcional, para OCR
 
 # Sistema híbrido (default: activo)
 HYBRID_EXTRACTION=1                         # 0 para desactivar (sin costo de API)
-HYBRID_MAX_TOKENS=6000
+HYBRID_MAX_TOKENS=3500                       # salida compacta: solo código + precio
 HYBRID_XLS_CHUNK_CHARS=25000
 CLAUDE_TIMEOUT_SEC=20                       # timeout estricto por página/chunk
 PDF_USE_MARKITDOWN=0                        # 1 solo si se necesita ese conversor; pdfplumber es default
@@ -272,6 +272,10 @@ python tmp/compact_pdf_for_hybrid.py "Listas/archivo.pdf" --output "tmp/archivo_
 ```
 
 El script no llama a Claude, no altera el PDF ni genera costo.
+
+El paso híbrido solicita a Claude solo objetos `{"code":"...","price":"..."}`.
+Las descripciones se conservan desde la extracción local; esto reduce tokens de salida,
+tiempo de respuesta y riesgo de timeouts.
 
 ---
 

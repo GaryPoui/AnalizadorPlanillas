@@ -239,7 +239,7 @@ PDF_MIN_EXPECTED_ROWS = max(int(os.getenv("PDF_MIN_EXPECTED_ROWS", "80")), 10)
 PDF_RECOVERY_MAX_CHUNKS = max(int(os.getenv("PDF_RECOVERY_MAX_CHUNKS", "12")), 1)
 # Hybrid mode: per-page (PDF) or per-chunk (XLS) Claude pass after heuristic
 HYBRID_EXTRACTION = os.getenv("HYBRID_EXTRACTION", "1") == "1"
-HYBRID_MAX_TOKENS = max(int(os.getenv("HYBRID_MAX_TOKENS", "6000")), 2000)
+HYBRID_MAX_TOKENS = max(int(os.getenv("HYBRID_MAX_TOKENS", "3500")), 1000)
 HYBRID_XLS_CHUNK_CHARS = max(int(os.getenv("HYBRID_XLS_CHUNK_CHARS", "25000")), 5000)
 CLAUDE_TIMEOUT_SEC = max(float(os.getenv("CLAUDE_TIMEOUT_SEC", "90")), 10.0)
 PDF_USE_MARKITDOWN = os.getenv("PDF_USE_MARKITDOWN", "0") == "1"
@@ -247,9 +247,8 @@ PDF_USE_MARKITDOWN = os.getenv("PDF_USE_MARKITDOWN", "0") == "1"
 # Domain-aware system prompt built from sessions 1-9 experience
 _HYBRID_SYSTEM_PROMPT = (
     "You extract product entries from Argentine electrical/industrial supplier price lists.\n"
-    "Return ONLY a JSON array. Each object must have:\n"
+    "Return ONLY a compact JSON array. Each object must have exactly:\n"
     '  "code": product code — 4-5 digit number OR alphanumeric (e.g. SCA-10, UCA-16, HM-12CB, A2, B3)\n'
-    '  "desc": full product description including model name and specifications\n'
     '  "price": unit price as a plain decimal number (no currency symbols, no spaces)\n'
     "\n"
     "Rules:\n"
@@ -257,7 +256,7 @@ _HYBRID_SYSTEM_PROMPT = (
     "- When a page has TWO side-by-side product columns, extract from BOTH columns\n"
     "- For paired rows (two products on one line), produce two separate objects\n"
     "- Convert Argentine price format: '1.234,56' → 1234.56; '1 234,56' → 1234.56\n"
-    "- If the input only contains code-price rows, set desc to an empty string; do not invent descriptions\n"
+    "- Do not include descriptions, categories, explanations, markdown, or any keys other than code and price\n"
     "- Skip: page headers, section/category titles, subtotals, empty rows\n"
     "- Known supplier formats: LCT (4-5 digit codes), N°95 (4-5 digit), MICROCONTROL (alphanumeric)\n"
     "- Return [] if the page/section has no product rows"
