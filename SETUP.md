@@ -248,6 +248,19 @@ Para desactivar el modo híbrido y no gastar tokens: `HYBRID_EXTRACTION=0` en `.
 
 ---
 
+## Validar una extracción PDF
+
+El siguiente comando no usa Claude ni genera costo. Recupera pares `código → precio`
+inequívocos del texto PDF y los compara con un JSON extraído:
+
+```bash
+python tmp/validate_pdf_json.py "Listas/archivo.pdf" "Respuestas/resultado.json"
+```
+
+El reporte muestra pares correctos, faltantes, precios diferentes y la precisión verificable.
+
+---
+
 ## Tests batch
 
 Correr extracción sobre todos los archivos de `Listas/` (sin AR36):
