@@ -1,5 +1,6 @@
 {
   "filename": "LP MICROCONTROL 2026-02 (3).xls",
+  "ts": "2026-09-01T16:40:00",
   "rows": [
     {
       "Cód. Artículo": "SHEET",
@@ -3628,19 +3629,7 @@
     ],
     "quality_score": 100.0
   },
-  "validation": null,
-  "metadata": {
-    "filename": "LP MICROCONTROL 2026-02 (3).xls",
-    "type": ".xls",
-    "pages": 0
-  },
   "extraction_method": "direct_structured",
-  "column_mapping": {
-    "heuristic_code": "Cód. Artículo",
-    "heuristic_price": "Precio",
-    "heuristic_list_code": "Cód. Lista",
-    "heuristic_list_desc": "Desc. Lista"
-  },
   "usage": {
     "tokens_in": 0,
     "tokens_out": 0,
@@ -3648,43 +3637,5 @@
     "calls": 0,
     "cost_display": 0.0,
     "cost_real": 0.0
-  },
-  "log": [
-    {
-      "step": "extraction",
-      "status": "running",
-      "detail": "Processing LP MICROCONTROL 2026-02 (3).xls",
-      "timestamp": "2026-09-01T16:39:59.658420"
-    },
-    {
-      "step": "extraction",
-      "status": "done",
-      "detail": "Extracted 54239 chars from 0 pages",
-      "timestamp": "2026-09-01T16:40:00.057647"
-    },
-    {
-      "step": "transformation",
-      "status": "running",
-      "detail": "Mapping data to template columns",
-      "timestamp": "2026-09-01T16:40:00.057660"
-    },
-    {
-      "step": "transformation",
-      "status": "done",
-      "detail": "Extracted 247 product rows",
-      "timestamp": "2026-09-01T16:40:00.294247"
-    },
-    {
-      "step": "verification",
-      "status": "running",
-      "detail": "Validating and cleaning data",
-      "timestamp": "2026-09-01T16:40:00.294269"
-    },
-    {
-      "step": "verification",
-      "status": "done",
-      "detail": "Quality: 100.0% (247/247 valid)",
-      "timestamp": "2026-09-01T16:40:00.299310"
-    }
-  ]
+  }
 }

@@ -1,5 +1,6 @@
 {
   "filename": "Lista de Precios N° 95 (2).pdf",
+  "ts": "2026-09-01T16:39:59",
   "rows": [
     {
       "Cód. Artículo": "BE64-12-150",
@@ -6612,23 +6613,7 @@
     ],
     "quality_score": 100.0
   },
-  "validation": null,
-  "metadata": {
-    "filename": "Lista de Precios N° 95 (2).pdf",
-    "type": ".pdf",
-    "pages": 7,
-    "pdf_sources": {
-      "markitdown_chars": 0,
-      "pdfplumber_chars": 38497
-    }
-  },
   "extraction_method": "pdf_pdfplumber_only",
-  "column_mapping": {
-    "pdf_table_code": "Cód. Artículo",
-    "pdf_table_price": "Precio",
-    "pdf_word_code": "Cód. Artículo",
-    "pdf_word_price": "Precio"
-  },
   "usage": {
     "tokens_in": 0,
     "tokens_out": 0,
@@ -6636,43 +6621,5 @@
     "calls": 0,
     "cost_display": 0.0,
     "cost_real": 0.0
-  },
-  "log": [
-    {
-      "step": "extraction",
-      "status": "running",
-      "detail": "Processing Lista de Precios N° 95 (2).pdf",
-      "timestamp": "2026-09-01T16:39:43.695837"
-    },
-    {
-      "step": "extraction",
-      "status": "done",
-      "detail": "Extracted 38524 chars from 7 pages",
-      "timestamp": "2026-09-01T16:39:59.536355"
-    },
-    {
-      "step": "transformation",
-      "status": "running",
-      "detail": "Mapping data to template columns",
-      "timestamp": "2026-09-01T16:39:59.536366"
-    },
-    {
-      "step": "transformation",
-      "status": "done",
-      "detail": "Extracted 462 product rows",
-      "timestamp": "2026-09-01T16:39:59.635404"
-    },
-    {
-      "step": "verification",
-      "status": "running",
-      "detail": "Validating and cleaning data",
-      "timestamp": "2026-09-01T16:39:59.635420"
-    },
-    {
-      "step": "verification",
-      "status": "done",
-      "detail": "Quality: 100.0% (462/462 valid)",
-      "timestamp": "2026-09-01T16:39:59.641391"
-    }
-  ]
+  }
 }

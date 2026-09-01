@@ -1,5 +1,6 @@
 {
   "filename": "L26031 (1) (5).xlsx",
+  "ts": "2026-09-01T16:38:52",
   "rows": [
     {
       "Cód. Artículo": "11517065",
@@ -35944,22 +35945,7 @@
     ],
     "quality_score": 0.0
   },
-  "validation": null,
-  "metadata": {
-    "filename": "L26031 (1) (5).xlsx",
-    "type": ".xlsx",
-    "pages": 0
-  },
   "extraction_method": "direct_structured",
-  "column_mapping": {
-    "PARTID": "Cód. Artículo",
-    "DESCRIPCION": "Descripción artículo",
-    "FAMILIA": "Descripción adicional artículo",
-    "MARCA": "Sinónimo",
-    "MONEDA": "Moneda",
-    "STOCK_UM": "Unidad",
-    "UNIT_PRICE": "Precio"
-  },
   "usage": {
     "tokens_in": 0,
     "tokens_out": 0,
@@ -35967,43 +35953,5 @@
     "calls": 0,
     "cost_display": 0.0,
     "cost_real": 0.0
-  },
-  "log": [
-    {
-      "step": "extraction",
-      "status": "running",
-      "detail": "Processing L26031 (1) (5).xlsx",
-      "timestamp": "2026-09-01T16:38:52.021719"
-    },
-    {
-      "step": "extraction",
-      "status": "done",
-      "detail": "Extracted 299293 chars from 0 pages",
-      "timestamp": "2026-09-01T16:38:52.767564"
-    },
-    {
-      "step": "transformation",
-      "status": "running",
-      "detail": "Mapping data to template columns",
-      "timestamp": "2026-09-01T16:38:52.767588"
-    },
-    {
-      "step": "transformation",
-      "status": "done",
-      "detail": "Extracted 2558 product rows",
-      "timestamp": "2026-09-01T16:38:52.780007"
-    },
-    {
-      "step": "verification",
-      "status": "running",
-      "detail": "Validating and cleaning data",
-      "timestamp": "2026-09-01T16:38:52.780036"
-    },
-    {
-      "step": "verification",
-      "status": "done",
-      "detail": "Quality: 0.0% (0/2558 valid)",
-      "timestamp": "2026-09-01T16:38:52.854342"
-    }
-  ]
+  }
 }

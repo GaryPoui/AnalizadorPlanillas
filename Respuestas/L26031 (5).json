@@ -35973,37 +35973,37 @@
       "step": "extraction",
       "status": "running",
       "detail": "Processing L26031 (5).csv",
-      "timestamp": "2026-09-01T15:52:53.872935"
+      "timestamp": "2026-09-01T16:38:52.899767"
     },
     {
       "step": "extraction",
       "status": "done",
       "detail": "Extracted 305340 chars from 0 pages",
-      "timestamp": "2026-09-01T15:52:53.972972"
+      "timestamp": "2026-09-01T16:38:53.050117"
     },
     {
       "step": "transformation",
       "status": "running",
       "detail": "Mapping data to template columns",
-      "timestamp": "2026-09-01T15:52:53.972989"
+      "timestamp": "2026-09-01T16:38:53.050135"
     },
     {
       "step": "transformation",
       "status": "done",
       "detail": "Extracted 2558 product rows",
-      "timestamp": "2026-09-01T15:52:53.984900"
+      "timestamp": "2026-09-01T16:38:53.067408"
     },
     {
       "step": "verification",
       "status": "running",
       "detail": "Validating and cleaning data",
-      "timestamp": "2026-09-01T15:52:53.984926"
+      "timestamp": "2026-09-01T16:38:53.067427"
     },
     {
       "step": "verification",
       "status": "done",
       "detail": "Quality: 0.0% (0/2558 valid)",
-      "timestamp": "2026-09-01T15:52:54.062580"
+      "timestamp": "2026-09-01T16:38:53.284022"
     }
   ]
 }
