@@ -2112,13 +2112,30 @@ async def agent_verifier(rows: list[dict], raw_data: dict) -> dict:
     """
     issues = []
     cleaned_rows = []
+    prices_by_code: dict[str, set[str]] = {}
+    for candidate in rows:
+        code = str(candidate.get("Cód. Artículo", "")).strip().upper()
+        price = str(candidate.get("Precio", "")).strip()
+        if code and price:
+            prices_by_code.setdefault(code, set()).add(price)
+    conflicting_codes = {code for code, prices in prices_by_code.items() if len(prices) > 1}
 
     for i, row in enumerate(rows):
         row_issues = []
+        code = str(row.get("Cód. Artículo", "")).strip().upper()
+
+        if not _is_valid_product_code(code):
+            row_issues.append(f"Invalid product code: '{code}'")
+
+        if code in conflicting_codes:
+            row_issues.append("Conflicting prices for the same code")
 
         # Check required fields
-        if not row.get("Descripción artículo", "").strip():
+        description = str(row.get("Descripción artículo", "")).strip()
+        if not description:
             row_issues.append("Missing description")
+        elif CODE_PRICE_RE.search(description):
+            row_issues.append("Description contains another product code and price")
 
         # Validate price
         price_str = str(row.get("Precio", "")).strip()
@@ -2141,6 +2158,8 @@ async def agent_verifier(rows: list[dict], raw_data: dict) -> dict:
                     row_issues.append(f"Invalid price: {price_val}")
                 else:
                     row["Precio"] = str(round(price_val, 2))
+                    if raw_data.get("metadata", {}).get("type") == ".pdf" and price_val >= 1000 and price_val.is_integer():
+                        row_issues.append("Suspicious integer price in PDF")
             except ValueError:
                 row_issues.append(f"Non-numeric price: '{row.get('Precio')}'")
                 row["Precio"] = ""
@@ -2178,12 +2197,17 @@ async def agent_verifier(rows: list[dict], raw_data: dict) -> dict:
         cleaned_rows.append(row)
 
     total = len(rows)
-    valid = total - len([i for i in issues if any("Missing price" in x or "Missing description" in x for x in i["issues"])])
+    blocking_terms = ("Missing price", "Non-numeric price", "Invalid price", "Invalid product code")
+    valid = total - len([item for item in issues if any(term in issue for term in blocking_terms for issue in item["issues"])])
+    suspicious_terms = ("Conflicting prices", "Description contains", "Suspicious integer price")
+    suspicious = [item for item in issues if any(term in issue for term in suspicious_terms for issue in item["issues"])]
 
     report = {
         "total_rows": total,
         "valid_rows": valid,
         "rows_with_issues": len(issues),
+        "suspicious_rows": len(suspicious),
+        "conflicting_price_codes": sorted(conflicting_codes)[:50],
         "issues": issues[:20],  # Limit to first 20 for brevity
         "quality_score": round((valid / total * 100) if total > 0 else 0, 1),
     }

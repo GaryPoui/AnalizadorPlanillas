@@ -89,6 +89,16 @@ SESION 10 (2026-08-19) — Fixes de extraccion + garbage codes + historial
   Resultado N°95: 4/10 -> 9/10 spot-checks correctos
   Costo sesion N°95: ~$0.80 display / ~$0.21 real
 
+SESION 11 (2026-09-01) — Resiliencia y calidad verificable
+  [x] Claude probe: API externa responde correctamente ("OK")
+  [x] Timeout híbrido estricto configurable: CLAUDE_TIMEOUT_SEC=20
+  [x] Una página lenta registra warning y no bloquea el PDF completo
+  [x] Logs de duración para MarkItDown, pdfplumber y cada página Claude
+  [x] Verificador extendido: detecta código inválido, descripciones que contienen
+      otro código+precio, precios PDF enteros sospechosos y precios en conflicto
+  [x] quality_score ya no ignora códigos inválidos ni precios no numéricos
+  [x] Test local: tmp/test_hybrid_timeout.py y tmp/test_verifier_confidence.py
+
 ==========================================================
 PENDIENTES / PROXIMOS PASOS
 ==========================================================
