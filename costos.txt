@@ -1,6 +1,6 @@
 REGISTRO DE COSTOS - AnalizadorPlanillas
 ========================================
-Ultima actualización: 2026-08-19
+Ultima actualización: 2026-09-01
 Modelo: claude-haiku-4-5
 Tasas display: $3.00/M input | $15.00/M output  (referencia Sonnet)
 Tasas reales Haiku: $0.80/M input | $4.00/M output
@@ -20,10 +20,15 @@ RESUMEN EJECUTIVO — TODOS LOS COSTOS ACUMULADOS
   10      2026-08-19   N°95 debug (hybrid bug)       ~488x2       $0.0092    ~$0.002
   10      2026-08-19   N°95 bug corregido            45,916       $0.4042    ~$0.108
   10      2026-08-19   N°95 + garbage fixes          44,439       $0.3820    ~$0.102
+  11      2026-09-01   Batch local post-fixes         0            $0.0000    $0.000
   ------  -----------  ----------------------------  -----------  ---------  --------
   TOTAL ACUMULADO                                    301,610+     $2.7773    ~$0.706
 
   ★ Máximo en una sola extracción
+
+Sesión 11: la prueba híbrida compacta fue cancelada sin respuesta final;
+no generó una entrada confirmada en costs_log.jsonl. El batch local completo
+usó 0 tokens y $0.00.
 
 ------------------------------------------------------------
 OBSERVACION CLAVE

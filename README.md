@@ -330,6 +330,54 @@ Los scripts de prueba están en `tests/`. Todos requieren la API corriendo en `l
 
 ---
 
+### Sesión 11 — 2026-09-01 · Estabilidad híbrida, compactación y validación integral
+
+#### Diagnóstico y resiliencia
+
+- La llamada mínima a Claude respondió `OK`: la clave, modelo y conectividad básica funcionan.
+- Se aisló cada llamada híbrida con `asyncio.wait_for`; una página lenta deja una advertencia y no debe cancelar el PDF completo.
+- Se agregaron logs temporizados de MarkItDown, pdfplumber y cada página Claude.
+- Se detectó que las páginas densas de N°95 tardan más de 20 segundos; `CLAUDE_TIMEOUT_SEC` quedó en 90 segundos por página.
+- `pdfplumber` se perfiló en N°95: páginas medidas entre ~1 y 3.5 segundos; no es el cuello de botella.
+- MarkItDown quedó opt-in (`PDF_USE_MARKITDOWN=0`): pdfplumber es el extractor PDF principal.
+
+#### Calidad de extracción
+
+- El verificador ahora informa `suspicious_rows` y `conflicting_price_codes`.
+- Detecta códigos inválidos, precios no numéricos, precios enteros sospechosos en PDFs, precios conflictivos y descripciones contaminadas con otro `código + precio`.
+- Los pares inequívocos `código → precio` extraídos del texto de cada PDF prevalecen sobre fragmentos provenientes de tablas, coordenadas o IA.
+- Se filtran fragmentos cortos como `PC`, `6000` o `BE64` solo cuando existe un código completo verificable en el mismo PDF.
+
+#### Híbrido compacto y alcance por formato
+
+- Antes de enviar un PDF a Claude se conservan solamente líneas con pares `código + precio`; si no se detectan pares, se usa la grilla/ página completa como fallback.
+- N°95: 38,486 → 19,097 caracteres (reducción 50.4%) y 746 pares conservados.
+- Claude devuelve solamente `code` y `price`; las descripciones se conservan desde la extracción local.
+- `HYBRID_MAX_TOKENS` default: 3,500.
+- **PDF e imágenes** usan modo híbrido; **XLS, XLSX y CSV** quedan en extracción local y costo $0.00.
+
+#### Validaciones y resultados
+
+| Validación | Resultado | Costo |
+|------------|-----------|-------|
+| Tests locales: regex, timeout, scoring, pares exactos y fragmentos | OK | $0.00 |
+| API health check | HTTP 200 | $0.00 |
+| Batch local post-fixes (AR36 omitido) | 5/5 OK | $0.00 |
+| L26031 XLSX / CSV | 2,558 / 2,558 filas | $0.00 |
+| LCT PDF | 954 filas, 50.2s | $0.00 |
+| N°95 PDF | 462 filas, 16.0s | $0.00 |
+| MICROCONTROL XLS | 247 filas, 0.7s | $0.00 |
+
+La prueba híbrida compacta sobre N°95 todavía no devolvió una respuesta completa de Claude. Se registró como limitación conocida: el probe mínimo funciona, pero las respuestas de gran volumen deben seguir observándose con los logs y el timeout por página.
+
+Herramientas agregadas:
+- `tmp/compact_pdf_for_hybrid.py`: inspecciona y guarda entrada compacta de cualquier PDF, sin API.
+- `tmp/validate_pdf_json.py`: compara pares PDF→JSON inequívocos, sin API.
+- `tmp/compare_history.py`: compara versiones históricas de extracciones.
+- `tmp/show_costs.py`: muestra costos acumulados.
+
+---
+
 ### Sesión 10 — 2026-08-19 · Fixes de extracción PDF, garbage codes, historial versionado
 
 #### Contexto
