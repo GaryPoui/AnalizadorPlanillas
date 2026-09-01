@@ -14,6 +14,8 @@ import asyncio
 import tempfile
 import unicodedata
 import contextvars
+import logging
+import time
 from pathlib import Path
 from typing import Optional
 from datetime import datetime
@@ -32,6 +34,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
 
 app = FastAPI(title="Price Extractor API", version="1.0.0")
+logger = logging.getLogger("pricebot")
 
 # Load local env files for non-Docker runs.
 API_DIR = Path(__file__).resolve().parent
@@ -109,7 +112,9 @@ async def claude_chat(messages: list, system: str = "", max_tokens: int = 8000) 
     if system:
         payload["system"] = system
 
-    async with httpx.AsyncClient(timeout=300.0) as client:
+    request_started = time.perf_counter()
+    logger.info("Claude request started: max_tokens=%s timeout=%ss", max_tokens, CLAUDE_TIMEOUT_SEC)
+    async with httpx.AsyncClient(timeout=CLAUDE_TIMEOUT_SEC) as client:
         try:
             resp = await client.post(
                 "https://api.anthropic.com/v1/messages",
@@ -130,6 +135,12 @@ async def claude_chat(messages: list, system: str = "", max_tokens: int = 8000) 
             )
 
         data = resp.json()
+        logger.info(
+            "Claude request completed in %.1fs: input=%s output=%s",
+            time.perf_counter() - request_started,
+            data.get("usage", {}).get("input_tokens", 0),
+            data.get("usage", {}).get("output_tokens", 0),
+        )
         # Accumulate token usage into the per-request tracker
         usage = data.get("usage", {})
         tracker = _request_usage.get()
@@ -180,7 +191,7 @@ def _append_cost_log(filename: str, usage: dict, rows: int, method: str) -> None
         pass  # never break the main flow due to logging errors
 
 
-HISTORY_DIR = Path(os.getenv("HISTORY_DIR", str(COST_LOG_PATH.parent / "Respuestas" / "history")))
+HISTORY_DIR = Path(os.getenv("HISTORY_DIR", str(Path(__file__).resolve().parent.parent.parent / "Respuestas" / "history")))
 
 
 def _save_versioned_result(filename: str, result_data: dict) -> None:
@@ -230,6 +241,7 @@ PDF_RECOVERY_MAX_CHUNKS = max(int(os.getenv("PDF_RECOVERY_MAX_CHUNKS", "12")), 1
 HYBRID_EXTRACTION = os.getenv("HYBRID_EXTRACTION", "1") == "1"
 HYBRID_MAX_TOKENS = max(int(os.getenv("HYBRID_MAX_TOKENS", "6000")), 2000)
 HYBRID_XLS_CHUNK_CHARS = max(int(os.getenv("HYBRID_XLS_CHUNK_CHARS", "25000")), 5000)
+CLAUDE_TIMEOUT_SEC = max(float(os.getenv("CLAUDE_TIMEOUT_SEC", "20")), 10.0)
 
 # Domain-aware system prompt built from sessions 1-9 experience
 _HYBRID_SYSTEM_PROMPT = (
@@ -844,12 +856,15 @@ def _extract_pdf_sync(file_bytes: bytes) -> dict:
     pdf_page_tables: dict[int, list] = {}  # page_idx (0-based) → list of tables
     pages = 0
 
+    markitdown_started = time.perf_counter()
     try:
         result = MARKITDOWN.convert(io.BytesIO(file_bytes))
         md_text = (result.markdown or "").strip()
+        logger.info("PDF MarkItDown completed in %.1fs: chars=%s", time.perf_counter() - markitdown_started, len(md_text))
     except Exception:
-        pass
+        logger.exception("PDF MarkItDown failed after %.1fs", time.perf_counter() - markitdown_started)
 
+    pdfplumber_started = time.perf_counter()
     try:
         with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
             pages = len(pdf.pages)
@@ -875,7 +890,12 @@ def _extract_pdf_sync(file_bytes: bytes) -> dict:
                 pdf_word_rows.extend(_extract_rows_from_word_coords(page))
             pdfplumber_text = "\n".join(pages_text).strip()
     except Exception:
-        pass
+        logger.exception("PDF pdfplumber failed after %.1fs", time.perf_counter() - pdfplumber_started)
+    else:
+        logger.info(
+            "PDF pdfplumber completed in %.1fs: pages=%s chars=%s tables=%s",
+            time.perf_counter() - pdfplumber_started, pages, len(pdfplumber_text), len(pdf_raw_tables),
+        )
 
     sources = []
     if md_text:
@@ -1313,6 +1333,21 @@ def _norm_hybrid_price(val: object) -> str:
         return ""
 
 
+def _clean_hybrid_description(desc: str) -> str:
+    """Discard a description that is actually a parallel product code-price pair."""
+    cleaned = str(desc or "").strip()
+    return "" if CODE_PRICE_RE.search(cleaned) else cleaned
+
+
+def _is_fragment_price(price: str) -> bool:
+    """Identify likely table fragments, not standalone product prices."""
+    try:
+        value = float(price)
+    except (TypeError, ValueError):
+        return True
+    return value < 1000 or value.is_integer()
+
+
 async def _run_hybrid_pass(
     raw_data: dict,
     list_code: str,
@@ -1371,15 +1406,32 @@ async def _run_hybrid_pass(
     if not segments:
         return []
 
+    logger.info("Hybrid pass started: segments=%s type=%s", len(segments), file_type)
     all_rows: list[dict] = []
     for text, label in segments:
+        segment_started = time.perf_counter()
+        logger.info("Hybrid %s started: chars=%s", label, len(text))
         try:
-            raw_response = await claude_chat(
-                messages=[{"role": "user", "content": f"{label}:\n{text}"}],
-                system=_HYBRID_SYSTEM_PROMPT,
-                max_tokens=HYBRID_MAX_TOKENS,
+            raw_response = await asyncio.wait_for(
+                claude_chat(
+                    messages=[{"role": "user", "content": f"{label}:\n{text}"}],
+                    system=_HYBRID_SYSTEM_PROMPT,
+                    max_tokens=HYBRID_MAX_TOKENS,
+                ),
+                timeout=CLAUDE_TIMEOUT_SEC,
             )
-        except Exception:
+        except TimeoutError:
+            message = f"{label}: timed out after {CLAUDE_TIMEOUT_SEC:.0f}s"
+            logger.warning("Hybrid %s", message)
+            raw_data.setdefault("hybrid_errors", []).append(message)
+            continue
+        except HTTPException as exc:
+            logger.warning("Hybrid %s failed in %.1fs: %s", label, time.perf_counter() - segment_started, exc.detail)
+            raw_data.setdefault("hybrid_errors", []).append(f"{label}: {exc.detail}")
+            continue
+        except Exception as exc:
+            logger.exception("Hybrid %s failed in %.1fs", label, time.perf_counter() - segment_started)
+            raw_data.setdefault("hybrid_errors", []).append(f"{label}: {str(exc)}")
             continue
 
         raw_response = raw_response.strip()
@@ -1408,7 +1460,7 @@ async def _run_hybrid_pass(
             if not isinstance(item, dict):
                 continue
             code  = re.sub(r'-{2,}', '-', str(item.get("code", "")).strip().upper())
-            desc  = str(item.get("desc",  "")).strip()
+            desc  = _clean_hybrid_description(item.get("desc", ""))
             price = _norm_hybrid_price(item.get("price"))
             if not code or not price or not _is_valid_product_code(code):
                 continue
@@ -1422,6 +1474,9 @@ async def _run_hybrid_pass(
             r["Unidad"] = "Un"
             all_rows.append(r)
 
+            logger.info("Hybrid %s completed in %.1fs: rows=%s", label, time.perf_counter() - segment_started, len(parsed))
+
+            logger.info("Hybrid pass completed: rows=%s", len(all_rows))
     return all_rows
 
 
@@ -1911,26 +1966,22 @@ async def agent_transformer(
                     new_desc = str(hr.get("Descripción artículo", "")).strip()
                     if len(new_desc) > len(existing_desc):
                         deduped_by_code[key]["Descripción artículo"] = new_desc
-                    # Fix truncated price: if Claude's price is >=2x larger, the existing is a fragment
                     try:
                         existing_p = float(deduped_by_code[key].get("Precio") or 0)
                         claude_p   = float(hr.get("Precio") or 0)
-                        if claude_p >= existing_p * 2.0:
-                            deduped_by_code[key]["Precio"] = hr["Precio"]
-                    except Exception:
-                        pass
-                    # Fix truncated prices: table cells can contain only the decimal fragment.
-                    # When Claude's price is >=2x larger the existing value is likely truncated.
-                    try:
-                        existing_p = float(deduped_by_code[key].get("Precio") or 0)
-                        claude_p   = float(hr.get("Precio") or 0)
-                        if claude_p >= existing_p * 2.0:
+                        # Only trust the AI replacement when local data looks like a fragment.
+                        if _is_fragment_price(str(existing_p)) and claude_p >= existing_p * 1.5:
                             deduped_by_code[key]["Precio"] = hr["Precio"]
                     except Exception:
                         pass
             deduped = list(deduped_by_code.values())
             merged_mapping["hybrid_code"] = "Cód. Artículo"
             merged_mapping["hybrid_price"] = "Precio"
+
+    for row in deduped:
+        description = str(row.get("Descripción artículo", "")).strip()
+        if CODE_PRICE_RE.search(description):
+            row["Descripción artículo"] = ""
 
     # Second pass: targeted removal of ghost rows in PDFs (BUG-8 + Sonnet audit).
     # Three rules, applied only to PDFs:
@@ -2186,6 +2237,8 @@ async def orchestrator(
     rows = transform_result["rows"]
     column_mapping = transform_result["column_mapping"]
     log_step("transformation", "done", f"Extracted {len(rows)} product rows")
+    for hybrid_error in raw_data.get("hybrid_errors", []):
+        log_step("hybrid", "warning", hybrid_error)
 
     validation_report = transform_result.get("validation")
     if validation_report:
