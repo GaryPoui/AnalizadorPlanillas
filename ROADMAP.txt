@@ -101,16 +101,16 @@ SESION 11 (2026-09-01) — Resiliencia y calidad verificable
   [x] Recuperación local autoritativa: pares código+precio encontrados de forma
       inequívoca en el texto PDF reemplazan fragmentos de tabla/word-coordinates
   [x] Regresión N°95 ampliada: BE, CPE, TEP, CPP, RSE, GSE, GCE y BRO
+    [x] Perfil local N°95: pdfplumber procesa páginas medidas en ~1–3.5s;
+      no es la causa del bloqueo de las corridas híbridas
+    [x] MarkItDown pasa a ser opt-in (PDF_USE_MARKITDOWN=1) porque puede bloquear
+      conversiones; pdfplumber queda como extractor PDF principal por defecto
 
 ==========================================================
 PENDIENTES / PROXIMOS PASOS
 ==========================================================
 
 ALTA PRIORIDAD
-  [ ] CPE90-64-16-150 precio incorrecto: el PDF tiene dos variantes en la misma
-      linea (-64- y -92-), Claude toma el primer precio. Solucion: prompt mas
-      especifico para distinguir variantes de mismo codigo base.
-
   [ ] Validacion cruzada PDF<->JSON: herramienta que dado un PDF y su JSON
       extrae metricas de precision (% codigos correctos, % precios correctos)
       sin requerir revision manual.

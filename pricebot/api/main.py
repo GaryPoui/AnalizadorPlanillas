@@ -242,6 +242,7 @@ HYBRID_EXTRACTION = os.getenv("HYBRID_EXTRACTION", "1") == "1"
 HYBRID_MAX_TOKENS = max(int(os.getenv("HYBRID_MAX_TOKENS", "6000")), 2000)
 HYBRID_XLS_CHUNK_CHARS = max(int(os.getenv("HYBRID_XLS_CHUNK_CHARS", "25000")), 5000)
 CLAUDE_TIMEOUT_SEC = max(float(os.getenv("CLAUDE_TIMEOUT_SEC", "20")), 10.0)
+PDF_USE_MARKITDOWN = os.getenv("PDF_USE_MARKITDOWN", "0") == "1"
 
 # Domain-aware system prompt built from sessions 1-9 experience
 _HYBRID_SYSTEM_PROMPT = (
@@ -856,15 +857,20 @@ def _extract_pdf_sync(file_bytes: bytes) -> dict:
     pdf_page_tables: dict[int, list] = {}  # page_idx (0-based) → list of tables
     pages = 0
 
-    markitdown_started = time.perf_counter()
-    try:
-        result = MARKITDOWN.convert(io.BytesIO(file_bytes))
-        md_text = (result.markdown or "").strip()
-        logger.info("PDF MarkItDown completed in %.1fs: chars=%s", time.perf_counter() - markitdown_started, len(md_text))
-    except Exception:
-        logger.exception("PDF MarkItDown failed after %.1fs", time.perf_counter() - markitdown_started)
+    if PDF_USE_MARKITDOWN:
+        markitdown_started = time.perf_counter()
+        logger.info("PDF MarkItDown started")
+        try:
+            result = MARKITDOWN.convert(io.BytesIO(file_bytes))
+            md_text = (result.markdown or "").strip()
+            logger.info("PDF MarkItDown completed in %.1fs: chars=%s", time.perf_counter() - markitdown_started, len(md_text))
+        except Exception:
+            logger.exception("PDF MarkItDown failed after %.1fs", time.perf_counter() - markitdown_started)
+    else:
+        logger.info("PDF MarkItDown skipped: PDF_USE_MARKITDOWN=0")
 
     pdfplumber_started = time.perf_counter()
+    logger.info("PDF pdfplumber started")
     try:
         with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
             pages = len(pdf.pages)

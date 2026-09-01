@@ -76,6 +76,8 @@ TESSERACT_CMD=C:\Users\...\Tesseract-OCR\tesseract.exe  # opcional, para OCR
 HYBRID_EXTRACTION=1                         # 0 para desactivar (sin costo de API)
 HYBRID_MAX_TOKENS=6000
 HYBRID_XLS_CHUNK_CHARS=25000
+CLAUDE_TIMEOUT_SEC=20                       # timeout estricto por página/chunk
+PDF_USE_MARKITDOWN=0                        # 1 solo si se necesita ese conversor; pdfplumber es default
 
 # Tracking de costos
 COST_LOG_PATH=costs_log.jsonl               # ruta del log (default: raíz del proyecto)
