@@ -2011,6 +2011,19 @@ async def agent_transformer(
             if code in exact_prices:
                 row["Precio"] = exact_prices[code]
 
+        # Drop only fragments that occur inside an exact, longer product code on the same PDF.
+        # This handles table splits such as PC / 6000 from PC44.44-09-6000.
+        exact_codes = set(exact_prices)
+        deduped = [
+            row for row in deduped
+            if not (
+                (code := str(row.get("Cód. Artículo", "")).strip().upper()) not in exact_codes
+                and len(code) >= 2
+                and any(code in full_code and code != full_code for full_code in exact_codes)
+                and (len(code) <= 4 or code.isdigit())
+            )
+        ]
+
     for row in deduped:
         description = str(row.get("Descripción artículo", "")).strip()
         if CODE_PRICE_RE.search(description):
