@@ -241,7 +241,7 @@ PDF_RECOVERY_MAX_CHUNKS = max(int(os.getenv("PDF_RECOVERY_MAX_CHUNKS", "12")), 1
 HYBRID_EXTRACTION = os.getenv("HYBRID_EXTRACTION", "1") == "1"
 HYBRID_MAX_TOKENS = max(int(os.getenv("HYBRID_MAX_TOKENS", "6000")), 2000)
 HYBRID_XLS_CHUNK_CHARS = max(int(os.getenv("HYBRID_XLS_CHUNK_CHARS", "25000")), 5000)
-CLAUDE_TIMEOUT_SEC = max(float(os.getenv("CLAUDE_TIMEOUT_SEC", "20")), 10.0)
+CLAUDE_TIMEOUT_SEC = max(float(os.getenv("CLAUDE_TIMEOUT_SEC", "90")), 10.0)
 PDF_USE_MARKITDOWN = os.getenv("PDF_USE_MARKITDOWN", "0") == "1"
 
 # Domain-aware system prompt built from sessions 1-9 experience

@@ -91,7 +91,7 @@ SESION 10 (2026-08-19) — Fixes de extraccion + garbage codes + historial
 
 SESION 11 (2026-09-01) — Resiliencia y calidad verificable
   [x] Claude probe: API externa responde correctamente ("OK")
-  [x] Timeout híbrido estricto configurable: CLAUDE_TIMEOUT_SEC=20
+  [x] Timeout híbrido estricto configurable: CLAUDE_TIMEOUT_SEC=90
   [x] Una página lenta registra warning y no bloquea el PDF completo
   [x] Logs de duración para MarkItDown, pdfplumber y cada página Claude
   [x] Verificador extendido: detecta código inválido, descripciones que contienen
@@ -111,6 +111,8 @@ SESION 11 (2026-09-01) — Resiliencia y calidad verificable
       no es la causa del bloqueo de las corridas híbridas
     [x] MarkItDown pasa a ser opt-in (PDF_USE_MARKITDOWN=1) porque puede bloquear
       conversiones; pdfplumber queda como extractor PDF principal por defecto
+      [x] Diagnóstico híbrido N°95: páginas 2 y 4 exceden 20s al devolver JSON
+        grande; timeout default corregido a 90s, aislado por página
 
 ==========================================================
 PENDIENTES / PROXIMOS PASOS
