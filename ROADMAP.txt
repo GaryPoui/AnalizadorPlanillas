@@ -112,6 +112,8 @@ SESION 11 (2026-09-01) — Resiliencia y calidad verificable
           N°95: 38,486→19,097 chars (-50.4%), 746 pares conservados
           [x] Primera pasada Claude compacta: solicita solo code+price, conserva
             descripciones locales y reduce HYBRID_MAX_TOKENS por defecto a 3,500
+            [x] Alcance híbrido restringido: PDF e imágenes usan Claude; XLS, XLSX y CSV
+              permanecen en extracción local, sin llamadas Claude ni costo de API
             [x] Validación integral local post-compactación: API health 200 y batch 5/5
               OK sin tokens (L26031 XLSX/CSV, LCT PDF, N°95 PDF, MICROCONTROL XLS)
             [!] Integración híbrida N°95: sigue sin respuesta Claude durante la prueba

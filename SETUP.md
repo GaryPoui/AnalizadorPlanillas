@@ -73,7 +73,7 @@ CLAUDE_MODEL=claude-haiku-4-5               # modelo activo
 TESSERACT_CMD=C:\Users\...\Tesseract-OCR\tesseract.exe  # opcional, para OCR
 
 # Sistema híbrido (default: activo)
-HYBRID_EXTRACTION=1                         # 0 para desactivar (sin costo de API)
+HYBRID_EXTRACTION=1                         # aplica solo a PDF e imágenes; 0 para desactivar
 HYBRID_MAX_TOKENS=3500                       # salida compacta: solo código + precio
 HYBRID_XLS_CHUNK_CHARS=25000
 CLAUDE_TIMEOUT_SEC=20                       # timeout estricto por página/chunk
@@ -276,6 +276,10 @@ El script no llama a Claude, no altera el PDF ni genera costo.
 El paso híbrido solicita a Claude solo objetos `{"code":"...","price":"..."}`.
 Las descripciones se conservan desde la extracción local; esto reduce tokens de salida,
 tiempo de respuesta y riesgo de timeouts.
+
+XLS, XLSX y CSV no usan el paso híbrido ni el transformador Claude: se procesan
+localmente para mantener costo $0.00. Las imágenes usan Vision y luego el complemento
+híbrido; los PDFs usan extracción local más el complemento híbrido.
 
 ---
 

@@ -1873,6 +1873,9 @@ async def agent_transformer(
         merged_mapping["pdf_word_price"] = "Precio"
 
     ai_enabled = bool(os.getenv("ANTHROPIC_API_KEY", "").strip())
+    file_type = raw_data.get("metadata", {}).get("type", "")
+    hybrid_supported = file_type in {".pdf", "image"}
+    legacy_ai_enabled = ai_enabled and hybrid_supported and not HYBRID_EXTRACTION
     ai_errors = 0
 
     if validation_mode:
@@ -1901,7 +1904,7 @@ async def agent_transformer(
                 ]
             local_rows_all.extend(local_rows)
 
-            if ai_enabled:
+            if legacy_ai_enabled:
                 chunk_mapping, chunk_rows = await transform_chunk(chunk)
                 if not chunk_rows:
                     ai_errors += 1
@@ -1936,7 +1939,7 @@ async def agent_transformer(
 
             all_rows.extend(local_rows)
 
-            if not ai_enabled:
+            if not legacy_ai_enabled:
                 continue
 
             # Skip AI when numeric-profile seed already covers the list (BUG-7 / LCT case)
@@ -1986,7 +1989,7 @@ async def agent_transformer(
     deduped = list(deduped_by_key.values())
 
     # --- Hybrid pass: per-page/chunk Claude extraction merged into deduped base ---
-    if ai_enabled and HYBRID_EXTRACTION and not validation_mode:
+    if ai_enabled and HYBRID_EXTRACTION and hybrid_supported and not validation_mode:
         hybrid_rows = await _run_hybrid_pass(raw_data, list_code, list_desc, default_currency)
         if hybrid_rows:
             deduped_by_code: dict[str, dict] = {
@@ -2097,7 +2100,7 @@ async def agent_transformer(
     # Adaptive recovery for difficult PDFs with low initial recall.
     if (
         raw_data.get("metadata", {}).get("type") == ".pdf"
-        and ai_enabled
+        and legacy_ai_enabled
         and len(deduped) < PDF_MIN_EXPECTED_ROWS
     ):
         recovery_chunks = build_full_chunks(raw_text, max_chunk_chars=4500)[:PDF_RECOVERY_MAX_CHUNKS]
