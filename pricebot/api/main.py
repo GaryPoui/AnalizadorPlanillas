@@ -257,6 +257,7 @@ _HYBRID_SYSTEM_PROMPT = (
     "- When a page has TWO side-by-side product columns, extract from BOTH columns\n"
     "- For paired rows (two products on one line), produce two separate objects\n"
     "- Convert Argentine price format: '1.234,56' → 1234.56; '1 234,56' → 1234.56\n"
+    "- If the input only contains code-price rows, set desc to an empty string; do not invent descriptions\n"
     "- Skip: page headers, section/category titles, subtotals, empty rows\n"
     "- Known supplier formats: LCT (4-5 digit codes), N°95 (4-5 digit), MICROCONTROL (alphanumeric)\n"
     "- Return [] if the page/section has no product rows"
@@ -1373,6 +1374,16 @@ def _extract_unambiguous_pdf_prices(raw_data: dict) -> dict[str, str]:
     return {code: next(iter(prices)) for code, prices in candidates.items() if len(prices) == 1}
 
 
+def _compact_pdf_segment(page_text: str) -> str:
+    """Keep only product-bearing lines before sending a PDF page to Claude."""
+    product_lines = []
+    for line in str(page_text).splitlines():
+        normalized_line = re.sub(r"-{2,}", "-", line).replace("|", " ")
+        if CODE_PRICE_RE.search(normalized_line):
+            product_lines.append(normalized_line.strip())
+    return "\n".join(product_lines)
+
+
 async def _run_hybrid_pass(
     raw_data: dict,
     list_code: str,
@@ -1388,6 +1399,10 @@ async def _run_hybrid_pass(
     if is_pdf:
         page_tables = raw_data.get("pdf_page_tables", {})
         for idx, page_text in enumerate(raw_data.get("pdf_pages", []), 1):
+            compact_segment = _compact_pdf_segment(page_text)
+            if compact_segment:
+                segments.append((compact_segment, f"page {idx}"))
+                continue
             tables = page_tables.get(idx - 1, [])
             if tables:
                 # Format raw table as a grid so Claude sees columns, not linearized text

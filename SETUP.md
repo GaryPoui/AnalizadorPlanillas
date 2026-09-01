@@ -261,6 +261,20 @@ El reporte muestra pares correctos, faltantes, precios diferentes y la precisió
 
 ---
 
+## Compactar un PDF antes del modo híbrido
+
+La API compacta cada página automáticamente antes de enviar texto a Claude: conserva
+líneas que contienen pares `código + precio` y deja el texto completo como fallback
+si no hay pares detectables. Para inspeccionar o guardar esa entrada con cualquier PDF:
+
+```bash
+python tmp/compact_pdf_for_hybrid.py "Listas/archivo.pdf" --output "tmp/archivo_compacto.txt"
+```
+
+El script no llama a Claude, no altera el PDF ni genera costo.
+
+---
+
 ## Tests batch
 
 Correr extracción sobre todos los archivos de `Listas/` (sin AR36):
