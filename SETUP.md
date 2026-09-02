@@ -295,6 +295,10 @@ El paso híbrido solicita a Claude solo objetos `{"code":"...","price":"..."}`.
 Las descripciones se conservan desde la extracción local; esto reduce tokens de salida,
 tiempo de respuesta y riesgo de timeouts.
 
+Las correcciones de códigos fragmentados, precios truncados y columnas paralelas son
+reglas estructurales del extractor: no contienen códigos ni precios específicos de LCT.
+Por eso se aplican también a cualquier PDF futuro con layouts equivalentes.
+
 XLS, XLSX y CSV no usan el paso híbrido ni el transformador Claude: se procesan
 localmente para mantener costo $0.00. Las imágenes usan Vision y luego el complemento
 híbrido; los PDFs usan extracción local más el complemento híbrido.

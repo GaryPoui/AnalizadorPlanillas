@@ -2109,10 +2109,29 @@ async def agent_transformer(
     # Exact inline PDF pairs are authoritative over table/word-coordinate fragments.
     if raw_data.get("metadata", {}).get("type") == ".pdf":
         exact_prices = _extract_unambiguous_pdf_prices(raw_data)
+        rows_by_code: dict[str, dict] = {
+            str(row.get("Cód. Artículo", "")).strip().upper(): row
+            for row in deduped
+            if str(row.get("Cód. Artículo", "")).strip()
+        }
         for row in deduped:
             code = str(row.get("Cód. Artículo", "")).strip().upper()
             if code in exact_prices:
                 row["Precio"] = exact_prices[code]
+
+        for code, price in exact_prices.items():
+            if code in rows_by_code:
+                continue
+            canonical = _empty_template_row()
+            canonical["Cód. Artículo"] = code
+            canonical["Precio"] = price
+            canonical["Descripción artículo"] = code
+            canonical["Cód. Lista"] = list_code
+            canonical["Desc. Lista"] = list_desc
+            canonical["Moneda"] = default_currency
+            canonical["Unidad"] = "Un"
+            deduped.append(canonical)
+            rows_by_code[code] = canonical
 
         # Drop only fragments that occur inside an exact, longer product code on the same PDF.
         # This handles table splits such as PC / 6000 from PC44.44-09-6000.

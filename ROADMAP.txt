@@ -105,6 +105,10 @@ SESION 11 (2026-09-01) — Resiliencia y calidad verificable
       correctos, faltantes, precios diferentes y precisión verificable
     [x] Filtro conservador de fragmentos: elimina una fila solo si su código corto
       es parte estricta de un código completo inequívoco del mismo PDF
+      [x] Correcciones recibidas del informe externo LCT convertidas en reglas
+        generales: no se agregan precios ni códigos hardcodeados de LCT
+      [x] Pairs canónicos: cada PDF puede aportar sus propios pares inequívocos;
+        se agregan filas faltantes y se corrigen valores desplazados automáticamente
       [x] Batch local completo post-fixes: 5/5 archivos OK, 0 errores, $0.00 API
         L26031 XLSX=2,558; L26031 CSV=2,558; LCT=954; N°95=462; MICROCONTROL=247
         [x] Compactación genérica PDF antes de Claude: conserva líneas con pares
