@@ -41,16 +41,33 @@ API_DIR = Path(__file__).resolve().parent
 load_dotenv(API_DIR / ".env", override=True)
 load_dotenv(API_DIR.parent / ".env", override=True)
 
+API_ACCESS_KEY = os.getenv("PRICEBOT_API_KEY", "").strip()
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        "PRICEBOT_ALLOWED_ORIGINS",
+        "http://127.0.0.1:3000,http://localhost:3000",
+    ).split(",")
+    if origin.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "X-PriceBot-Key"],
 )
 
+
+@app.middleware("http")
+async def require_api_access_key(request, call_next):
+    if API_ACCESS_KEY and request.headers.get("X-PriceBot-Key", "") != API_ACCESS_KEY:
+        return JSONResponse(status_code=401, content={"detail": "Invalid API access key"})
+    return await call_next(request)
+
 # Anthropic (Claude) configuration
-CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-haiku-4-5")
+CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-5")
 MARKITDOWN = MarkItDown()
 
 
@@ -192,6 +209,7 @@ def _append_cost_log(filename: str, usage: dict, rows: int, method: str) -> None
 
 
 HISTORY_DIR = Path(os.getenv("HISTORY_DIR", str(Path(__file__).resolve().parent.parent.parent / "Respuestas" / "history")))
+SAVE_HISTORY = os.getenv("SAVE_HISTORY", "0") == "1"
 
 
 def _save_versioned_result(filename: str, result_data: dict) -> None:
@@ -242,6 +260,7 @@ HYBRID_EXTRACTION = os.getenv("HYBRID_EXTRACTION", "1") == "1"
 HYBRID_MAX_TOKENS = max(int(os.getenv("HYBRID_MAX_TOKENS", "3500")), 1000)
 HYBRID_XLS_CHUNK_CHARS = max(int(os.getenv("HYBRID_XLS_CHUNK_CHARS", "25000")), 5000)
 CLAUDE_TIMEOUT_SEC = max(float(os.getenv("CLAUDE_TIMEOUT_SEC", "90")), 10.0)
+HYBRID_CONCURRENCY = max(int(os.getenv("HYBRID_CONCURRENCY", "3")), 1)
 PDF_USE_MARKITDOWN = os.getenv("PDF_USE_MARKITDOWN", "0") == "1"
 
 # Domain-aware system prompt built from sessions 1-9 experience
@@ -249,7 +268,7 @@ _HYBRID_SYSTEM_PROMPT = (
     "You extract product entries from Argentine electrical/industrial supplier price lists.\n"
     "Return ONLY a compact JSON array. Each object must have exactly:\n"
     '  "code": product code — 4-5 digit number OR alphanumeric (e.g. SCA-10, UCA-16, HM-12CB, A2, B3)\n'
-    '  "price": unit price as a plain decimal number (no currency symbols, no spaces)\n'
+    '  "price": unit price as a plain decimal number (no currency symbols, no spaces), or "" when absent\n'
     "\n"
     "Rules:\n"
     "- Extract ALL products visible on the page/section\n"
@@ -257,6 +276,7 @@ _HYBRID_SYSTEM_PROMPT = (
     "- For paired rows (two products on one line), produce two separate objects\n"
     "- Convert Argentine price format: '1.234,56' → 1234.56; '1 234,56' → 1234.56\n"
     "- Do not include descriptions, categories, explanations, markdown, or any keys other than code and price\n"
+    "- Do not discard a product when its price is absent; return it with price \"\"\n"
     "- Skip: page headers, section/category titles, subtotals, empty rows\n"
     "- Known supplier formats: LCT (4-5 digit codes), N°95 (4-5 digit), MICROCONTROL (alphanumeric)\n"
     "- Return [] if the page/section has no product rows"
@@ -374,7 +394,9 @@ def _extract_list_header(text: str) -> tuple[str, str]:
 
 
 def _empty_template_row() -> dict:
-    return {col: "" for col in TEMPLATE_COLUMNS}
+    row = {col: "" for col in TEMPLATE_COLUMNS}
+    row["estado_precio"] = ""
+    return row
 
 
 def _row_key(row: dict) -> tuple[str, str]:
@@ -630,13 +652,11 @@ def heuristic_extract_rows_blockwise(
                     best_dist = dist
                     price_val = norm
 
-        if not price_val:
-            continue
-
         row = _empty_template_row()
         row["Cód. Artículo"] = code
         row["Precio"] = price_val
         row["Descripción artículo"] = code
+        row["estado_precio"] = "" if price_val else "a completar"
         row["Cód. Lista"] = list_code
         row["Desc. Lista"] = list_desc
         row["Moneda"] = default_currency
@@ -827,11 +847,9 @@ def _extract_rows_from_word_coords(
                         break
                 except Exception:
                     pass
-        if not price_str:
-            continue
         code_idx = next((i for i, t in enumerate(texts) if t == code), 0)
-        rev_price_idx = next((i for i, t in enumerate(reversed(texts)) if price_re.match(t)), 0)
-        price_idx = len(texts) - 1 - rev_price_idx
+        price_matches = [i for i, t in enumerate(texts) if price_re.match(t)]
+        price_idx = price_matches[-1] if price_matches else len(texts)
         desc_parts = [
             t for t in texts[code_idx + 1:price_idx]
             if not _is_valid_product_code(t) and not price_re.match(t)
@@ -844,6 +862,7 @@ def _extract_rows_from_word_coords(
         r["Desc. Lista"] = list_desc
         r["Moneda"] = default_currency
         r["Unidad"] = "Un"
+        r["estado_precio"] = "" if price_str else "a completar"
         rows.append(r)
     return rows
 
@@ -953,6 +972,52 @@ def _is_valid_product_code(code: str) -> bool:
     return bool(re.match(r'^[A-Z][A-Z0-9\-/\.]{1,19}$', code))
 
 
+def _extract_code_only_rows(
+    text: str,
+    list_code: str = "",
+    list_desc: str = "",
+    default_currency: str = "ARS",
+) -> list[dict]:
+    """Recover valid product codes whose row has no numeric price."""
+    rows = []
+    for line in str(text or "").splitlines():
+        line_clean = line.strip()
+        if not line_clean or _NOISE_LINE_RE.search(line_clean):
+            continue
+        if CODE_PRICE_RE.search(line_clean):
+            continue
+        for match in CODE_ONLY_RE.finditer(line_clean):
+            code = re.sub(r"-{2,}", "-", match.group(1).strip().upper())
+            if not _is_valid_product_code(code):
+                continue
+            remainder = line_clean[:match.start()] + line_clean[match.end():]
+            if PRICE_ONLY_RE.search(remainder):
+                continue
+            # Prefer product-like codes with a digit or a separator over ordinary words.
+            if not any(ch.isdigit() for ch in code) and not any(ch in code for ch in "-./"):
+                continue
+            description = line_clean[:match.start()] + line_clean[match.end():]
+            description = re.sub(r"\s{2,}", " ", description).strip(" |;,-\t")
+            row = _empty_template_row()
+            row["Cód. Artículo"] = code
+            row["Descripción artículo"] = description or code
+            row["Cód. Lista"] = list_code
+            row["Desc. Lista"] = list_desc
+            row["Moneda"] = default_currency
+            row["Unidad"] = "Un"
+            row["estado_precio"] = "a completar"
+            rows.append(row)
+    deduped = []
+    seen = set()
+    for row in rows:
+        code = row["Cód. Artículo"]
+        if code in seen:
+            continue
+        seen.add(code)
+        deduped.append(row)
+    return deduped
+
+
 def _detect_table_column_roles(rows: list[list[str]]) -> dict[str, int]:
     """Detect which column in a pdfplumber table is code / price / description."""
     if not rows:
@@ -1048,17 +1113,17 @@ def extract_rows_from_pdf_tables(
                                 price_candidate = ""
                         elif not m_price:
                             desc_parts.append(cell)
-                    if price_candidate:
-                        r = _empty_template_row()
-                        r["Cód. Artículo"] = code_candidate
-                        r["Precio"] = price_candidate
-                        r["Descripción artículo"] = " ".join(desc_parts).strip() or code_candidate
-                        r["Cód. Lista"] = list_code
-                        r["Desc. Lista"] = list_desc
-                        r["Moneda"] = default_currency
-                        r["Unidad"] = "Un"
-                        all_rows.append(r)
-                        continue  # skip standard column-role detection for this table
+                    r = _empty_template_row()
+                    r["Cód. Artículo"] = code_candidate
+                    r["Precio"] = price_candidate
+                    r["Descripción artículo"] = " ".join(desc_parts).strip() or code_candidate
+                    r["Cód. Lista"] = list_code
+                    r["Desc. Lista"] = list_desc
+                    r["Moneda"] = default_currency
+                    r["Unidad"] = "Un"
+                    r["estado_precio"] = "" if price_candidate else "a completar"
+                    all_rows.append(r)
+                    continue  # skip standard column-role detection for this table
 
             cols = _detect_table_column_roles(norm)
             code_col = cols["code"]
@@ -1099,9 +1164,6 @@ def extract_rows_from_pdf_tables(
                             except Exception:
                                 pass
 
-                if not price_str:
-                    continue
-
                 desc = ""
                 if desc_col >= 0 and desc_col < len(row):
                     desc = str(row[desc_col] or "").strip()
@@ -1121,6 +1183,7 @@ def extract_rows_from_pdf_tables(
                 r["Desc. Lista"] = list_desc
                 r["Moneda"] = default_currency
                 r["Unidad"] = "Un"
+                r["estado_precio"] = "" if price_str else "a completar"
                 all_rows.append(r)
 
             # Second pass: extract from extra column pairs (multi-column layouts, BUG-6)
@@ -1139,8 +1202,6 @@ def extract_rows_from_pdf_tables(
                                 price_str = ""
                         except Exception:
                             price_str = ""
-                    if not price_str:
-                        continue
                     r = _empty_template_row()
                     r["Cód. Artículo"] = code
                     r["Precio"] = price_str
@@ -1149,6 +1210,7 @@ def extract_rows_from_pdf_tables(
                     r["Desc. Lista"] = list_desc
                     r["Moneda"] = default_currency
                     r["Unidad"] = "Un"
+                    r["estado_precio"] = "" if price_str else "a completar"
                     all_rows.append(r)
 
     deduped: list[dict] = []
@@ -1445,77 +1507,86 @@ async def _run_hybrid_pass(
     if not segments:
         return []
 
-    logger.info("Hybrid pass started: segments=%s type=%s", len(segments), file_type)
-    all_rows: list[dict] = []
-    for text, label in segments:
+    logger.info("Hybrid pass started: segments=%s type=%s concurrency=%s", len(segments), file_type, HYBRID_CONCURRENCY)
+    semaphore = asyncio.Semaphore(HYBRID_CONCURRENCY)
+
+    async def process_segment(text: str, label: str) -> tuple[str, list[dict], str | None]:
         segment_started = time.perf_counter()
         logger.info("Hybrid %s started: chars=%s", label, len(text))
-        try:
-            raw_response = await asyncio.wait_for(
-                claude_chat(
-                    messages=[{"role": "user", "content": f"{label}:\n{text}"}],
-                    system=_HYBRID_SYSTEM_PROMPT,
-                    max_tokens=HYBRID_MAX_TOKENS,
-                ),
-                timeout=CLAUDE_TIMEOUT_SEC,
-            )
-        except TimeoutError:
-            message = f"{label}: timed out after {CLAUDE_TIMEOUT_SEC:.0f}s"
-            logger.warning("Hybrid %s", message)
-            raw_data.setdefault("hybrid_errors", []).append(message)
-            continue
-        except HTTPException as exc:
-            logger.warning("Hybrid %s failed in %.1fs: %s", label, time.perf_counter() - segment_started, exc.detail)
-            raw_data.setdefault("hybrid_errors", []).append(f"{label}: {exc.detail}")
-            continue
-        except Exception as exc:
-            logger.exception("Hybrid %s failed in %.1fs", label, time.perf_counter() - segment_started)
-            raw_data.setdefault("hybrid_errors", []).append(f"{label}: {str(exc)}")
-            continue
+        async with semaphore:
+            try:
+                raw_response = await asyncio.wait_for(
+                    claude_chat(
+                        messages=[{"role": "user", "content": f"{label}:\n{text}"}],
+                        system=_HYBRID_SYSTEM_PROMPT,
+                        max_tokens=HYBRID_MAX_TOKENS,
+                    ),
+                    timeout=CLAUDE_TIMEOUT_SEC,
+                )
+            except TimeoutError:
+                message = f"{label}: timed out after {CLAUDE_TIMEOUT_SEC:.0f}s"
+                logger.warning("Hybrid %s", message)
+                return label, [], message
+            except HTTPException as exc:
+                message = f"{label}: {exc.detail}"
+                logger.warning("Hybrid %s failed in %.1fs: %s", label, time.perf_counter() - segment_started, exc.detail)
+                return label, [], message
+            except Exception as exc:
+                message = f"{label}: {str(exc)}"
+                logger.exception("Hybrid %s failed in %.1fs", label, message)
+                return label, [], message
 
-        raw_response = raw_response.strip()
-        if raw_response.startswith("```"):
-            raw_response = raw_response[raw_response.find("\n") + 1:]
-            raw_response = re.sub(r"```\s*$", "", raw_response).strip()
+            raw_response = raw_response.strip()
+            if raw_response.startswith("```"):
+                raw_response = raw_response[raw_response.find("\n") + 1:]
+                raw_response = re.sub(r"```\s*$", "", raw_response).strip()
 
-        parsed: list[dict] = []
-        try:
-            parsed = json.loads(raw_response)
-            if not isinstance(parsed, list):
-                parsed = []
-        except Exception:
-            # Salvage truncated JSON array
-            if "[" in raw_response:
-                last_close = raw_response.rfind("}")
-                if last_close > 0:
-                    try:
-                        salvaged = json.loads(raw_response[:last_close + 1] + "]")
-                        if isinstance(salvaged, list):
-                            parsed = salvaged
-                    except Exception:
-                        pass
+            parsed: list[dict] = []
+            try:
+                parsed = json.loads(raw_response)
+                if not isinstance(parsed, list):
+                    parsed = []
+            except Exception:
+                if "[" in raw_response:
+                    last_close = raw_response.rfind("}")
+                    if last_close > 0:
+                        try:
+                            salvaged = json.loads(raw_response[:last_close + 1] + "]")
+                            if isinstance(salvaged, list):
+                                parsed = salvaged
+                        except Exception:
+                            pass
 
-        for item in parsed:
-            if not isinstance(item, dict):
-                continue
-            code  = re.sub(r'-{2,}', '-', str(item.get("code", "")).strip().upper())
-            desc  = _clean_hybrid_description(item.get("desc", ""))
-            price = _norm_hybrid_price(item.get("price"))
-            if not code or not price or not _is_valid_product_code(code):
-                continue
-            r = _empty_template_row()
-            r["Cód. Artículo"] = code
-            r["Descripción artículo"] = desc
-            r["Precio"] = price
-            r["Cód. Lista"] = list_code
-            r["Desc. Lista"] = list_desc
-            r["Moneda"] = default_currency
-            r["Unidad"] = "Un"
-            all_rows.append(r)
+            segment_rows: list[dict] = []
+            for item in parsed:
+                if not isinstance(item, dict):
+                    continue
+                code  = re.sub(r'-{2,}', '-', str(item.get("code", "")).strip().upper())
+                desc  = _clean_hybrid_description(item.get("desc", ""))
+                price = _norm_hybrid_price(item.get("price"))
+                if not code or not _is_valid_product_code(code):
+                    continue
+                r = _empty_template_row()
+                r["Cód. Artículo"] = code
+                r["Descripción artículo"] = desc
+                r["Precio"] = price
+                r["estado_precio"] = "" if price else "a completar"
+                r["Cód. Lista"] = list_code
+                r["Desc. Lista"] = list_desc
+                r["Moneda"] = default_currency
+                r["Unidad"] = "Un"
+                segment_rows.append(r)
 
-            logger.info("Hybrid %s completed in %.1fs: rows=%s", label, time.perf_counter() - segment_started, len(parsed))
+            logger.info("Hybrid %s completed in %.1fs: rows=%s", label, time.perf_counter() - segment_started, len(segment_rows))
+            return label, segment_rows, None
 
-            logger.info("Hybrid pass completed: rows=%s", len(all_rows))
+    results = await asyncio.gather(*(process_segment(text, label) for text, label in segments))
+    all_rows: list[dict] = []
+    for label, segment_rows, error in results:
+        if error:
+            raw_data.setdefault("hybrid_errors", []).append(error)
+        all_rows.extend(segment_rows)
+    logger.info("Hybrid pass completed: rows=%s errors=%s", len(all_rows), len(raw_data.get("hybrid_errors", [])))
     return all_rows
 
 
@@ -1844,6 +1915,16 @@ async def agent_transformer(
             }
         )
 
+    code_only_rows = _extract_code_only_rows(
+        raw_text,
+        list_code=list_code,
+        list_desc=list_desc,
+        default_currency=default_currency,
+    ) if raw_text else []
+    if code_only_rows:
+        all_rows.extend(code_only_rows)
+        local_rows_all.extend(code_only_rows)
+
     # Structured table extraction — primary method for complex multi-column layouts.
     # This fixes: missing rows (Termi-Plast, UCA, FL...) and corrupted codes (LY-10→136261).
     pdf_raw_tables = raw_data.get("pdf_raw_tables") or []
@@ -1942,8 +2023,13 @@ async def agent_transformer(
             if not legacy_ai_enabled:
                 continue
 
-            # Skip AI when numeric-profile seed already covers the list (BUG-7 / LCT case)
-            if strict_numeric_profile and len(strict_rows_seed) >= PDF_MIN_EXPECTED_ROWS:
+            # Skip the legacy AI pass when the numeric profile already covers the list.
+            # The dedicated hybrid pass below must still run when enabled.
+            if (
+                strict_numeric_profile
+                and len(strict_rows_seed) >= PDF_MIN_EXPECTED_ROWS
+                and not HYBRID_EXTRACTION
+            ):
                 continue
 
             # Complement with AI on all chunks by default to maximize recall.
@@ -2176,6 +2262,19 @@ async def agent_verifier(rows: list[dict], raw_data: dict) -> dict:
     issues = []
     cleaned_rows = []
     prices_by_code: dict[str, set[str]] = {}
+    structured_partid_codes = set()
+    for source_row in raw_data.get("structured_rows", []):
+        if not isinstance(source_row, dict):
+            continue
+        for source_name, source_value in source_row.items():
+            normalized_source_name = re.sub(
+                r"[^a-z0-9]+", " ", unicodedata.normalize("NFKD", str(source_name).lower())
+            ).strip().replace(" ", "")
+            if normalized_source_name == "partid":
+                normalized_value = str(source_value or "").strip().upper()
+                if normalized_value:
+                    structured_partid_codes.add(normalized_value)
+                break
     for candidate in rows:
         code = str(candidate.get("Cód. Artículo", "")).strip().upper()
         price = str(candidate.get("Precio", "")).strip()
@@ -2187,7 +2286,7 @@ async def agent_verifier(rows: list[dict], raw_data: dict) -> dict:
         row_issues = []
         code = str(row.get("Cód. Artículo", "")).strip().upper()
 
-        if not _is_valid_product_code(code):
+        if not _is_valid_product_code(code) and code not in structured_partid_codes:
             row_issues.append(f"Invalid product code: '{code}'")
 
         if code in conflicting_codes:
@@ -2221,13 +2320,15 @@ async def agent_verifier(rows: list[dict], raw_data: dict) -> dict:
                     row_issues.append(f"Invalid price: {price_val}")
                 else:
                     row["Precio"] = str(round(price_val, 2))
+                    row["estado_precio"] = ""
                     if raw_data.get("metadata", {}).get("type") == ".pdf" and price_val >= 1000 and price_val.is_integer():
                         row_issues.append("Suspicious integer price in PDF")
             except ValueError:
                 row_issues.append(f"Non-numeric price: '{row.get('Precio')}'")
                 row["Precio"] = ""
         else:
-            row_issues.append("Missing price")
+            row["Precio"] = ""
+            row["estado_precio"] = "a completar"
 
         # Validate currency
         currency = row.get("Moneda", "").strip().upper()
@@ -2260,7 +2361,7 @@ async def agent_verifier(rows: list[dict], raw_data: dict) -> dict:
         cleaned_rows.append(row)
 
     total = len(rows)
-    blocking_terms = ("Missing price", "Non-numeric price", "Invalid price", "Invalid product code")
+    blocking_terms = ("Non-numeric price", "Invalid price", "Invalid product code")
     valid = total - len([item for item in issues if any(term in issue for term in blocking_terms for issue in item["issues"])])
     suspicious_terms = ("Conflicting prices", "Description contains", "Suspicious integer price")
     suspicious = [item for item in issues if any(term in issue for term in suspicious_terms for issue in item["issues"])]
@@ -2362,14 +2463,15 @@ async def orchestrator(
         "cost_display": round((usage_tracker["input"] / 1e6 * _DISPLAY_INPUT_RATE) + (usage_tracker["output"] / 1e6 * _DISPLAY_OUTPUT_RATE), 6),
         "cost_real":    round((usage_tracker["input"] / 1e6 * _REAL_INPUT_RATE)    + (usage_tracker["output"] / 1e6 * _REAL_OUTPUT_RATE),    6),
     }
-    _save_versioned_result(filename, {
-        "filename": filename,
-        "ts": datetime.now().isoformat(timespec="seconds"),
-        "rows": result["rows"],
-        "report": result["report"],
-        "extraction_method": final_method,
-        "usage": cost_info,
-    })
+    if SAVE_HISTORY:
+        _save_versioned_result(filename, {
+            "filename": filename,
+            "ts": datetime.now().isoformat(timespec="seconds"),
+            "rows": result["rows"],
+            "report": result["report"],
+            "extraction_method": final_method,
+            "usage": cost_info,
+        })
 
     return {
         "filename": filename,
@@ -2550,4 +2652,4 @@ async def extract_batch(
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run(app, host="127.0.0.1", port=8000, reload=True)

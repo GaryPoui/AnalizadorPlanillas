@@ -114,6 +114,9 @@ SESION 11 (2026-09-01) — Resiliencia y calidad verificable
             descripciones locales y reduce HYBRID_MAX_TOKENS por defecto a 3,500
             [x] Alcance híbrido restringido: PDF e imágenes usan Claude; XLS, XLSX y CSV
               permanecen en extracción local, sin llamadas Claude ni costo de API
+              [x] Concurrencia híbrida limitada a 3 páginas/chunks: evita que PDFs grandes
+                superen linealmente el timeout del frontend de 180s
+              [x] Timeout explícito por segmento y logs de inicio/fin/error corregidos
             [x] Validación integral local post-compactación: API health 200 y batch 5/5
               OK sin tokens (L26031 XLSX/CSV, LCT PDF, N°95 PDF, MICROCONTROL XLS)
             [!] Integración híbrida N°95: sigue sin respuesta Claude durante la prueba

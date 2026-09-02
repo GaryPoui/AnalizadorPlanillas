@@ -9,13 +9,16 @@ start.bat
 
 **Opcion B — desde PowerShell:**
 ```powershell
-C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -File "start.ps1"
+C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -File "C:\Users\Pasante\Desktop\AnalizadorPlanillas\start.ps1"
 ```
 
 El script levanta el backend, espera que arranque y abre el frontend en el navegador.
 - Backend: http://localhost:8000
 - Docs API: http://localhost:8000/docs
-- Frontend: `pricebot/frontend/index.html` (se abre automaticamente)
+- Frontend: http://127.0.0.1:3000 (se abre automaticamente)
+
+El backend queda limitado a `127.0.0.1`; no acepta conexiones desde otros equipos de la red.
+El frontend solo se sirve localmente y CORS permite únicamente los orígenes locales configurados.
 
 ---
 
@@ -32,7 +35,7 @@ API REST construida con FastAPI que recibe archivos de listas de precios de prov
 | Requisito | Versión | Notas |
 |-----------|---------|-------|
 | Python | 3.11+ | Testeado en 3.14.5 |
-| Anthropic API Key | — | Cuenta con acceso a `claude-haiku-4-5` |
+| Anthropic API Key | — | Cuenta con acceso a `claude-sonnet-4-5` |
 | Tesseract OCR | 5.4+ | Solo para PDFs escaneados (AR36-style) |
 
 ### Ruta Python en este entorno
@@ -68,7 +71,10 @@ Crear o editar `pricebot/.env` (UTF-8 SIN BOM — importante):
 
 ```env
 ANTHROPIC_API_KEY=sk-ant-api03-...          # obligatorio
-CLAUDE_MODEL=claude-haiku-4-5               # modelo activo
+CLAUDE_MODEL=claude-sonnet-4-5               # modelo activo
+PRICEBOT_API_KEY=                            # recomendado: clave larga para proteger la API
+PRICEBOT_ALLOWED_ORIGINS=http://127.0.0.1:3000,http://localhost:3000
+SAVE_HISTORY=0                               # no persistir filas completas por defecto
 
 TESSERACT_CMD=C:\Users\...\Tesseract-OCR\tesseract.exe  # opcional, para OCR
 
@@ -76,7 +82,8 @@ TESSERACT_CMD=C:\Users\...\Tesseract-OCR\tesseract.exe  # opcional, para OCR
 HYBRID_EXTRACTION=1                         # aplica solo a PDF e imágenes; 0 para desactivar
 HYBRID_MAX_TOKENS=3500                       # salida compacta: solo código + precio
 HYBRID_XLS_CHUNK_CHARS=25000
-CLAUDE_TIMEOUT_SEC=20                       # timeout estricto por página/chunk
+CLAUDE_TIMEOUT_SEC=90                       # timeout estricto por página/chunk
+HYBRID_CONCURRENCY=3                        # páginas/chunks simultáneos
 PDF_USE_MARKITDOWN=0                        # 1 solo si se necesita ese conversor; pdfplumber es default
 
 # Tracking de costos
@@ -99,7 +106,7 @@ Usar en su lugar:
 
 ```bash
 C:\Users\Pasante\AppData\Local\Python\pythoncore-3.14-64\python.exe -m uvicorn main:app \
-    --host 0.0.0.0 \
+  --host 127.0.0.1 \
     --port 8000 \
     --reload \
     --app-dir "c:\Users\Pasante\Desktop\AnalizadorPlanillas\pricebot\api"
@@ -108,6 +115,17 @@ C:\Users\Pasante\AppData\Local\Python\pythoncore-3.14-64\python.exe -m uvicorn m
 La API queda disponible en: **http://localhost:8000**
 
 Documentación interactiva Swagger: **http://localhost:8000/docs**
+
+La comunicación entre el navegador y el backend ocurre por loopback (`127.0.0.1`) y no sale de
+la computadora. La comunicación con Anthropic usa HTTPS. Los archivos enviados a Claude son
+procesados por Anthropic; si los datos no pueden salir de la máquina, hay que desactivar el modo
+IA y usar únicamente extracción local. Para proteger también el acceso a los endpoints, definir
+`PRICEBOT_API_KEY` en `.env` y la misma clave en `pricebot/frontend/app.js` como
+`window.PRICEBOT_API_KEY`.
+
+Regla de extracción: todo código de producto válido detectado genera una fila, aunque no tenga
+precio. En ese caso `Precio` queda vacío y `estado_precio` toma el valor `a completar`; la fila
+no se descarta ni se considera inválida por esa ausencia.
 
 ---
 
@@ -236,7 +254,7 @@ print(f"\nTotal acumulado: ${total:.4f}")
 
 ## Costos de referencia
 
-| Tipo de archivo | Costo display aprox. | Costo real (Haiku) |
+| Tipo de archivo | Costo display aprox. | Costo configurado aprox. |
 |----------------|---------------------|-------------------|
 | Excel/CSV | $0.00 | $0.00 |
 | PDF pequeño (<10 pág) | $0.15–$0.35 | $0.04–$0.09 |
