@@ -23,7 +23,7 @@ automáticamente al formato de la **Plantilla_Precios_Compras**.
              │  raw_text
     ┌────────▼──────────────┐
     │  AGENT TRANSFORMER    │
-    │  Claude claude-sonnet-4-20250514     │
+    │  Claude claude-sonnet-4-5             │
     │  raw_text → JSON rows │
     │  Mapea a 12 columnas  │
     └────────┬──────────────┘
@@ -140,9 +140,12 @@ curl -X POST http://localhost:8000/extract/batch \
 
 ## Notas Técnicas
 
-- El **Transformer** usa `claude-sonnet-4-20250514` con contexto de hasta 12.000 chars por chunk
-- Los PDFs se convierten primero con MarkItDown para reducir texto ruidoso antes de enviar a IA
-- Si MarkItDown no logra extraer contenido utilizable, la API vuelve a pdfplumber como respaldo
-- Las imágenes usan Claude Vision directamente (no OCR local)
-- El Verifier normaliza formatos argentinos: `$1.535,26` → `1535.26`
-- El XLSX de salida respeta exactamente el formato de `Plantilla_Precios_Compras`
+- El **Transformer** usa el modelo configurado en `CLAUDE_MODEL` mediante un paso híbrido acotado para PDFs e imágenes.
+- PDFs: pdfplumber es el extractor principal; MarkItDown es opcional con `PDF_USE_MARKITDOWN=1`.
+- El híbrido compacta las páginas y solicita a Claude solo pares `code` + `price`.
+- El híbrido tiene concurrencia limitada, timeout por segmento y límite total por archivo; ante fallo conserva las filas locales.
+- XLS, XLSX y CSV se procesan localmente sin Claude ni costo de API.
+- Las imágenes usan Claude Vision y luego el complemento híbrido.
+- El Verifier normaliza formatos argentinos: `$1.535,26` → `1535.26`.
+- La respuesta incluye `hybrid_status`, `hybrid_errors` y `usage` cuando corresponde.
+- El XLSX de salida respeta exactamente el formato de `Plantilla_Precios_Compras`.

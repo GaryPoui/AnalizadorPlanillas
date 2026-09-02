@@ -49,7 +49,7 @@ Archivo (PDF / XLS / XLSX / CSV / imagen)
           │ raw_text
     ┌─────▼──────────────┐
     │   TRANSFORMER      │  Intenta mapear localmente (pandas/regex)
-    │                    │  Si falla → Claude claude-sonnet-4-6
+      │                    │  Si falla → Claude claude-sonnet-4-5
     │                    │  raw_text → rows[] (12 columnas)
     └─────┬──────────────┘
           │ rows[]
@@ -110,7 +110,7 @@ pip install -r pricebot/api/requirements.txt
 
 ```bash
 cd pricebot/api
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
 El frontend estático está en `pricebot/frontend/` — abrirlo con Live Server o cualquier servidor HTTP.
@@ -387,7 +387,7 @@ Continuación de la sesión 9. Un análisis externo (otra IA comparando el JSON 
 
 La API fue levantada con uvicorn en modo `--reload`:
 ```
-python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload --app-dir pricebot/api
+python -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload --app-dir pricebot/api
 ```
 Documentación de setup completa en `SETUP.md`.
 
@@ -979,6 +979,33 @@ code_col = pick_column(columns, ["partid", "cod articulo", "cod. articulo", "sku
 - [ ] **PASO-2** — Patch LCT: aplicar correcciones de auditoría Sonnet (~127 faltantes + 3 precios + ~14 basura).
 - [ ] **FEAT** — Tracking de tokens/costo en endpoint `/extract`.
 - [ ] **FEAT** — LP MICROCONTROL: extracción completa (actualmente 60/~100 productos).
+
+---
+
+## Estado actualizado — 2026-09-02
+
+Desde la última documentación se implementó y publicó lo siguiente:
+
+- `tmp/run_pdf_hybrid.py` es el ejecutor recomendado y acepta cualquier PDF por argumento; los scripts específicos anteriores se conservaron como pruebas históricas.
+- El híbrido procesa PDFs e imágenes; XLS, XLSX y CSV permanecen locales y sin costo de API.
+- Los PDFs se compactan antes de Claude, reduciendo texto auxiliar y solicitando únicamente `code` y `price`.
+- Claude usa hasta tres segmentos simultáneos, timeout HTTP por fase y límite total de 120 segundos por archivo.
+- Si Claude falla o supera el límite, se conservan las filas locales y la respuesta informa `hybrid_status` y `hybrid_errors`.
+- El frontend espera hasta 300 segundos para permitir extracción local más complemento Claude.
+- Se agregaron pares PDF→precio autoritativos, filtros de códigos fragmentados, detección de basura y scoring de confianza.
+- Se agregaron `validate_pdf_json.py`, `compare_history.py`, `show_costs.py` y el historial versionado en `Respuestas/history/`.
+
+Validaciones realizadas:
+
+| Prueba | Resultado | Costo |
+|---|---|---|
+| API health | HTTP 200 | $0.00 |
+| Batch local sin Claude | 5/5 archivos OK | $0.00 |
+| Tests de regex, timeout, merge, compactación y confianza | OK | $0.00 |
+| Híbrido completo sobre PDFs grandes | Claude puede exceder límite; fallback local activo | variable |
+
+Commits publicados: `b942756`, `55453f9`, `064fd41`, `511bb3e`, `07046cc`.
+Detalle operativo y de costos: [SETUP.md](SETUP.md), [ROADMAP.txt](ROADMAP.txt) y [costos.txt](costos.txt).
 
 ---
 
