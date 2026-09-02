@@ -261,6 +261,7 @@ HYBRID_MAX_TOKENS = max(int(os.getenv("HYBRID_MAX_TOKENS", "3500")), 1000)
 HYBRID_XLS_CHUNK_CHARS = max(int(os.getenv("HYBRID_XLS_CHUNK_CHARS", "25000")), 5000)
 CLAUDE_TIMEOUT_SEC = max(float(os.getenv("CLAUDE_TIMEOUT_SEC", "90")), 10.0)
 HYBRID_CONCURRENCY = max(int(os.getenv("HYBRID_CONCURRENCY", "3")), 1)
+HYBRID_TOTAL_TIMEOUT_SEC = max(float(os.getenv("HYBRID_TOTAL_TIMEOUT_SEC", "120")), 15.0)
 PDF_USE_MARKITDOWN = os.getenv("PDF_USE_MARKITDOWN", "0") == "1"
 
 # Domain-aware system prompt built from sessions 1-9 experience
@@ -2076,7 +2077,17 @@ async def agent_transformer(
 
     # --- Hybrid pass: per-page/chunk Claude extraction merged into deduped base ---
     if ai_enabled and HYBRID_EXTRACTION and hybrid_supported and not validation_mode:
-        hybrid_rows = await _run_hybrid_pass(raw_data, list_code, list_desc, default_currency)
+        try:
+            hybrid_rows = await asyncio.wait_for(
+                _run_hybrid_pass(raw_data, list_code, list_desc, default_currency),
+                timeout=HYBRID_TOTAL_TIMEOUT_SEC,
+            )
+        except TimeoutError:
+            raw_data.setdefault("hybrid_errors", []).append(
+                f"hybrid pass timed out after {HYBRID_TOTAL_TIMEOUT_SEC:.0f}s; local rows retained"
+            )
+            logger.warning("Hybrid pass timed out; retaining local rows")
+            hybrid_rows = []
         if hybrid_rows:
             deduped_by_code: dict[str, dict] = {
                 str(r.get("Cód. Artículo", "")).strip().upper(): r

@@ -84,6 +84,7 @@ HYBRID_MAX_TOKENS=3500                       # salida compacta: solo código + p
 HYBRID_XLS_CHUNK_CHARS=25000
 CLAUDE_TIMEOUT_SEC=90                       # timeout estricto por página/chunk
 HYBRID_CONCURRENCY=3                        # páginas/chunks simultáneos
+HYBRID_TOTAL_TIMEOUT_SEC=120                # límite total; conserva filas locales si vence
 PDF_USE_MARKITDOWN=0                        # 1 solo si se necesita ese conversor; pdfplumber es default
 
 # Tracking de costos
@@ -302,6 +303,10 @@ Por eso se aplican también a cualquier PDF futuro con layouts equivalentes.
 XLS, XLSX y CSV no usan el paso híbrido ni el transformador Claude: se procesan
 localmente para mantener costo $0.00. Las imágenes usan Vision y luego el complemento
 híbrido; los PDFs usan extracción local más el complemento híbrido.
+
+Si Claude no responde antes de `HYBRID_TOTAL_TIMEOUT_SEC`, la API devuelve la extracción
+local disponible y agrega una advertencia al `log`; no devuelve cero filas ni deja pendiente
+la solicitud indefinidamente.
 
 ---
 
