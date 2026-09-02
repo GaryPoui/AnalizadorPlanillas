@@ -2,7 +2,12 @@
 let files = [];
 let lastResult = null;
 const API_URL = 'http://127.0.0.1:8000';
-const REQUEST_TIMEOUT_MS = 180000;
+const API_ACCESS_KEY = window.PRICEBOT_API_KEY || '';
+const REQUEST_TIMEOUT_MS = 300000;
+
+function apiHeaders() {
+  return API_ACCESS_KEY ? {'X-PriceBot-Key': API_ACCESS_KEY} : {};
+}
 
 // ─── TAB SWITCHING ───────────────────────────
 function switchTab(name) {
@@ -170,6 +175,7 @@ async function startExtraction() {
       const resp = await fetch(`${API_URL}/extract`, {
         method: 'POST',
         body: formData,
+        headers: apiHeaders(),
         signal: controller.signal
       }).finally(() => clearTimeout(timeoutId));
 
@@ -314,7 +320,8 @@ async function downloadFile(format) {
   try {
     const resp = await fetch(`${API_URL}/extract/download?format=${format}`, {
       method: 'POST',
-      body: formData
+      body: formData,
+      headers: apiHeaders()
     });
 
     if (!resp.ok) throw new Error(await resp.text());

@@ -318,6 +318,8 @@ tiempo de respuesta y riesgo de timeouts.
 La respuesta incluye `hybrid_status`: `completed`, `partial`, `timeout` o `disabled`.
 Ante un timeout o error de Claude, la API conserva y devuelve las filas locales y agrega
 el detalle en `hybrid_errors`; una falla externa no bloquea todo el procesamiento.
+El frontend espera hasta 300 segundos; el complemento híbrido está limitado a 120 segundos
+y después devuelve el resultado local disponible.
 
 Las correcciones de códigos fragmentados, precios truncados y columnas paralelas son
 reglas estructurales del extractor: no contienen códigos ni precios específicos de LCT.
