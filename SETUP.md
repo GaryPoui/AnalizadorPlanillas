@@ -278,6 +278,24 @@ python tmp/validate_pdf_json.py "Listas/archivo.pdf" "Respuestas/resultado.json"
 
 El reporte muestra pares correctos, faltantes, precios diferentes y la precisión verificable.
 
+## Ejecutar el híbrido con cualquier PDF
+
+El comando recomendado no está ligado a ningún proveedor:
+
+```bash
+python tmp/run_pdf_hybrid.py "Listas/archivo.pdf"
+```
+
+También permite indicar el JSON de salida:
+
+```bash
+python tmp/run_pdf_hybrid.py "ruta/archivo.pdf" --output "Respuestas/resultado.json"
+```
+
+El ejecutor informa filas, calidad, tokens, costos y advertencias por página. Los scripts
+con nombres de proveedores que permanecen en `tmp/` son pruebas históricas; la API y este
+comando usan la implementación genérica.
+
 ---
 
 ## Compactar un PDF antes del modo híbrido

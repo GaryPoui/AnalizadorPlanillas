@@ -116,6 +116,8 @@ SESION 11 (2026-09-01) — Resiliencia y calidad verificable
           N°95: 38,486→19,097 chars (-50.4%), 746 pares conservados
           [x] Primera pasada Claude compacta: solicita solo code+price, conserva
             descripciones locales y reduce HYBRID_MAX_TOKENS por defecto a 3,500
+            [x] Ejecutor genérico `tmp/run_pdf_hybrid.py`: recibe cualquier PDF por argumento,
+              guarda JSON y reporta filas, calidad, costos y advertencias
             [x] Alcance híbrido restringido: PDF e imágenes usan Claude; XLS, XLSX y CSV
               permanecen en extracción local, sin llamadas Claude ni costo de API
               [x] Concurrencia híbrida limitada a 3 páginas/chunks: evita que PDFs grandes
