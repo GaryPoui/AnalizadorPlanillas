@@ -84,6 +84,7 @@ HYBRID_MAX_TOKENS=3500                       # salida compacta: solo código + p
 HYBRID_XLS_CHUNK_CHARS=25000
 CLAUDE_TIMEOUT_SEC=90                       # timeout estricto por página/chunk
 HYBRID_CONCURRENCY=3                        # páginas/chunks simultáneos
+HYBRID_TOTAL_TIMEOUT_SEC=120                # límite total del complemento por archivo
 HYBRID_TOTAL_TIMEOUT_SEC=120                # límite total; conserva filas locales si vence
 PDF_USE_MARKITDOWN=0                        # 1 solo si se necesita ese conversor; pdfplumber es default
 
@@ -313,6 +314,10 @@ El script no llama a Claude, no altera el PDF ni genera costo.
 El paso híbrido solicita a Claude solo objetos `{"code":"...","price":"..."}`.
 Las descripciones se conservan desde la extracción local; esto reduce tokens de salida,
 tiempo de respuesta y riesgo de timeouts.
+
+La respuesta incluye `hybrid_status`: `completed`, `partial`, `timeout` o `disabled`.
+Ante un timeout o error de Claude, la API conserva y devuelve las filas locales y agrega
+el detalle en `hybrid_errors`; una falla externa no bloquea todo el procesamiento.
 
 Las correcciones de códigos fragmentados, precios truncados y columnas paralelas son
 reglas estructurales del extractor: no contienen códigos ni precios específicos de LCT.

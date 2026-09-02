@@ -131,7 +131,14 @@ async def claude_chat(messages: list, system: str = "", max_tokens: int = 8000) 
 
     request_started = time.perf_counter()
     logger.info("Claude request started: max_tokens=%s timeout=%ss", max_tokens, CLAUDE_TIMEOUT_SEC)
-    async with httpx.AsyncClient(timeout=CLAUDE_TIMEOUT_SEC) as client:
+    timeout = httpx.Timeout(
+        connect=min(CLAUDE_TIMEOUT_SEC, 15.0),
+        read=CLAUDE_TIMEOUT_SEC,
+        write=min(CLAUDE_TIMEOUT_SEC, 30.0),
+        pool=10.0,
+    )
+    limits = httpx.Limits(max_connections=HYBRID_CONCURRENCY, max_keepalive_connections=HYBRID_CONCURRENCY)
+    async with httpx.AsyncClient(timeout=timeout, limits=limits) as client:
         try:
             resp = await client.post(
                 "https://api.anthropic.com/v1/messages",
@@ -2243,6 +2250,14 @@ async def agent_transformer(
         "rows": normalize_rows(deduped),
         "column_mapping": merged_mapping,
     }
+    if hybrid_supported and HYBRID_EXTRACTION:
+        if raw_data.get("hybrid_errors"):
+            response["hybrid_status"] = "partial"
+            response["hybrid_errors"] = raw_data["hybrid_errors"]
+        else:
+            response["hybrid_status"] = "completed"
+    elif hybrid_supported:
+        response["hybrid_status"] = "disabled"
 
     if ai_errors:
         response["ai_fallback"] = {
@@ -2511,6 +2526,8 @@ async def orchestrator(
         "metadata": raw_data["metadata"],
         "extraction_method": final_method,
         "column_mapping": column_mapping,
+        "hybrid_status": transform_result.get("hybrid_status"),
+        "hybrid_errors": transform_result.get("hybrid_errors", []),
         "usage": cost_info,
         "log": log,
     }

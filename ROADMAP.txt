@@ -118,6 +118,8 @@ SESION 11 (2026-09-01) — Resiliencia y calidad verificable
             descripciones locales y reduce HYBRID_MAX_TOKENS por defecto a 3,500
             [x] Ejecutor genérico `tmp/run_pdf_hybrid.py`: recibe cualquier PDF por argumento,
               guarda JSON y reporta filas, calidad, costos y advertencias
+              [x] Protección de red híbrida: timeouts HTTP explícitos para connect/read/write/pool
+                y límite total por archivo; fallback local garantizado con hybrid_status/errors
             [x] Alcance híbrido restringido: PDF e imágenes usan Claude; XLS, XLSX y CSV
               permanecen en extracción local, sin llamadas Claude ni costo de API
               [x] Concurrencia híbrida limitada a 3 páginas/chunks: evita que PDFs grandes
