@@ -1,0 +1,14 @@
+﻿=== authoritative extractor (BUG-9/10) ===
+total authoritative pairs: 820
+  2060: got=8383.53 want~8383.53 OK
+  2062: got=15285.1 want~15285.1 OK
+  mid-line CCD-16 present? False (should be False)
+  mid-line CCD-25 present? False (should be False)
+  mid-line T30-44 present? False (should be False)
+  GK 4569: 25888.59
+  GK 4570: 125409.11
+  GK 4571: 129325.05
+=== sorting ===
+rows: 1340 numeric codes sorted: True
+first 8 codes: ['1000', '1886', '1900', '2002', '2003', '2004', '2005', '2006']
+quality: 97.7 review: 233 recovered: 5

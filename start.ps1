@@ -5,7 +5,8 @@
 $PYTHON   = "C:\Users\Pasante\AppData\Local\Python\pythoncore-3.14-64\python.exe"
 $ROOT     = $PSScriptRoot
 $API_DIR  = Join-Path $ROOT "pricebot\api"
-$FRONTEND = Join-Path $ROOT "pricebot\frontend\index.html"
+$FRONTEND_DIR = Join-Path $ROOT "pricebot\frontend"
+$FRONTEND_URL = "http://127.0.0.1:3000"
 $PORT     = 8000
 
 Write-Host ""
@@ -25,7 +26,7 @@ if ($busy) {
     Write-Host "  El backend ya está corriendo en :$PORT" -ForegroundColor Yellow
 } else {
     # Levantar uvicorn en una nueva ventana de consola
-    $cmd = "& '$PYTHON' -m uvicorn main:app --host 0.0.0.0 --port $PORT --reload --app-dir '$API_DIR'; pause"
+    $cmd = "& '$PYTHON' -m uvicorn main:app --host 127.0.0.1 --port $PORT --reload --app-dir '$API_DIR'; pause"
     Start-Process powershell -ArgumentList "-NoExit", "-Command", $cmd -WindowStyle Normal
     Write-Host "  Backend iniciado en nueva ventana" -ForegroundColor Green
 
@@ -49,11 +50,24 @@ if ($busy) {
     }
 }
 
-# Abrir frontend en el navegador por defecto
-Start-Process $FRONTEND
+# Serve the frontend on a fixed local origin so CORS can remain restricted.
+$frontendBusy = $false
+try {
+    $frontendConn = New-Object System.Net.Sockets.TcpClient
+    $frontendConn.Connect("localhost", 3000)
+    $frontendConn.Close()
+    $frontendBusy = $true
+} catch {}
+
+if (-not $frontendBusy) {
+    $frontendCmd = "& '$PYTHON' -m http.server 3000 --bind 127.0.0.1 --directory '$FRONTEND_DIR'; pause"
+    Start-Process powershell -ArgumentList "-NoExit", "-Command", $frontendCmd -WindowStyle Normal
+}
+
+Start-Process $FRONTEND_URL
 
 Write-Host ""
 Write-Host "  Backend:  http://localhost:$PORT" -ForegroundColor Cyan
 Write-Host "  Docs API: http://localhost:$PORT/docs" -ForegroundColor Cyan
-Write-Host "  Frontend: $FRONTEND" -ForegroundColor Cyan
+Write-Host "  Frontend: $FRONTEND_URL" -ForegroundColor Cyan
 Write-Host ""

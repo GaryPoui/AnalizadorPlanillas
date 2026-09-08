@@ -179,7 +179,12 @@ print(f"Costo: ${data['usage']['cost_display']} display / ${data['usage']['cost_
   "report": {
     "total_rows": 1052,
     "valid_rows": 1052,
-    "quality_score": 100.0
+    "quality_score": 100.0,
+    "price_recovered_from_description": 0,
+    "rows_sent_to_review": 2,
+    "review_rows": [
+      { "Cód. Artículo": "PHILLIPS", "Descripción artículo": "PHILLIPS", "Precio": "", "motivo": "código no válido (encabezado/texto/ruido)" }
+    ]
   },
   "usage": {
     "tokens_in": 60788,
@@ -193,6 +198,16 @@ print(f"Costo: ${data['usage']['cost_display']} display / ${data['usage']['cost_
   "metadata": { "pages": 46 }
 }
 ```
+
+Notas sobre el `report` (validación genérica, aplica a todos los formatos):
+- `total_rows`: filas efectivamente emitidas (ya excluye las enviadas a revisión).
+- `rows_sent_to_review` + `review_rows`: filas cuyo `Cód. Artículo` no es un código válido
+  (encabezados, texto descriptivo, glyphs OCR). No se emiten como productos pero se listan
+  para inspección manual; no se descartan en silencio.
+- `price_recovered_from_description`: cantidad de filas donde el precio estaba dentro de
+  `Descripción artículo` (columnas desalineadas) y se movió al campo `Precio`.
+- Las filas se devuelven **ordenadas por código** (numéricos primero en orden ascendente,
+  luego alfanuméricos).
 
 ---
 
@@ -222,7 +237,14 @@ Archivo recibido
  Deduplicación + filtro ghost rows (BUG-8)
       │
       ▼
- Verificación (quality_score, normalización de precios)
+ Saneamiento genérico (todos los formatos)
+      │  • Códigos basura (encabezados, texto, glyphs OCR) → lista de revisión
+      │  • Precio embebido en Descripción → se recupera al campo Precio
+      │  • Pares código→precio inequívocos (código al inicio de línea, precio con
+      │    decimales) rellenan solo precios vacíos o fragmentados (no sobreescriben)
+      │
+      ▼
+ Verificación (quality_score, normalización de precios) + orden por código
       │
       ▼
  Respuesta JSON + log de costos (costs_log.jsonl)

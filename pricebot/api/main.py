@@ -414,6 +414,14 @@ def _row_key(row: dict) -> tuple[str, str]:
     )
 
 
+def _code_sort_key(row: dict) -> tuple:
+    """Sort key that orders numeric codes numerically, then alphanumeric codes."""
+    code = str(row.get("Cód. Artículo", "")).strip()
+    if code.isdigit():
+        return (0, int(code), "")
+    return (1, 0, code.upper())
+
+
 def _row_non_empty_score(row: dict) -> int:
     return sum(1 for v in row.values() if str(v).strip())
 
@@ -980,6 +988,83 @@ def _is_valid_product_code(code: str) -> bool:
     return bool(re.match(r'^[A-Z][A-Z0-9\-/\.]{1,19}$', code))
 
 
+# Argentine-format price embedded in a description: "$ 1.234,56", "1234,56", "$8383,53".
+# Requires 2 decimals so plain quantities/sections ("50 3/8", "240") are never matched.
+_DESC_EMBEDDED_PRICE_RE = re.compile(
+    r"\$\s*\d[\d.\s]*\d[,]\d{2}"          # $ 1.234,56  /  $ 8383,53
+    r"|\b\d{1,3}(?:\.\d{3})+[,]\d{2}\b"   # 1.234,56 (with thousands separator)
+    r"|\b\d{2,7}[,]\d{2}\b"                # 8383,53
+)
+
+
+def _recover_price_from_description(row: dict) -> bool:
+    """Move a price embedded in the description into an empty Precio field.
+
+    Generic (any file type): fixes column-misalignment where the price landed in
+    'Descripción artículo' while 'Precio' stayed empty. Returns True if recovered.
+    """
+    price = str(row.get("Precio", "")).strip()
+    if price:
+        return False
+    desc = str(row.get("Descripción artículo", "")).strip()
+    if not desc:
+        return False
+    matches = list(_DESC_EMBEDDED_PRICE_RE.finditer(desc))
+    if not matches:
+        return False
+    # The unit price is conventionally the last monetary token on the line.
+    chosen = matches[-1]
+    normalized = _normalize_price_token(chosen.group(0))
+    try:
+        if float(normalized) <= 0:
+            return False
+    except ValueError:
+        return False
+    row["Precio"] = normalized
+    cleaned_desc = (desc[:chosen.start()] + " " + desc[chosen.end():])
+    cleaned_desc = re.sub(r"\s{2,}", " ", cleaned_desc).strip(" |;,-\t")
+    row["Descripción artículo"] = cleaned_desc
+    return True
+
+
+# Words that reveal a "code" is really header/paragraph text (any supplier, any file type).
+_GARBAGE_CODE_WORDS = frozenset({
+    "CODIGO", "MODELO", "DESCRIPCION", "PRECIO", "PRECIOS", "UNITARIO", "RANGO",
+    "NOMINAL", "SECCION", "PLANOS", "PHILLIPS", "DESCUENTO", "VIGENCIA",
+    "MATERIALES", "ACCESORIOS", "OBSERVACIONES", "CONDICIONES", "BANCARIA",
+    "CONSULTAR", "DISPONIBLE", "CERTIFICADOS", "CATALOGO", "REGLAMENTOS",
+    "SECRETARIA", "NACIONAL", "INDUSTRIA", "COMERCIAL", "LEALTAD", "PEDIDOS",
+    "CUMPLIMIENTO", "MARCADO", "TERMINALES", "FUSIBLES", "CONECTORES",
+    "UNIONES", "PASANTE", "DERIVACION", "ENVASE", "CORRIENTE", "TENSION",
+})
+
+
+def _looks_like_garbage_code(code: str, whitelist: set[str] | None = None) -> bool:
+    """Conservative, file-type-agnostic test: is this 'code' actually noise?
+
+    Only flags near-certain non-codes (spaces, OCR cid-glyphs, overlong strings,
+    header/paragraph words). Real SKUs — numeric, alphanumeric, dashed — pass.
+    """
+    c = str(code or "").strip()
+    if not c:
+        return True
+    upper = c.upper()
+    if whitelist and upper in whitelist:
+        return False
+    if " " in c or "\t" in c:
+        return True
+    if "cid:" in c.lower() or "(cid" in c.lower():
+        return True
+    if len(c) > 24:
+        return True
+    if upper in _GARBAGE_CODE_WORDS:
+        return True
+    # A pure alphabetic token with no digit and no separator is prose, not a code.
+    if re.match(r"^[A-Za-zÁÉÍÓÚÑÜáéíóúñü.]+$", c) and not any(ch.isdigit() for ch in c):
+        return True
+    return False
+
+
 def _extract_code_only_rows(
     text: str,
     list_code: str = "",
@@ -1425,22 +1510,58 @@ def _is_fragment_price(price: str) -> bool:
 
 
 def _extract_unambiguous_pdf_prices(raw_data: dict) -> dict[str, str]:
-    """Return code-price pairs found exactly once across PDF page text."""
+    """Return code→price pairs that are safe to trust as authoritative.
+
+    Only a code anchored at the START of a line, paired with a decimal price on the
+    same line, is accepted. This rejects mid-line model/connector codes (e.g. CCD-16
+    in "4180 T30-44 CCD-16 $ 226048,26") and prevents pairing a code with the next
+    code (BUG-9). Space-split prices like "$ 1254 09,11" are rejoined (BUG-10).
+    """
     candidates: dict[str, set[str]] = {}
     for page_text in raw_data.get("pdf_pages", []):
-        normalized_page = re.sub(r"-{2,}", "-", str(page_text))
-        for code, raw_price in CODE_PRICE_RE.findall(normalized_page):
-            normalized_code = re.sub(r"-{2,}", "-", code.strip().upper())
-            normalized_price = _normalize_price_token(raw_price)
+        for raw_line in str(page_text).splitlines():
+            line = re.sub(r"-{2,}", "-", raw_line).strip()
+            if not line:
+                continue
+            code_match = re.match(r"([A-Za-z0-9][A-Za-z0-9\-/\.]{1,19})\b", line)
+            if not code_match:
+                continue
+            normalized_code = code_match.group(1).strip().upper()
             if not _is_valid_product_code(normalized_code):
                 continue
-            try:
-                if float(normalized_price) <= 0:
-                    continue
-            except ValueError:
+            price = _parse_authoritative_line_price(line[code_match.end():])
+            if price is None:
                 continue
-            candidates.setdefault(normalized_code, set()).add(normalized_price)
+            candidates.setdefault(normalized_code, set()).add(price)
     return {code: next(iter(prices)) for code, prices in candidates.items() if len(prices) == 1}
+
+
+def _parse_authoritative_line_price(segment: str) -> Optional[str]:
+    """Return the last decimal price on a line segment, or None.
+
+    Accepts '$ 1.234,56', '1234,56', and space-split '$ 1254 09,11' → 125409.11.
+    Requires a two-decimal comma part, so bare integers (quantities, adjacent codes)
+    are never treated as prices.
+    """
+    dollar_price_re = re.compile(r"\$\s*(\d[\d.\s]*\d|\d)\s*,\s*(\d{2})(?!\d)")
+    plain_price_re = re.compile(r"\b(\d{1,3}(?:\.\d{3})*|\d+)\s*,\s*(\d{2})(?!\d)")
+
+    matches = list(dollar_price_re.finditer(segment)) or list(plain_price_re.finditer(segment))
+    if not matches:
+        return None
+    chosen = matches[-1]
+    integer_part = re.sub(r"[.\s]", "", chosen.group(1))
+    decimals = chosen.group(2)
+    if not integer_part:
+        return None
+    try:
+        value = float(f"{integer_part}.{decimals}")
+    except ValueError:
+        return None
+    if value <= 0:
+        return None
+    return str(round(value, 2))
+
 
 
 def _compact_pdf_segment(page_text: str) -> str:
@@ -2134,7 +2255,12 @@ async def agent_transformer(
         }
         for row in deduped:
             code = str(row.get("Cód. Artículo", "")).strip().upper()
-            if code in exact_prices:
+            if code not in exact_prices:
+                continue
+            current = str(row.get("Precio", "")).strip()
+            # Non-destructive: only fill an empty price or replace a likely fragment,
+            # never overwrite an existing valid price (BUG-9).
+            if not current or _is_fragment_price(current):
                 row["Precio"] = exact_prices[code]
 
         for code, price in exact_prices.items():
@@ -2327,9 +2453,26 @@ async def agent_verifier(rows: list[dict], raw_data: dict) -> dict:
             prices_by_code.setdefault(code, set()).add(price)
     conflicting_codes = {code for code, prices in prices_by_code.items() if len(prices) > 1}
 
+    review_rows: list[dict] = []
+    price_recovered = 0
+
     for i, row in enumerate(rows):
         row_issues = []
         code = str(row.get("Cód. Artículo", "")).strip().upper()
+
+        # Generic sanitation (all file types): quarantine noise codes and recover
+        # prices that landed in the description due to column misalignment.
+        if _looks_like_garbage_code(code, structured_partid_codes):
+            review_rows.append({
+                "Cód. Artículo": row.get("Cód. Artículo", ""),
+                "Descripción artículo": str(row.get("Descripción artículo", ""))[:120],
+                "Precio": row.get("Precio", ""),
+                "motivo": "código no válido (encabezado/texto/ruido)",
+            })
+            continue
+
+        if _recover_price_from_description(row):
+            price_recovered += 1
 
         if not _is_valid_product_code(code) and code not in structured_partid_codes:
             row_issues.append(f"Invalid product code: '{code}'")
@@ -2405,20 +2548,26 @@ async def agent_verifier(rows: list[dict], raw_data: dict) -> dict:
 
         cleaned_rows.append(row)
 
+    cleaned_rows.sort(key=_code_sort_key)
+
     total = len(rows)
     blocking_terms = ("Non-numeric price", "Invalid price", "Invalid product code")
-    valid = total - len([item for item in issues if any(term in issue for term in blocking_terms for issue in item["issues"])])
+    emitted = len(cleaned_rows)
+    valid = emitted - len([item for item in issues if any(term in issue for term in blocking_terms for issue in item["issues"])])
     suspicious_terms = ("Conflicting prices", "Description contains", "Suspicious integer price")
     suspicious = [item for item in issues if any(term in issue for term in suspicious_terms for issue in item["issues"])]
 
     report = {
-        "total_rows": total,
+        "total_rows": emitted,
         "valid_rows": valid,
         "rows_with_issues": len(issues),
         "suspicious_rows": len(suspicious),
+        "price_recovered_from_description": price_recovered,
+        "rows_sent_to_review": len(review_rows),
+        "review_rows": review_rows[:50],
         "conflicting_price_codes": sorted(conflicting_codes)[:50],
         "issues": issues[:20],  # Limit to first 20 for brevity
-        "quality_score": round((valid / total * 100) if total > 0 else 0, 1),
+        "quality_score": round((valid / emitted * 100) if emitted > 0 else 0, 1),
     }
 
     return {"rows": cleaned_rows, "report": report}
