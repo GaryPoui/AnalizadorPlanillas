@@ -1,7 +1,11 @@
 // ─── STATE ───────────────────────────────────
 let files = [];
 let lastResult = null;
-const API_URL = 'http://127.0.0.1:8000';
+// Same-origin API path for cPanel/Passenger deployments, while preserving
+// the separate local frontend/backend setup used during development.
+const API_URL = ['localhost', '127.0.0.1'].includes(window.location.hostname)
+  ? 'http://127.0.0.1:8000'
+  : '/api';
 const API_ACCESS_KEY = window.PRICEBOT_API_KEY || '';
 const REQUEST_TIMEOUT_MS = 300000;
 
