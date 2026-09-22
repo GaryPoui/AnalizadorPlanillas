@@ -407,7 +407,7 @@ PDF_USE_MARKITDOWN = os.getenv("PDF_USE_MARKITDOWN", "0") == "1"
 _HYBRID_SYSTEM_PROMPT = (
     "You extract product entries from Argentine electrical/industrial supplier price lists.\n"
     "Return ONLY a compact JSON array. Each object must have exactly:\n"
-    '  "code": product code — 4-5 digit number OR alphanumeric (e.g. SCA-10, UCA-16, HM-12CB, A2, B3)\n'
+    '  "code": product code — numeric or alphanumeric (e.g. 2200, SCA-10, HM-12CB, A2, B3, GCE)\n'
     '  "price": unit price as a plain decimal number (no currency symbols, no spaces), or "" when absent\n'
     "\n"
     "Rules:\n"
@@ -418,17 +418,24 @@ _HYBRID_SYSTEM_PROMPT = (
     "- Do not include descriptions, categories, explanations, markdown, or any keys other than code and price\n"
     "- Do not discard a product when its price is absent; return it with price \"\"\n"
     "- Skip: page headers, section/category titles, subtotals, empty rows\n"
-    "- Known supplier formats: LCT (4-5 digit codes), N°95 (4-5 digit), MICROCONTROL (alphanumeric)\n"
     "- Return [] if the page/section has no product rows"
 )
 
 # Codes: alphanum with dashes OR pure 4-5 digit (NOT 6+ digit barcodes/prices)
 # CODE_TOKEN_RE: handles pure-letter prefix (TBE-07-150), alnum prefix (BE64-12-150, CPE90-64-16-150), standalone alnum (GCE), numeric (2200)
-CODE_TOKEN_RE = r"(?:[A-Z][A-Z0-9]{0,7}(?:[-./][A-Z0-9]{1,10}){1,4}|[A-Z]{1,5}\d{2,6}|[A-Z]{2,8}|\d{4,5})"
+CODE_TOKEN_RE = r"(?:[A-Z][A-Z0-9]{0,7}(?:[-./][A-Z0-9]{1,10}){1,4}|[A-Z][A-Z0-9]{0,19}|[A-Z]{1,5}\d{2,6}|[A-Z]{2,8}|\d{4,5})"
 # PRICE_TOKEN_RE: handles formatted (49.440,42), plain decimal (17814,76), integer-like (49440)
-PRICE_TOKEN_RE = r"(?:\$\s*)?\d{1,3}(?:\.\d{3})*[,\.]\d{2}|(?:\$\s*)?\d{2,7}[,\.]\d{2}|(?:\$\s*)?\d{4,7}"
-CODE_PRICE_RE = re.compile(rf"({CODE_TOKEN_RE})\s+({PRICE_TOKEN_RE})")
-CODE_PRICE_ANYWHERE_RE = re.compile(rf"({CODE_TOKEN_RE}).{{0,80}}?({PRICE_TOKEN_RE})")
+PRICE_TOKEN_RE = r"(?:\$\s*)?\d{1,3}(?:\.\d{3})*\s*[,\.]\s*\d{2}|(?:\$\s*)?\d{2,7}\s*[,\.]\s*\d{2}|\$\s*\d{4,7}"
+# Punctuation-aware boundaries prevent an amount such as ``31163,97`` from
+# backtracking into the fake pair code=3116, price=3.97. Integer-only prices are
+# accepted only when a currency marker is present, which avoids dimensions such
+# as ``3000/6000 mm`` being interpreted as a product-price pair.
+CODE_CAPTURE_RE = rf"(?<![A-Z0-9.,])({CODE_TOKEN_RE})(?![A-Z0-9.,])"
+CODE_PRICE_RE = re.compile(rf"{CODE_CAPTURE_RE}\s+({PRICE_TOKEN_RE})", flags=re.IGNORECASE)
+CODE_PRICE_ANYWHERE_RE = re.compile(
+    rf"{CODE_CAPTURE_RE}.{{0,80}}?({PRICE_TOKEN_RE})",
+    flags=re.IGNORECASE,
+)
 CODE_ONLY_RE = re.compile(rf"\b({CODE_TOKEN_RE})\b", flags=re.IGNORECASE)
 PRICE_ONLY_RE = re.compile(rf"\b({PRICE_TOKEN_RE})\b")
 
@@ -462,6 +469,9 @@ _NOISE_LINE_RE = re.compile(
     | PATENTE\s+DE       # patent text
     | \d\s+DE\s+\w+\s+DE\s+\d{4}   # date: "6 DE MAYO DE 2026"
     | P\s*atente         # "P atente" OCR artifact for patent
+    | \bINVENCI[ÓO]N\b   # patent/certification captions
+    | @                   # email addresses
+    | \b[A-Z0-9.-]+\.(?:COM|AR|NET|ORG)\b  # domains without www prefix
     | Fax\b|Tel[.:]|www\.
     """,
     re.IGNORECASE,
@@ -556,6 +566,25 @@ def _code_sort_key(row: dict) -> tuple:
 
 def _row_non_empty_score(row: dict) -> int:
     return sum(1 for v in row.values() if str(v).strip())
+
+
+def _dedupe_rows_by_key(rows: list[dict]) -> list[dict]:
+    """Keep the richest row for each normalized code-price pair."""
+    selected: dict[tuple[str, str], dict] = {}
+    order: list[tuple[str, str]] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        key = _row_key(row)
+        if not any(key):
+            continue
+        previous = selected.get(key)
+        if previous is None:
+            selected[key] = row
+            order.append(key)
+        elif _row_non_empty_score(row) > _row_non_empty_score(previous):
+            selected[key] = row
+    return [selected[key] for key in order]
 
 
 def _format_key_samples(keys: set[tuple[str, str]], limit: int = 20) -> list[dict]:
@@ -1125,7 +1154,7 @@ def _is_valid_product_code(code: str) -> bool:
 _DESC_EMBEDDED_PRICE_RE = re.compile(
     r"\$\s*\d[\d.\s]*\d[,]\d{2}"          # $ 1.234,56  /  $ 8383,53
     r"|\b\d{1,3}(?:\.\d{3})+[,]\d{2}\b"   # 1.234,56 (with thousands separator)
-    r"|\b\d{2,7}[,]\d{2}\b"                # 8383,53
+    r"|\b\d{2,7}\s*[,]\s*\d{2}\b"        # 8383,53 / 1766 ,84
 )
 
 
@@ -1202,6 +1231,7 @@ def _extract_code_only_rows(
     list_code: str = "",
     list_desc: str = "",
     default_currency: str = "ARS",
+    allow_numeric: bool = True,
 ) -> list[dict]:
     """Recover valid product codes whose row has no numeric price."""
     rows = []
@@ -1211,9 +1241,16 @@ def _extract_code_only_rows(
             continue
         if CODE_PRICE_RE.search(line_clean):
             continue
+        # This recovery pass is only for genuinely price-less rows. When a line
+        # contains a decimal amount, numeric fragments before/after the separator
+        # must never be promoted to standalone product codes.
+        if _DESC_EMBEDDED_PRICE_RE.search(line_clean) or PRICE_ONLY_RE.search(line_clean):
+            continue
         for match in CODE_ONLY_RE.finditer(line_clean):
             code = re.sub(r"-{2,}", "-", match.group(1).strip().upper())
             if not _is_valid_product_code(code):
+                continue
+            if code.isdigit() and not allow_numeric:
                 continue
             remainder = line_clean[:match.start()] + line_clean[match.end():]
             if PRICE_ONLY_RE.search(remainder):
@@ -1644,28 +1681,66 @@ def _is_fragment_price(price: str) -> bool:
 def _extract_unambiguous_pdf_prices(raw_data: dict) -> dict[str, str]:
     """Return code→price pairs that are safe to trust as authoritative.
 
-    Only a code anchored at the START of a line, paired with a decimal price on the
-    same line, is accepted. This rejects mid-line model/connector codes (e.g. CCD-16
-    in "4180 T30-44 CCD-16 $ 226048,26") and prevents pairing a code with the next
-    code (BUG-9). Space-split prices like "$ 1254 09,11" are rejoined (BUG-10).
+    Every adjacent code-price pair is captured independently. This is important
+    for price lists with several side-by-side products on one visual row: pairing
+    the first code with the last price silently corrupts otherwise valid data.
+    Table separators are flattened to spaces, but descriptive text between a code
+    and a price is not treated as authoritative here.
     """
-    candidates: dict[str, set[str]] = {}
+    text_candidates: dict[str, set[str]] = {}
+    table_candidates: dict[str, set[str]] = {}
     for page_text in raw_data.get("pdf_pages", []):
         for raw_line in str(page_text).splitlines():
-            line = re.sub(r"-{2,}", "-", raw_line).strip()
+            is_reconstructed_table = "|" in raw_line
+            line = re.sub(r"-{2,}", "-", raw_line).replace("|", " ").strip()
             if not line:
                 continue
-            code_match = re.match(r"([A-Za-z0-9][A-Za-z0-9\-/\.]{1,19})\b", line)
-            if not code_match:
+            for code, raw_price in CODE_PRICE_RE.findall(line):
+                normalized_code = re.sub(r"-{2,}", "-", code.strip().upper())
+                if not _is_valid_product_code(normalized_code):
+                    continue
+                price = _normalize_price_token(raw_price)
+                try:
+                    if float(price) <= 0:
+                        continue
+                except (TypeError, ValueError):
+                    continue
+                target = table_candidates if is_reconstructed_table else text_candidates
+                target.setdefault(normalized_code, set()).add(price)
+
+    # Native page text preserves reading order better than a reconstructed table.
+    # Use a table value only when native text did not provide an unambiguous pair.
+    result: dict[str, str] = {}
+    for code in text_candidates.keys() | table_candidates.keys():
+        native_prices = text_candidates.get(code, set())
+        table_prices = table_candidates.get(code, set())
+        if len(native_prices) == 1:
+            result[code] = next(iter(native_prices))
+        elif not native_prices and len(table_prices) == 1:
+            result[code] = next(iter(table_prices))
+    return result
+
+
+def _extract_explicit_no_price_codes(raw_data: dict) -> set[str]:
+    """Find source-backed products explicitly marked as lacking a numeric price."""
+    no_price_codes: set[str] = set()
+    marker_re = re.compile(r"\b(?:PEDIR\s+PRECIO|CONSULTAR|SIN\s+PRECIO)\b", re.IGNORECASE)
+    for page_text in raw_data.get("pdf_pages", []):
+        for raw_line in str(page_text).splitlines():
+            line = re.sub(r"-{2,}", "-", raw_line).replace("|", " ").strip()
+            if not marker_re.search(line):
                 continue
-            normalized_code = code_match.group(1).strip().upper()
-            if not _is_valid_product_code(normalized_code):
-                continue
-            price = _parse_authoritative_line_price(line[code_match.end():])
-            if price is None:
-                continue
-            candidates.setdefault(normalized_code, set()).add(price)
-    return {code: next(iter(prices)) for code, prices in candidates.items() if len(prices) == 1}
+            code_matches = []
+            for match in re.finditer(CODE_CAPTURE_RE, line, flags=re.IGNORECASE):
+                code = re.sub(r"-{2,}", "-", match.group(1).strip().upper())
+                product_like = any(ch.isdigit() or ch in "-./" for ch in code) or len(code) <= 5
+                if _is_valid_product_code(code) and product_like:
+                    code_matches.append((match, code))
+            for idx, (match, code) in enumerate(code_matches):
+                segment_end = code_matches[idx + 1][0].start() if idx + 1 < len(code_matches) else len(line)
+                if marker_re.search(line[match.end():segment_end]):
+                    no_price_codes.add(code)
+    return no_price_codes
 
 
 def _parse_authoritative_line_price(segment: str) -> Optional[str]:
@@ -1982,6 +2057,9 @@ async def agent_transformer(
             for col in TEMPLATE_COLUMNS:
                 if col not in row:
                     row[col] = ""
+            row["Cód. Artículo"] = re.sub(
+                r"-{2,}", "-", str(row.get("Cód. Artículo", "")).strip().upper()
+            )
             normalized.append(row)
         return normalized
 
@@ -2181,6 +2259,7 @@ async def agent_transformer(
         list_code=list_code,
         list_desc=list_desc,
         default_currency=default_currency,
+        allow_numeric=strict_numeric_profile,
     ) if raw_text else []
     if code_only_rows:
         all_rows.extend(code_only_rows)
@@ -2380,20 +2459,18 @@ async def agent_transformer(
     # Exact inline PDF pairs are authoritative over table/word-coordinate fragments.
     if raw_data.get("metadata", {}).get("type") == ".pdf":
         exact_prices = _extract_unambiguous_pdf_prices(raw_data)
+        explicit_no_price_codes = _extract_explicit_no_price_codes(raw_data)
         rows_by_code: dict[str, dict] = {
-            str(row.get("Cód. Artículo", "")).strip().upper(): row
+            re.sub(r"-{2,}", "-", str(row.get("Cód. Artículo", "")).strip().upper()): row
             for row in deduped
             if str(row.get("Cód. Artículo", "")).strip()
         }
         for row in deduped:
-            code = str(row.get("Cód. Artículo", "")).strip().upper()
+            code = re.sub(r"-{2,}", "-", str(row.get("Cód. Artículo", "")).strip().upper())
+            row["Cód. Artículo"] = code
             if code not in exact_prices:
                 continue
-            current = str(row.get("Precio", "")).strip()
-            # Non-destructive: only fill an empty price or replace a likely fragment,
-            # never overwrite an existing valid price (BUG-9).
-            if not current or _is_fragment_price(current):
-                row["Precio"] = exact_prices[code]
+            row["Precio"] = exact_prices[code]
 
         for code, price in exact_prices.items():
             if code in rows_by_code:
@@ -2408,6 +2485,15 @@ async def agent_transformer(
             canonical["Unidad"] = "Un"
             deduped.append(canonical)
             rows_by_code[code] = canonical
+
+        # An explicit "pedir precio" is authoritative too. It must not inherit a
+        # nearby amount or a numeric fragment from the product code itself.
+        for row in deduped:
+            code = re.sub(r"-{2,}", "-", str(row.get("Cód. Artículo", "")).strip().upper())
+            if code in explicit_no_price_codes and code not in exact_prices:
+                row["Cód. Artículo"] = code
+                row["Precio"] = ""
+                row["estado_precio"] = "a completar"
 
         # Drop only fragments that occur inside an exact, longer product code on the same PDF.
         # This handles table splits such as PC / 6000 from PC44.44-09-6000.
@@ -2504,6 +2590,12 @@ async def agent_transformer(
         deduped = list(deduped_by_key.values())
         recovery_applied = True
 
+    for row in deduped:
+        row["Cód. Artículo"] = re.sub(
+            r"-{2,}", "-", str(row.get("Cód. Artículo", "")).strip().upper()
+        )
+    deduped = _dedupe_rows_by_key(deduped)
+
     response = {
         "rows": normalize_rows(deduped),
         "column_mapping": merged_mapping,
@@ -2578,6 +2670,20 @@ async def agent_verifier(rows: list[dict], raw_data: dict) -> dict:
                 if normalized_value:
                     structured_partid_codes.add(normalized_value)
                 break
+
+    # Short alphabetic SKUs are common (GCE, DU, SRVS, ...), so alphabetic-only
+    # tokens are accepted when the source itself shows them directly beside a
+    # monetary value. This keeps real codes without admitting arbitrary headings.
+    source_product_codes = set(structured_partid_codes)
+    for source_line in str(raw_data.get("raw_text", "") or "").splitlines():
+        normalized_line = re.sub(r"-{2,}", "-", source_line).replace("|", " ")
+        for source_code, _source_price in CODE_PRICE_RE.findall(normalized_line):
+            source_code = source_code.strip().upper()
+            if _is_valid_product_code(source_code):
+                source_product_codes.add(source_code)
+    is_pdf = raw_data.get("metadata", {}).get("type") == ".pdf"
+    explicit_no_price_codes = _extract_explicit_no_price_codes(raw_data) if is_pdf else set()
+    source_supported_codes = source_product_codes | explicit_no_price_codes
     for candidate in rows:
         code = str(candidate.get("Cód. Artículo", "")).strip().upper()
         price = str(candidate.get("Precio", "")).strip()
@@ -2594,7 +2700,7 @@ async def agent_verifier(rows: list[dict], raw_data: dict) -> dict:
 
         # Generic sanitation (all file types): quarantine noise codes and recover
         # prices that landed in the description due to column misalignment.
-        if _looks_like_garbage_code(code, structured_partid_codes):
+        if _looks_like_garbage_code(code, source_supported_codes):
             review_rows.append({
                 "Cód. Artículo": row.get("Cód. Artículo", ""),
                 "Descripción artículo": str(row.get("Descripción artículo", ""))[:120],
@@ -2606,7 +2712,20 @@ async def agent_verifier(rows: list[dict], raw_data: dict) -> dict:
         if _recover_price_from_description(row):
             price_recovered += 1
 
-        if not _is_valid_product_code(code) and code not in structured_partid_codes:
+        # For PDFs, a price-less row must be backed by an explicit source marker
+        # such as "pedir precio". This removes page numbers, dimensions, patent IDs,
+        # and other isolated tokens without assuming any supplier-specific format.
+        recovered_price = str(row.get("Precio", "")).strip()
+        if is_pdf and not recovered_price and code not in source_supported_codes:
+            review_rows.append({
+                "Cód. Artículo": row.get("Cód. Artículo", ""),
+                "Descripción artículo": str(row.get("Descripción artículo", ""))[:120],
+                "Precio": row.get("Precio", ""),
+                "motivo": "fila sin precio ni respaldo explícito en el documento",
+            })
+            continue
+
+        if not _is_valid_product_code(code) and code not in source_supported_codes:
             row_issues.append(f"Invalid product code: '{code}'")
 
         if code in conflicting_codes:
@@ -2682,7 +2801,7 @@ async def agent_verifier(rows: list[dict], raw_data: dict) -> dict:
 
     cleaned_rows.sort(key=_code_sort_key)
 
-    total = len(rows)
+    source_total = len(rows)
     blocking_terms = ("Non-numeric price", "Invalid price", "Invalid product code")
     emitted = len(cleaned_rows)
     valid = emitted - len([item for item in issues if any(term in issue for term in blocking_terms for issue in item["issues"])])
@@ -2690,6 +2809,7 @@ async def agent_verifier(rows: list[dict], raw_data: dict) -> dict:
     suspicious = [item for item in issues if any(term in issue for term in suspicious_terms for issue in item["issues"])]
 
     report = {
+        "input_rows": source_total,
         "total_rows": emitted,
         "valid_rows": valid,
         "rows_with_issues": len(issues),
@@ -2700,6 +2820,10 @@ async def agent_verifier(rows: list[dict], raw_data: dict) -> dict:
         "conflicting_price_codes": sorted(conflicting_codes)[:50],
         "issues": issues[:20],  # Limit to first 20 for brevity
         "quality_score": round((valid / emitted * 100) if emitted > 0 else 0, 1),
+        "source_acceptance_score": round(
+            (emitted / source_total * 100) if source_total > 0 else 0,
+            1,
+        ),
     }
 
     return {"rows": cleaned_rows, "report": report}
