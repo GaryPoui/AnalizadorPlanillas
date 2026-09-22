@@ -8,7 +8,13 @@ $API_DIR  = Join-Path $ROOT "pricebot\api"
 $FRONTEND_DIR = Join-Path $ROOT "pricebot\frontend"
 $FRONTEND_URL = "http://127.0.0.1:3000"
 $PORT     = 8000
-$BIND_HOST = if ($env:PRICEBOT_BIND_HOST) { $env:PRICEBOT_BIND_HOST } else { "127.0.0.1" }
+
+# Escuchar en todas las interfaces para permitir acceso desde la LAN.
+$BIND_HOST = if ($env:PRICEBOT_BIND_HOST) {
+    $env:PRICEBOT_BIND_HOST
+} else {
+    "0.0.0.0"
+}
 
 if (-not (Test-Path -LiteralPath $PYTHON)) {
     Write-Host ""
@@ -43,9 +49,11 @@ if ($busy) {
     Write-Host "  Esperando que el servidor arranque..." -ForegroundColor DarkGray
     $tries = 0
     $ready = $false
+
     while ($tries -lt 15 -and -not $ready) {
         Start-Sleep -Milliseconds 600
         $tries++
+
         try {
             $r = Invoke-WebRequest -Uri "http://localhost:$PORT/" -UseBasicParsing -TimeoutSec 1 -ErrorAction Stop
             $ready = $true
@@ -59,8 +67,9 @@ if ($busy) {
     }
 }
 
-# Serve the frontend on a fixed local origin so CORS can remain restricted.
+# Servir el frontend en el puerto 3000
 $frontendBusy = $false
+
 try {
     $frontendConn = New-Object System.Net.Sockets.TcpClient
     $frontendConn.Connect("localhost", 3000)
@@ -80,3 +89,4 @@ Write-Host "  Backend:  http://$BIND_HOST`:$PORT" -ForegroundColor Cyan
 Write-Host "  Docs API: http://localhost:$PORT/docs" -ForegroundColor Cyan
 Write-Host "  Frontend: $FRONTEND_URL" -ForegroundColor Cyan
 Write-Host ""
+
