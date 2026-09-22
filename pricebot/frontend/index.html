@@ -9,11 +9,29 @@
 </head>
 <body>
 
+<section class="auth-screen" id="authScreen" hidden>
+  <form class="auth-card" id="loginForm">
+    <div class="hero-badge">Acceso privado</div>
+    <h1>Ingresar a PriceBot</h1>
+    <p>Este sistema está restringido a usuarios autorizados.</p>
+    <label for="loginUsername">Usuario</label>
+    <input id="loginUsername" name="username" autocomplete="username" required>
+    <label for="loginPassword">Contraseña</label>
+    <input id="loginPassword" name="password" type="password" autocomplete="current-password" required>
+    <div class="auth-error" id="authError" role="alert"></div>
+    <button class="btn btn-primary" type="submit" id="loginBtn">Ingresar</button>
+  </form>
+</section>
+
 <main>
   <div class="container">
 
     <!-- HERO -->
     <section class="hero">
+      <div class="session-bar">
+        <span id="sessionUser"></span>
+        <button class="btn btn-outline" id="logoutBtn" type="button">Cerrar sesión</button>
+      </div>
       <div class="hero-badge">Powered by Claude AI</div>
       <h1>Extractor Inteligente de<br><span class="highlight">Listas de Precios</span></h1>
       <p>Cargá archivos de listas de precios en cualquier formato. El sistema multi-agente extrae, transforma y valida los datos al formato de importación.</p>

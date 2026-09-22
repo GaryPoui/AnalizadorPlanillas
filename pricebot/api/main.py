@@ -10,7 +10,9 @@ import json
 import base64
 import re
 import hashlib
+import hmac
 import asyncio
+import secrets
 import tempfile
 import unicodedata
 import contextvars
@@ -28,7 +30,7 @@ from dotenv import load_dotenv
 from docx import Document as DocxDocument
 from PIL import Image
 from markitdown import MarkItDown
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
@@ -42,6 +44,76 @@ load_dotenv(API_DIR / ".env", override=True)
 load_dotenv(API_DIR.parent / ".env", override=True)
 
 API_ACCESS_KEY = os.getenv("PRICEBOT_API_KEY", "").strip()
+SESSION_COOKIE = "pricebot_session"
+SESSION_TTL_SEC = max(int(os.getenv("PRICEBOT_SESSION_TTL_SEC", "28800")), 300)
+SESSION_SECRET = os.getenv("PRICEBOT_SESSION_SECRET", "").strip()
+COOKIE_SECURE = os.getenv("PRICEBOT_COOKIE_SECURE", "1") == "1"
+
+
+def _decode_b64(value: str) -> bytes:
+    return base64.urlsafe_b64decode(value.encode("ascii") + b"=" * (-len(value) % 4))
+
+
+def _password_digest(password: str, salt: bytes) -> bytes:
+    return hashlib.scrypt(
+        password.encode("utf-8"),
+        salt=salt,
+        n=2**14,
+        r=8,
+        p=1,
+        dklen=32,
+    )
+
+
+def _parse_users(raw: str) -> dict[str, tuple[bytes, bytes]]:
+    """Parse username$salt$digest records without keeping plaintext passwords."""
+    users = {}
+    for record in raw.split(","):
+        parts = record.strip().split("$", 2)
+        if len(parts) != 3 or not parts[0]:
+            continue
+        try:
+            users[parts[0]] = (_decode_b64(parts[1]), _decode_b64(parts[2]))
+        except (ValueError, UnicodeError):
+            logger.warning("Ignoring malformed PRICEBOT_USERS record for %s", parts[0])
+    return users
+
+
+AUTH_USERS = _parse_users(os.getenv("PRICEBOT_USERS", ""))
+AUTH_REQUIRED = os.getenv(
+    "PRICEBOT_AUTH_REQUIRED", "1" if AUTH_USERS else "0"
+) == "1"
+
+
+def _session_token(username: str, expires_at: int | None = None) -> str:
+    expires_at = expires_at or int(time.time()) + SESSION_TTL_SEC
+    payload = f"{username}.{expires_at}"
+    signature = hmac.new(
+        SESSION_SECRET.encode("utf-8"), payload.encode("utf-8"), hashlib.sha256
+    ).digest()
+    encode = lambda value: base64.urlsafe_b64encode(value).decode("ascii").rstrip("=")
+    return f"{encode(payload.encode('utf-8'))}.{encode(signature)}"
+
+
+def _session_username(token: str) -> str | None:
+    if not SESSION_SECRET or not token or "." not in token:
+        return None
+    try:
+        encoded_payload, encoded_signature = token.split(".", 1)
+        payload = _decode_b64(encoded_payload).decode("utf-8")
+        expected = hmac.new(
+            SESSION_SECRET.encode("utf-8"), payload.encode("utf-8"), hashlib.sha256
+        ).digest()
+        if not hmac.compare_digest(expected, _decode_b64(encoded_signature)):
+            return None
+        username, expires_at = payload.rsplit(".", 1)
+        if int(expires_at) < int(time.time()) or username not in AUTH_USERS:
+            return None
+        return username
+    except (ValueError, TypeError, UnicodeError):
+        return None
+
+
 ALLOWED_ORIGINS = [
     origin.strip()
     for origin in os.getenv(
@@ -54,7 +126,7 @@ ALLOWED_ORIGINS = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_credentials=False,
+    allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type", "X-PriceBot-Key"],
 )
@@ -62,9 +134,69 @@ app.add_middleware(
 
 @app.middleware("http")
 async def require_api_access_key(request, call_next):
+    if request.method == "OPTIONS" or request.url.path in {"/auth/login", "/health"}:
+        return await call_next(request)
+    if AUTH_REQUIRED:
+        if not SESSION_SECRET or not AUTH_USERS:
+            return JSONResponse(
+                status_code=503,
+                content={"detail": "Authentication is not configured on the server"},
+            )
+        username = _session_username(request.cookies.get(SESSION_COOKIE, ""))
+        if not username:
+            return JSONResponse(status_code=401, content={"detail": "Login required"})
     if API_ACCESS_KEY and request.headers.get("X-PriceBot-Key", "") != API_ACCESS_KEY:
         return JSONResponse(status_code=401, content={"detail": "Invalid API access key"})
     return await call_next(request)
+
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok", "authentication_enabled": AUTH_REQUIRED}
+
+
+@app.post("/auth/login")
+async def login(payload: LoginRequest, response: Response):
+    if not AUTH_REQUIRED:
+        return {"authenticated": True, "username": "local"}
+    user_record = AUTH_USERS.get(payload.username.strip())
+    if not user_record:
+        raise HTTPException(status_code=401, detail="Usuario o contraseña incorrectos")
+    salt, expected_digest = user_record
+    actual_digest = _password_digest(payload.password, salt)
+    if not hmac.compare_digest(actual_digest, expected_digest):
+        raise HTTPException(status_code=401, detail="Usuario o contraseña incorrectos")
+    response.set_cookie(
+        SESSION_COOKIE,
+        _session_token(payload.username.strip()),
+        max_age=SESSION_TTL_SEC,
+        httponly=True,
+        secure=COOKIE_SECURE,
+        samesite="lax",
+        path="/",
+    )
+    return {"authenticated": True, "username": payload.username.strip()}
+
+
+@app.get("/auth/me")
+async def current_user(request: Request):
+    if not AUTH_REQUIRED:
+        return {"authenticated": True, "username": "local"}
+    username = _session_username(request.cookies.get(SESSION_COOKIE, ""))
+    if not username:
+        raise HTTPException(status_code=401, detail="Login required")
+    return {"authenticated": True, "username": username}
+
+
+@app.post("/auth/logout")
+async def logout(response: Response):
+    response.delete_cookie(SESSION_COOKIE, path="/")
+    return {"authenticated": False}
 
 # Anthropic (Claude) configuration
 CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-5")

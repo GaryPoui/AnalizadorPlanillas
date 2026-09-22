@@ -9,9 +9,62 @@ const API_URL = ['localhost', '127.0.0.1'].includes(window.location.hostname)
 const API_ACCESS_KEY = window.PRICEBOT_API_KEY || '';
 const REQUEST_TIMEOUT_MS = 300000;
 
+let authenticated = false;
+
 function apiHeaders() {
   return API_ACCESS_KEY ? {'X-PriceBot-Key': API_ACCESS_KEY} : {};
 }
+
+async function checkAuthentication() {
+  try {
+    const resp = await fetch(`${API_URL}/auth/me`, {credentials: 'include'});
+    if (resp.ok) {
+      const data = await resp.json();
+      authenticated = true;
+      document.getElementById('sessionUser').textContent = `Usuario: ${data.username}`;
+      document.getElementById('authScreen').hidden = true;
+      return;
+    }
+  } catch (_) {
+    // The normal application error handling will explain an unavailable API.
+  }
+  authenticated = false;
+  document.getElementById('authScreen').hidden = false;
+}
+
+document.getElementById('loginForm').addEventListener('submit', async event => {
+  event.preventDefault();
+  const button = document.getElementById('loginBtn');
+  const error = document.getElementById('authError');
+  button.disabled = true;
+  error.textContent = '';
+  try {
+    const resp = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      credentials: 'include',
+      body: JSON.stringify({
+        username: document.getElementById('loginUsername').value.trim(),
+        password: document.getElementById('loginPassword').value,
+      }),
+    });
+    const data = await resp.json().catch(() => ({}));
+    if (!resp.ok) throw new Error(data.detail || 'No se pudo iniciar sesión');
+    document.getElementById('loginPassword').value = '';
+    await checkAuthentication();
+  } catch (err) {
+    error.textContent = err.message;
+  } finally {
+    button.disabled = false;
+  }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  await fetch(`${API_URL}/auth/logout`, {method: 'POST', credentials: 'include'}).catch(() => {});
+  window.location.reload();
+});
+
+checkAuthentication();
 
 // ─── TAB SWITCHING ───────────────────────────
 function switchTab(name) {
@@ -180,6 +233,7 @@ async function startExtraction() {
         method: 'POST',
         body: formData,
         headers: apiHeaders(),
+        credentials: 'include',
         signal: controller.signal
       }).finally(() => clearTimeout(timeoutId));
 
@@ -325,7 +379,8 @@ async function downloadFile(format) {
     const resp = await fetch(`${API_URL}/extract/download?format=${format}`, {
       method: 'POST',
       body: formData,
-      headers: apiHeaders()
+      headers: apiHeaders(),
+      credentials: 'include'
     });
 
     if (!resp.ok) throw new Error(await resp.text());

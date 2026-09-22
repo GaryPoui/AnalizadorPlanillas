@@ -88,6 +88,12 @@ HYBRID_TOTAL_TIMEOUT_SEC=120                # límite total del complemento por 
 HYBRID_TOTAL_TIMEOUT_SEC=120                # límite total; conserva filas locales si vence
 PDF_USE_MARKITDOWN=0                        # 1 solo si se necesita ese conversor; pdfplumber es default
 
+# Acceso privado (recomendado si el servidor es accesible desde otras PCs)
+PRICEBOT_AUTH_REQUIRED=1
+PRICEBOT_SESSION_SECRET=generar-una-clave-aleatoria-larga
+PRICEBOT_COOKIE_SECURE=1                    # 1 si se usa HTTPS; 0 solo para HTTP local
+PRICEBOT_USERS=usuario$SAL$HASH,otro$SAL$HASH
+
 # Tracking de costos
 COST_LOG_PATH=costs_log.jsonl               # ruta del log (default: raíz del proyecto)
 INPUT_RATE_PER_M=3.0                        # USD/M tokens — tasa display
@@ -95,6 +101,26 @@ OUTPUT_RATE_PER_M=15.0
 REAL_INPUT_RATE_PER_M=0.80                  # USD/M tokens — tasa real Haiku
 REAL_OUTPUT_RATE_PER_M=4.0
 ```
+
+### Usuarios autorizados y seguridad de red
+
+No guardes contraseñas en `PRICEBOT_USERS`. Generá un registro por usuario desde
+la carpeta `pricebot/api`:
+
+```powershell
+python create_password_hash.py nombre_usuario
+```
+
+Copiá la línea impresa en `PRICEBOT_USERS`. Para agregar varios usuarios,
+separá los registros con comas. Generá también un valor aleatorio largo para
+`PRICEBOT_SESSION_SECRET`; nunca lo publiques en Git ni lo pongas en el
+frontend.
+
+La aplicación rechaza la extracción, las descargas y la documentación API si
+no existe una sesión válida. El endpoint `/health` queda disponible para
+monitoreo. Además, en el router/firewall del servidor permití únicamente los
+puertos necesarios y no expongas directamente el puerto 8000 a Internet;
+preferí un proxy HTTPS (Nginx/Caddy) o acceso solo desde la LAN/VPN.
 
 **ADVERTENCIA**: PowerShell `Set-Content -Encoding UTF8` agrega BOM y rompe `load_dotenv`.
 Usar en su lugar:
@@ -118,12 +144,11 @@ La API queda disponible en: **http://localhost:8000**
 
 Documentación interactiva Swagger: **http://localhost:8000/docs**
 
-La comunicación entre el navegador y el backend ocurre por loopback (`127.0.0.1`) y no sale de
-la computadora. La comunicación con Anthropic usa HTTPS. Los archivos enviados a Claude son
-procesados por Anthropic; si los datos no pueden salir de la máquina, hay que desactivar el modo
-IA y usar únicamente extracción local. Para proteger también el acceso a los endpoints, definir
-`PRICEBOT_API_KEY` en `.env` y la misma clave en `pricebot/frontend/app.js` como
-`window.PRICEBOT_API_KEY`.
+La comunicación con Anthropic usa HTTPS. Los archivos enviados a Claude son procesados por
+Anthropic; si los datos no pueden salir de la máquina, hay que desactivar el modo IA y usar
+únicamente extracción local. Para un servidor compartido por varias personas, usar el acceso por
+usuarios (`PRICEBOT_AUTH_REQUIRED=1`) y no colocar secretos en el frontend. `PRICEBOT_API_KEY`
+queda disponible como compatibilidad adicional para clientes internos, pero no reemplaza el login.
 
 Regla de extracción: todo código de producto válido detectado genera una fila, aunque no tenga
 precio. En ese caso `Precio` queda vacío y `estado_precio` toma el valor `a completar`; la fila
