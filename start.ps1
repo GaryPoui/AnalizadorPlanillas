@@ -2,13 +2,21 @@
 # Uso: .\start.ps1
 # Levanta el backend en una nueva ventana y abre el frontend en el navegador.
 
-$PYTHON   = "C:\Users\Pasante\AppData\Local\Python\pythoncore-3.14-64\python.exe"
 $ROOT     = $PSScriptRoot
+$PYTHON   = Join-Path $ROOT ".venv\Scripts\python.exe"
 $API_DIR  = Join-Path $ROOT "pricebot\api"
 $FRONTEND_DIR = Join-Path $ROOT "pricebot\frontend"
 $FRONTEND_URL = "http://127.0.0.1:3000"
 $PORT     = 8000
 $BIND_HOST = if ($env:PRICEBOT_BIND_HOST) { $env:PRICEBOT_BIND_HOST } else { "127.0.0.1" }
+
+if (-not (Test-Path -LiteralPath $PYTHON)) {
+    Write-Host ""
+    Write-Host "  ERROR: faltan las dependencias del proyecto." -ForegroundColor Red
+    Write-Host "  Ejecuta instalar.bat y vuelve a intentar." -ForegroundColor Yellow
+    Write-Host ""
+    exit 1
+}
 
 Write-Host ""
 Write-Host "  PriceBot - iniciando" -ForegroundColor Cyan

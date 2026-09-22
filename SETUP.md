@@ -1,6 +1,19 @@
 # SETUP — AnalizadorPlanillas API
 
-## Inicio rapido (un solo comando)
+## Primera instalacion despues de clonar
+
+Ejecutar con doble clic o desde una terminal:
+
+```bat
+instalar.bat
+```
+
+El instalador detecta Python 3.11+, crea `.venv`, actualiza `pip`, instala todas
+las librerias de `pricebot/api/requirements.txt` y crea `pricebot/.env` desde el
+ejemplo cuando no existe. Luego hay que completar las claves y usuarios en ese
+archivo.
+
+## Inicio rapido
 
 **Opcion A — doble clic o desde cmd/bat:**
 ```
@@ -38,18 +51,18 @@ API REST construida con FastAPI que recibe archivos de listas de precios de prov
 | Anthropic API Key | — | Cuenta con acceso a `claude-sonnet-4-5` |
 | Tesseract OCR | 5.4+ | Solo para PDFs escaneados (AR36-style) |
 
-### Ruta Python en este entorno
+### Python utilizado por el proyecto
 
 ```
-C:\Users\Pasante\AppData\Local\Python\pythoncore-3.14-64\python.exe
+.venv\Scripts\python.exe
 ```
 
 ---
 
 ## Instalación de dependencias
 
-```bash
-C:\Users\Pasante\AppData\Local\Python\pythoncore-3.14-64\python.exe -m pip install -r pricebot/api/requirements.txt
+```bat
+instalar.bat
 ```
 
 Dependencias clave: `fastapi`, `uvicorn`, `httpx`, `pandas`, `pdfplumber`, `markitdown`,

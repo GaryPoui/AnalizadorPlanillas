@@ -6,6 +6,15 @@ Sistema multi-agente que recibe archivos de listas de precios de proveedores y l
 
 ## Inicio rapido
 
+La primera vez, despues de clonar el repositorio:
+
+```bat
+instalar.bat
+```
+
+El instalador crea `.venv`, instala todas las librerias y prepara `pricebot/.env`
+si todavia no existe. Luego, para iniciar:
+
 ```bat
 start.bat
 ```
@@ -102,9 +111,12 @@ cp pricebot/.env.example pricebot/.env
 
 ### 2. Instalar dependencias
 
-```bash
-pip install -r pricebot/api/requirements.txt
+```bat
+instalar.bat
 ```
+
+El script usa Python 3.11 o superior, crea un entorno virtual local `.venv` e
+instala `pricebot/api/requirements.txt`. No es necesario activar el entorno.
 
 ### 3. Levantar el servidor
 
