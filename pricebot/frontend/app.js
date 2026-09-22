@@ -3,9 +3,14 @@ let files = [];
 let lastResult = null;
 // Same-origin API path for cPanel/Passenger deployments, while preserving
 // the separate local frontend/backend setup used during development.
-const API_URL = ['localhost', '127.0.0.1'].includes(window.location.hostname)
-  ? 'http://127.0.0.1:8000'
-  : '/api';
+const browserHost = window.location.hostname;
+const API_URL = window.PRICEBOT_API_URL || (
+  browserHost === 'pricebot.dynamicenergy.com.ar'
+    ? '/api'
+    : ['localhost', '127.0.0.1'].includes(browserHost)
+      ? 'http://127.0.0.1:8000'
+      : `${window.location.protocol}//${browserHost}:8000`
+);
 const API_ACCESS_KEY = window.PRICEBOT_API_KEY || '';
 const REQUEST_TIMEOUT_MS = 300000;
 

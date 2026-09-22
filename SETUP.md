@@ -150,6 +150,22 @@ Anthropic; si los datos no pueden salir de la máquina, hay que desactivar el mo
 usuarios (`PRICEBOT_AUTH_REQUIRED=1`) y no colocar secretos en el frontend. `PRICEBOT_API_KEY`
 queda disponible como compatibilidad adicional para clientes internos, pero no reemplaza el login.
 
+### Servidor accesible desde otras computadoras
+
+Por defecto `start.ps1` escucha únicamente en la propia PC. Para compartirlo dentro de una
+red local, iniciá PowerShell con:
+
+```powershell
+$env:PRICEBOT_BIND_HOST="0.0.0.0"
+$env:PRICEBOT_ALLOWED_ORIGINS="http://IP_DEL_SERVIDOR:3000"
+.\start.ps1
+```
+
+Reemplazá `IP_DEL_SERVIDOR` por la IP privada fija de la computadora servidora. En el firewall
+de Windows permití los puertos 3000 y 8000 solamente en el perfil **Privado** de la red, nunca
+en redes públicas. Para acceso fuera de la LAN, no abras esos puertos directamente: usá una VPN
+o un proxy HTTPS con autenticación.
+
 Regla de extracción: todo código de producto válido detectado genera una fila, aunque no tenga
 precio. En ese caso `Precio` queda vacío y `estado_precio` toma el valor `a completar`; la fila
 no se descarta ni se considera inválida por esa ausencia.

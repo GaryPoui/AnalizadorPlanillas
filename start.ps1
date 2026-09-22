@@ -8,6 +8,7 @@ $API_DIR  = Join-Path $ROOT "pricebot\api"
 $FRONTEND_DIR = Join-Path $ROOT "pricebot\frontend"
 $FRONTEND_URL = "http://127.0.0.1:3000"
 $PORT     = 8000
+$BIND_HOST = if ($env:PRICEBOT_BIND_HOST) { $env:PRICEBOT_BIND_HOST } else { "127.0.0.1" }
 
 Write-Host ""
 Write-Host "  PriceBot - iniciando" -ForegroundColor Cyan
@@ -26,7 +27,7 @@ if ($busy) {
     Write-Host "  El backend ya está corriendo en :$PORT" -ForegroundColor Yellow
 } else {
     # Levantar uvicorn en una nueva ventana de consola
-    $cmd = "& '$PYTHON' -m uvicorn main:app --host 127.0.0.1 --port $PORT --reload --app-dir '$API_DIR'; pause"
+    $cmd = "& '$PYTHON' -m uvicorn main:app --host $BIND_HOST --port $PORT --reload --app-dir '$API_DIR'; pause"
     Start-Process powershell -ArgumentList "-NoExit", "-Command", $cmd -WindowStyle Normal
     Write-Host "  Backend iniciado en nueva ventana" -ForegroundColor Green
 
@@ -60,14 +61,14 @@ try {
 } catch {}
 
 if (-not $frontendBusy) {
-    $frontendCmd = "& '$PYTHON' -m http.server 3000 --bind 127.0.0.1 --directory '$FRONTEND_DIR'; pause"
+    $frontendCmd = "& '$PYTHON' -m http.server 3000 --bind $BIND_HOST --directory '$FRONTEND_DIR'; pause"
     Start-Process powershell -ArgumentList "-NoExit", "-Command", $frontendCmd -WindowStyle Normal
 }
 
 Start-Process $FRONTEND_URL
 
 Write-Host ""
-Write-Host "  Backend:  http://localhost:$PORT" -ForegroundColor Cyan
+Write-Host "  Backend:  http://$BIND_HOST`:$PORT" -ForegroundColor Cyan
 Write-Host "  Docs API: http://localhost:$PORT/docs" -ForegroundColor Cyan
 Write-Host "  Frontend: $FRONTEND_URL" -ForegroundColor Cyan
 Write-Host ""
