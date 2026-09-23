@@ -59,9 +59,11 @@ if ($busy) {
     Write-Host "  Esperando que el servidor arranque..." -ForegroundColor DarkGray
     $tries = 0
     $ready = $false
+
     while ($tries -lt 15 -and -not $ready) {
         Start-Sleep -Milliseconds 600
         $tries++
+
         try {
             $readyConn = New-Object System.Net.Sockets.TcpClient
             $readyConn.Connect("localhost", $PORT)
@@ -77,8 +79,9 @@ if ($busy) {
     }
 }
 
-# Serve the frontend on a fixed local origin so CORS can remain restricted.
+# Servir el frontend en el puerto 3000
 $frontendBusy = $false
+
 try {
     $frontendConn = New-Object System.Net.Sockets.TcpClient
     $frontendConn.Connect("localhost", 3000)
@@ -104,3 +107,4 @@ if (-not $TLS_CERT -and $BIND_HOST -ne "127.0.0.1") {
     Write-Host "  SEGURIDAD: sin TLS, la API rechazara conexiones remotas por defecto." -ForegroundColor Yellow
 }
 Write-Host ""
+
