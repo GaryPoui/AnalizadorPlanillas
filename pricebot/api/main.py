@@ -12,12 +12,15 @@ import re
 import hashlib
 import hmac
 import asyncio
-import secrets
 import tempfile
 import unicodedata
 import contextvars
 import logging
 import time
+import ipaddress
+import threading
+import zipfile
+from collections import defaultdict, deque
 from pathlib import Path
 from typing import Optional
 from datetime import datetime
@@ -33,9 +36,13 @@ from markitdown import MarkItDown
 from fastapi import FastAPI, File, UploadFile, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-app = FastAPI(title="Price Extractor API", version="1.0.0")
+try:
+    from .user_auth import UserStore, build_confirmation_url, send_confirmation_email
+except ImportError:  # Uvicorn/Passenger loads main.py as a top-level module.
+    from user_auth import UserStore, build_confirmation_url, send_confirmation_email
+
 logger = logging.getLogger("pricebot")
 
 # Load local env files for non-Docker runs.
@@ -43,11 +50,47 @@ API_DIR = Path(__file__).resolve().parent
 load_dotenv(API_DIR / ".env", override=True)
 load_dotenv(API_DIR.parent / ".env", override=True)
 
+ENABLE_API_DOCS = os.getenv("PRICEBOT_ENABLE_API_DOCS", "0") == "1"
+app = FastAPI(
+    title="Price Extractor API",
+    version="1.0.0",
+    docs_url="/docs" if ENABLE_API_DOCS else None,
+    redoc_url="/redoc" if ENABLE_API_DOCS else None,
+    openapi_url="/openapi.json" if ENABLE_API_DOCS else None,
+)
+
 API_ACCESS_KEY = os.getenv("PRICEBOT_API_KEY", "").strip()
 SESSION_COOKIE = "pricebot_session"
 SESSION_TTL_SEC = max(int(os.getenv("PRICEBOT_SESSION_TTL_SEC", "28800")), 300)
 SESSION_SECRET = os.getenv("PRICEBOT_SESSION_SECRET", "").strip()
 COOKIE_SECURE = os.getenv("PRICEBOT_COOKIE_SECURE", "1") == "1"
+REQUIRE_HTTPS = os.getenv("PRICEBOT_REQUIRE_HTTPS", "1") == "1"
+USER_STORE = UserStore(
+    os.getenv("PRICEBOT_USERS_DB", str(API_DIR / "data" / "users.db"))
+)
+CONFIRMATION_TTL_SEC = max(
+    int(os.getenv("PRICEBOT_CONFIRMATION_TTL_SEC", "86400")), 300
+)
+PUBLIC_URL = os.getenv("PRICEBOT_PUBLIC_URL", "http://127.0.0.1:3000").strip()
+SMTP_HOST = os.getenv("PRICEBOT_SMTP_HOST", "").strip()
+SMTP_PORT = int(os.getenv("PRICEBOT_SMTP_PORT", "587"))
+SMTP_USERNAME = os.getenv("PRICEBOT_SMTP_USERNAME", "").strip()
+SMTP_PASSWORD = os.getenv("PRICEBOT_SMTP_PASSWORD", "")
+SMTP_FROM = os.getenv("PRICEBOT_SMTP_FROM", SMTP_USERNAME).strip()
+SMTP_STARTTLS = os.getenv("PRICEBOT_SMTP_STARTTLS", "1") == "1"
+SMTP_SSL = os.getenv("PRICEBOT_SMTP_SSL", "0") == "1"
+LOGIN_MAX_ATTEMPTS = max(int(os.getenv("PRICEBOT_LOGIN_MAX_ATTEMPTS", "5")), 1)
+LOGIN_WINDOW_SEC = max(int(os.getenv("PRICEBOT_LOGIN_WINDOW_SEC", "900")), 60)
+MAX_UPLOAD_BYTES = max(int(os.getenv("PRICEBOT_MAX_UPLOAD_MB", "50")), 1) * 1024 * 1024
+MAX_BATCH_FILES = max(int(os.getenv("PRICEBOT_MAX_BATCH_FILES", "10")), 1)
+MAX_BATCH_BYTES = max(int(os.getenv("PRICEBOT_MAX_BATCH_MB", "100")), 1) * 1024 * 1024
+MAX_ARCHIVE_UNCOMPRESSED_BYTES = max(
+    int(os.getenv("PRICEBOT_MAX_ARCHIVE_UNCOMPRESSED_MB", "200")), 1
+) * 1024 * 1024
+MAX_ARCHIVE_ENTRIES = max(int(os.getenv("PRICEBOT_MAX_ARCHIVE_ENTRIES", "10000")), 100)
+MAX_PDF_PAGES = max(int(os.getenv("PRICEBOT_MAX_PDF_PAGES", "300")), 1)
+ALLOW_EXTERNAL_AI = os.getenv("PRICEBOT_ALLOW_EXTERNAL_AI", "0") == "1"
+LOG_FILENAMES = os.getenv("PRICEBOT_LOG_FILENAMES", "0") == "1"
 
 
 def _decode_b64(value: str) -> bytes:
@@ -80,9 +123,33 @@ def _parse_users(raw: str) -> dict[str, tuple[bytes, bytes]]:
 
 
 AUTH_USERS = _parse_users(os.getenv("PRICEBOT_USERS", ""))
-AUTH_REQUIRED = os.getenv(
-    "PRICEBOT_AUTH_REQUIRED", "1" if AUTH_USERS else "0"
-) == "1"
+AUTH_REQUIRED = os.getenv("PRICEBOT_AUTH_REQUIRED", "1") == "1"
+
+_LOGIN_ATTEMPTS: dict[str, deque[float]] = defaultdict(deque)
+_LOGIN_ATTEMPTS_LOCK = threading.Lock()
+
+
+def _login_rate_key(request: Request) -> str:
+    return request.client.host if request.client else "unknown"
+
+
+def _is_login_rate_limited(key: str) -> bool:
+    cutoff = time.monotonic() - LOGIN_WINDOW_SEC
+    with _LOGIN_ATTEMPTS_LOCK:
+        attempts = _LOGIN_ATTEMPTS[key]
+        while attempts and attempts[0] < cutoff:
+            attempts.popleft()
+        return len(attempts) >= LOGIN_MAX_ATTEMPTS
+
+
+def _record_failed_login(key: str) -> None:
+    with _LOGIN_ATTEMPTS_LOCK:
+        _LOGIN_ATTEMPTS[key].append(time.monotonic())
+
+
+def _clear_failed_logins(key: str) -> None:
+    with _LOGIN_ATTEMPTS_LOCK:
+        _LOGIN_ATTEMPTS.pop(key, None)
 
 
 def _session_token(username: str, expires_at: int | None = None) -> str:
@@ -107,11 +174,67 @@ def _session_username(token: str) -> str | None:
         if not hmac.compare_digest(expected, _decode_b64(encoded_signature)):
             return None
         username, expires_at = payload.rsplit(".", 1)
-        if int(expires_at) < int(time.time()) or username not in AUTH_USERS:
+        if int(expires_at) < int(time.time()) or not _identity_is_active(username):
             return None
         return username
     except (ValueError, TypeError, UnicodeError):
         return None
+
+
+def _identity_is_active(identifier: str) -> bool:
+    return identifier in AUTH_USERS or USER_STORE.is_active(identifier)
+
+
+def _has_active_identities() -> bool:
+    return bool(AUTH_USERS) or USER_STORE.has_active_users()
+
+
+def _is_local_request(request: Request) -> bool:
+    """Require both a loopback socket peer and a loopback Host header.
+
+    The extra Host check keeps a reverse proxy running on this machine from
+    accidentally turning remote requests into local-administrator requests.
+    Forwarded headers are deliberately ignored because clients can spoof them.
+    """
+    if not request.client:
+        return False
+    try:
+        peer_is_loopback = ipaddress.ip_address(request.client.host).is_loopback
+    except ValueError:
+        return False
+    host = request.url.hostname or ""
+    if host.lower() == "localhost":
+        host_is_loopback = True
+    else:
+        try:
+            host_is_loopback = ipaddress.ip_address(host).is_loopback
+        except ValueError:
+            host_is_loopback = False
+    return peer_is_loopback and host_is_loopback
+
+
+def _require_local_admin(request: Request) -> None:
+    if not _is_local_request(request):
+        raise HTTPException(
+            status_code=403,
+            detail="La administración de usuarios solo está disponible en el servidor",
+        )
+
+
+async def _email_confirmation(email: str, token: str) -> None:
+    confirmation_url = build_confirmation_url(PUBLIC_URL, token)
+    await asyncio.to_thread(
+        send_confirmation_email,
+        recipient=email,
+        confirmation_url=confirmation_url,
+        smtp_host=SMTP_HOST,
+        smtp_port=SMTP_PORT,
+        smtp_username=SMTP_USERNAME,
+        smtp_password=SMTP_PASSWORD,
+        smtp_from=SMTP_FROM,
+        smtp_starttls=SMTP_STARTTLS,
+        smtp_ssl=SMTP_SSL,
+    )
 
 
 ALLOWED_ORIGINS = [
@@ -134,10 +257,21 @@ app.add_middleware(
 
 @app.middleware("http")
 async def require_api_access_key(request, call_next):
-    if request.method == "OPTIONS" or request.url.path in {"/auth/login", "/health"}:
+    public_paths = {"/auth/login", "/auth/confirm", "/health"}
+    if request.method == "OPTIONS" or request.url.path in public_paths:
+        return await call_next(request)
+    local_bootstrap = (
+        _is_local_request(request)
+        and not _has_active_identities()
+        and (
+            request.url.path == "/auth/me"
+            or request.url.path.startswith("/admin/users")
+        )
+    )
+    if local_bootstrap:
         return await call_next(request)
     if AUTH_REQUIRED:
-        if not SESSION_SECRET or not AUTH_USERS:
+        if not SESSION_SECRET:
             return JSONResponse(
                 status_code=503,
                 content={"detail": "Authentication is not configured on the server"},
@@ -145,14 +279,65 @@ async def require_api_access_key(request, call_next):
         username = _session_username(request.cookies.get(SESSION_COOKIE, ""))
         if not username:
             return JSONResponse(status_code=401, content={"detail": "Login required"})
-    if API_ACCESS_KEY and request.headers.get("X-PriceBot-Key", "") != API_ACCESS_KEY:
+    elif API_ACCESS_KEY and request.headers.get("X-PriceBot-Key", "") != API_ACCESS_KEY:
         return JSONResponse(status_code=401, content={"detail": "Invalid API access key"})
     return await call_next(request)
 
 
+@app.middleware("http")
+async def enforce_transport_and_security_headers(request, call_next):
+    if REQUIRE_HTTPS and not _is_local_request(request) and request.url.scheme != "https":
+        response = JSONResponse(
+            status_code=426,
+            content={"detail": "HTTPS is required"},
+            headers={"Upgrade": "TLS/1.2"},
+        )
+    else:
+        origin = request.headers.get("origin", "")
+        if (
+            request.method in {"POST", "PUT", "PATCH", "DELETE"}
+            and origin
+            and origin not in ALLOWED_ORIGINS
+        ):
+            response = JSONResponse(
+                status_code=403, content={"detail": "Origin not allowed"}
+            )
+        else:
+            response = await call_next(request)
+
+    response.headers["Cache-Control"] = "no-store, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "no-referrer"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    response.headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'"
+    if request.url.scheme == "https":
+        response.headers["Strict-Transport-Security"] = "max-age=31536000"
+    return response
+
+
 class LoginRequest(BaseModel):
-    username: str
-    password: str
+    username: str = Field(min_length=1, max_length=254)
+    password: str = Field(min_length=1, max_length=256)
+
+
+class ConfirmEmailRequest(BaseModel):
+    token: str = Field(min_length=1, max_length=512)
+
+
+class CreateUserRequest(BaseModel):
+    email: str = Field(min_length=3, max_length=254)
+    password: str = Field(min_length=10, max_length=256)
+
+
+class UserEmailRequest(BaseModel):
+    email: str = Field(min_length=3, max_length=254)
+
+
+class UserStatusRequest(BaseModel):
+    email: str
+    enabled: bool
 
 
 @app.get("/health")
@@ -161,36 +346,70 @@ async def health_check():
 
 
 @app.post("/auth/login")
-async def login(payload: LoginRequest, response: Response):
+async def login(payload: LoginRequest, response: Response, request: Request):
     if not AUTH_REQUIRED:
         return {"authenticated": True, "username": "local"}
-    user_record = AUTH_USERS.get(payload.username.strip())
-    if not user_record:
+    rate_key = _login_rate_key(request)
+    if _is_login_rate_limited(rate_key):
+        raise HTTPException(
+            status_code=429,
+            detail="Demasiados intentos. Esperá antes de volver a intentar.",
+            headers={"Retry-After": str(LOGIN_WINDOW_SEC)},
+        )
+    identifier = payload.username.strip()
+    user_record = AUTH_USERS.get(identifier)
+    authenticated_identifier = None
+    if user_record:
+        salt, expected_digest = user_record
+        actual_digest = _password_digest(payload.password, salt)
+        if hmac.compare_digest(actual_digest, expected_digest):
+            authenticated_identifier = identifier
+    else:
+        authenticated_identifier = USER_STORE.authenticate(identifier, payload.password)
+    if not authenticated_identifier:
+        _record_failed_login(rate_key)
         raise HTTPException(status_code=401, detail="Usuario o contraseña incorrectos")
-    salt, expected_digest = user_record
-    actual_digest = _password_digest(payload.password, salt)
-    if not hmac.compare_digest(actual_digest, expected_digest):
-        raise HTTPException(status_code=401, detail="Usuario o contraseña incorrectos")
+    _clear_failed_logins(rate_key)
     response.set_cookie(
         SESSION_COOKIE,
-        _session_token(payload.username.strip()),
+        _session_token(authenticated_identifier),
         max_age=SESSION_TTL_SEC,
         httponly=True,
-        secure=COOKIE_SECURE,
+        secure=COOKIE_SECURE and not (
+            _is_local_request(request) and request.url.scheme == "http"
+        ),
         samesite="lax",
         path="/",
     )
-    return {"authenticated": True, "username": payload.username.strip()}
+    return {"authenticated": True, "username": authenticated_identifier}
+
+
+@app.post("/auth/confirm")
+async def confirm_email(payload: ConfirmEmailRequest):
+    try:
+        email = USER_STORE.confirm(payload.token)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {"confirmed": True, "email": email}
 
 
 @app.get("/auth/me")
 async def current_user(request: Request):
-    if not AUTH_REQUIRED:
-        return {"authenticated": True, "username": "local"}
+    local_bootstrap = _is_local_request(request) and not _has_active_identities()
+    if not AUTH_REQUIRED or local_bootstrap:
+        return {
+            "authenticated": True,
+            "username": "Administrador local" if local_bootstrap else "local",
+            "local_admin": _is_local_request(request),
+        }
     username = _session_username(request.cookies.get(SESSION_COOKIE, ""))
     if not username:
         raise HTTPException(status_code=401, detail="Login required")
-    return {"authenticated": True, "username": username}
+    return {
+        "authenticated": True,
+        "username": username,
+        "local_admin": _is_local_request(request),
+    }
 
 
 @app.post("/auth/logout")
@@ -198,9 +417,143 @@ async def logout(response: Response):
     response.delete_cookie(SESSION_COOKIE, path="/")
     return {"authenticated": False}
 
+
+@app.get("/admin/users")
+async def list_managed_users(request: Request):
+    _require_local_admin(request)
+    return {"users": USER_STORE.list_users(), "smtp_configured": bool(SMTP_HOST and SMTP_FROM)}
+
+
+@app.post("/admin/users")
+async def create_managed_user(payload: CreateUserRequest, request: Request):
+    _require_local_admin(request)
+    try:
+        email, token = USER_STORE.create_pending_user(
+            payload.email, payload.password, CONFIRMATION_TTL_SEC
+        )
+        await _email_confirmation(email, token)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        logger.exception("Could not send account confirmation email to %s", payload.email)
+        raise HTTPException(
+            status_code=502,
+            detail=(
+                "El usuario quedó pendiente, pero no se pudo enviar el correo. "
+                "Revisá la configuración SMTP y usá Reenviar."
+            ),
+        ) from exc
+    return {"created": True, "email": email, "confirmation_sent": True}
+
+
+@app.post("/admin/users/resend")
+async def resend_confirmation(payload: UserEmailRequest, request: Request):
+    _require_local_admin(request)
+    try:
+        email, token = USER_STORE.regenerate_confirmation_token(
+            payload.email, CONFIRMATION_TTL_SEC
+        )
+        await _email_confirmation(email, token)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        logger.exception("Could not resend account confirmation email to %s", payload.email)
+        raise HTTPException(
+            status_code=502, detail="No se pudo enviar el correo de confirmación"
+        ) from exc
+    return {"confirmation_sent": True, "email": email}
+
+
+@app.post("/admin/users/status")
+async def update_user_status(payload: UserStatusRequest, request: Request):
+    _require_local_admin(request)
+    try:
+        USER_STORE.set_enabled(payload.email, payload.enabled)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {"updated": True, "email": payload.email.strip().lower(), "enabled": payload.enabled}
+
 # Anthropic (Claude) configuration
 CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-5")
 MARKITDOWN = MarkItDown()
+
+ALLOWED_UPLOAD_EXTENSIONS = {
+    ".pdf", ".xls", ".xlsx", ".xlsm", ".csv", ".jpg", ".jpeg", ".png", ".webp"
+}
+
+
+def _safe_upload_name(filename: str | None) -> str:
+    name = (filename or "upload").replace("\\", "/").split("/")[-1].strip()
+    name = re.sub(r"[\x00-\x1f\x7f]", "", name)
+    if not name or len(name) > 255:
+        raise HTTPException(status_code=400, detail="Nombre de archivo inválido")
+    return name
+
+
+async def _read_upload_limited(file: UploadFile, limit: int = MAX_UPLOAD_BYTES) -> bytes:
+    chunks = []
+    total = 0
+    try:
+        while True:
+            chunk = await file.read(min(1024 * 1024, limit + 1 - total))
+            if not chunk:
+                break
+            total += len(chunk)
+            if total > limit:
+                raise HTTPException(
+                    status_code=413,
+                    detail=f"Archivo demasiado grande (máximo {limit // (1024 * 1024)} MB)",
+                )
+            chunks.append(chunk)
+    finally:
+        await file.close()
+    if not chunks:
+        raise HTTPException(status_code=400, detail="El archivo está vacío")
+    return b"".join(chunks)
+
+
+def _validate_archive_safety(file_bytes: bytes) -> None:
+    try:
+        with zipfile.ZipFile(io.BytesIO(file_bytes)) as archive:
+            entries = archive.infolist()
+            if len(entries) > MAX_ARCHIVE_ENTRIES:
+                raise HTTPException(status_code=400, detail="El archivo comprimido tiene demasiadas entradas")
+            total_uncompressed = sum(entry.file_size for entry in entries)
+            if total_uncompressed > MAX_ARCHIVE_UNCOMPRESSED_BYTES:
+                raise HTTPException(status_code=413, detail="El contenido descomprimido es demasiado grande")
+            for entry in entries:
+                if entry.compress_size == 0:
+                    ratio = entry.file_size
+                else:
+                    ratio = entry.file_size / entry.compress_size
+                if entry.file_size > 10 * 1024 * 1024 and ratio > 200:
+                    raise HTTPException(status_code=400, detail="Archivo comprimido sospechoso")
+    except HTTPException:
+        raise
+    except (zipfile.BadZipFile, OSError) as exc:
+        raise HTTPException(status_code=400, detail="Archivo Office inválido") from exc
+
+
+def _validate_upload(filename: str, file_bytes: bytes) -> str:
+    ext = Path(filename).suffix.lower()
+    if ext not in ALLOWED_UPLOAD_EXTENSIONS:
+        raise HTTPException(status_code=400, detail=f"Tipo de archivo no soportado: {ext or 'sin extensión'}")
+
+    signatures = {
+        ".pdf": file_bytes.startswith(b"%PDF"),
+        ".xls": file_bytes.startswith(b"\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1"),
+        ".xlsx": file_bytes.startswith(b"PK\x03\x04"),
+        ".xlsm": file_bytes.startswith(b"PK\x03\x04"),
+        ".jpg": file_bytes.startswith(b"\xFF\xD8\xFF"),
+        ".jpeg": file_bytes.startswith(b"\xFF\xD8\xFF"),
+        ".png": file_bytes.startswith(b"\x89PNG\r\n\x1a\n"),
+        ".webp": file_bytes.startswith(b"RIFF") and b"WEBP" in file_bytes[:32],
+    }
+    if ext in signatures and not signatures[ext]:
+        raise HTTPException(status_code=400, detail="El contenido no coincide con la extensión del archivo")
+    if ext in {".xlsx", ".xlsm"}:
+        _validate_archive_safety(file_bytes)
+    return ext
 
 
 def detect_extension(filename: str, file_bytes: bytes) -> str:
@@ -238,6 +591,14 @@ def detect_extension(filename: str, file_bytes: bytes) -> str:
 
 async def claude_chat(messages: list, system: str = "", max_tokens: int = 8000) -> str:
     """Send a chat request to Anthropic Claude API and return the response text."""
+    if not ALLOW_EXTERNAL_AI:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "El procesamiento con IA externa está deshabilitado por seguridad. "
+                "Un administrador debe autorizarlo explícitamente."
+            ),
+        )
     api_key = os.getenv("ANTHROPIC_API_KEY", "").strip()
     if not api_key:
         raise HTTPException(
@@ -329,7 +690,8 @@ def _append_cost_log(filename: str, usage: dict, rows: int, method: str) -> None
         out_t = int(usage.get("output", 0))
         record = {
             "ts":            datetime.now().isoformat(timespec="seconds"),
-            "file":          filename,
+            "file":          filename if LOG_FILENAMES else None,
+            "file_type":     Path(filename).suffix.lower(),
             "rows":          rows,
             "method":        method,
             "tokens_in":     in_t,
@@ -379,7 +741,7 @@ TEMPLATE_COLUMNS = [
     "Fecha vigencia hasta",
 ]
 
-TRANSFORM_CACHE_MAX_ITEMS = max(int(os.getenv("TRANSFORM_CACHE_MAX_ITEMS", "512")), 32)
+TRANSFORM_CACHE_MAX_ITEMS = max(int(os.getenv("TRANSFORM_CACHE_MAX_ITEMS", "0")), 0)
 TRANSFORM_CACHE: dict[str, dict] = {}
 AI_COMPLEMENT_ALL_CHUNKS = os.getenv("AI_COMPLEMENT_ALL_CHUNKS", "0") == "1"
 
@@ -491,6 +853,8 @@ CANDIDATE_LINE_RE = re.compile(
 
 
 def _cache_get(cache_key: str) -> Optional[dict]:
+    if TRANSFORM_CACHE_MAX_ITEMS <= 0:
+        return None
     cached = TRANSFORM_CACHE.get(cache_key)
     if cached is None:
         return None
@@ -501,6 +865,8 @@ def _cache_get(cache_key: str) -> Optional[dict]:
 
 
 def _cache_set(cache_key: str, value: dict) -> None:
+    if TRANSFORM_CACHE_MAX_ITEMS <= 0:
+        return
     if cache_key in TRANSFORM_CACHE:
         TRANSFORM_CACHE.pop(cache_key, None)
     TRANSFORM_CACHE[cache_key] = value
@@ -1053,6 +1419,13 @@ def _extract_pdf_sync(file_bytes: bytes) -> dict:
     pdf_page_tables: dict[int, list] = {}  # page_idx (0-based) → list of tables
     pages = 0
 
+    with pdfplumber.open(io.BytesIO(file_bytes)) as probe_pdf:
+        if len(probe_pdf.pages) > MAX_PDF_PAGES:
+            raise HTTPException(
+                status_code=413,
+                detail=f"El PDF supera el máximo de {MAX_PDF_PAGES} páginas",
+            )
+
     if PDF_USE_MARKITDOWN:
         markitdown_started = time.perf_counter()
         logger.info("PDF MarkItDown started")
@@ -1091,6 +1464,8 @@ def _extract_pdf_sync(file_bytes: bytes) -> dict:
                 pages_text.append(block)
                 pdf_word_rows.extend(_extract_rows_from_word_coords(page))
             pdfplumber_text = "\n".join(pages_text).strip()
+    except HTTPException:
+        raise
     except Exception:
         logger.exception("PDF pdfplumber failed after %.1fs", time.perf_counter() - pdfplumber_started)
     else:
@@ -1627,6 +2002,8 @@ async def agent_extractor(file_bytes: bytes, filename: str, file_type: str) -> d
                 status_code=400, detail=f"Unsupported file type: {ext}"
             )
 
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Extraction error: {str(e)}"
@@ -2293,7 +2670,7 @@ async def agent_transformer(
         merged_mapping["pdf_word_code"] = "Cód. Artículo"
         merged_mapping["pdf_word_price"] = "Precio"
 
-    ai_enabled = bool(os.getenv("ANTHROPIC_API_KEY", "").strip())
+    ai_enabled = ALLOW_EXTERNAL_AI and bool(os.getenv("ANTHROPIC_API_KEY", "").strip())
     file_type = raw_data.get("metadata", {}).get("type", "")
     hybrid_supported = file_type in {".pdf", "image"}
     legacy_ai_enabled = ai_enabled and hybrid_supported and not HYBRID_EXTRACTION
@@ -2942,6 +3319,22 @@ async def orchestrator(
 # API ENDPOINTS
 # ─────────────────────────────────────────────
 
+
+def _safe_spreadsheet_value(value):
+    if value is None:
+        return ""
+    text = str(value)
+    if len(text) > 32767:
+        text = text[:32767]
+    if text.lstrip().startswith(("=", "+", "@", "\t", "\r", "\n")):
+        text = "'" + text
+    return text
+
+
+def _safe_download_stem(filename: str) -> str:
+    stem = re.sub(r"[^A-Za-z0-9._-]+", "_", Path(filename).stem).strip("._")
+    return (stem or "archivo")[:80]
+
 @app.get("/")
 def root():
     return {"status": "ok", "service": "Price Extractor API v1.0"}
@@ -2957,18 +3350,13 @@ async def extract_file(
     Main endpoint: upload a price list file and get structured data back.
     Accepts: PDF, XLS, XLSX, CSV, JPG, PNG
     """
-    allowed_ext = {".pdf", ".xls", ".xlsx", ".xlsm", ".csv", ".jpg", ".jpeg", ".png", ".webp"}
-    file_bytes = await file.read()
-    ext = detect_extension(file.filename, file_bytes)
-    if ext not in allowed_ext:
-        raise HTTPException(status_code=400, detail=f"File type not supported: {ext}")
-
-    if len(file_bytes) > 50 * 1024 * 1024:  # 50MB limit
-        raise HTTPException(status_code=400, detail="File too large (max 50MB)")
+    filename = _safe_upload_name(file.filename)
+    file_bytes = await _read_upload_limited(file)
+    _validate_upload(filename, file_bytes)
 
     result = await orchestrator(
         file_bytes,
-        file.filename,
+        filename,
         supplier_cuit,
         validation_mode=validation_mode,
     )
@@ -2986,33 +3374,27 @@ async def extract_and_download(
     Same as /extract but returns a file ready to import.
     format: 'xlsx' or 'xls'
     """
-    allowed_ext = {".pdf", ".xls", ".xlsx", ".xlsm", ".csv", ".jpg", ".jpeg", ".png", ".webp"}
-    file_bytes = await file.read()
-    ext = detect_extension(file.filename, file_bytes)
-    if ext not in allowed_ext:
-        raise HTTPException(status_code=400, detail=f"File type not supported: {ext}")
+    if format not in {"xls", "xlsx"}:
+        raise HTTPException(status_code=400, detail="Formato de descarga inválido")
+    filename = _safe_upload_name(file.filename)
+    file_bytes = await _read_upload_limited(file)
+    _validate_upload(filename, file_bytes)
 
     result = await orchestrator(
         file_bytes,
-        file.filename,
+        filename,
         supplier_cuit,
         validation_mode=validation_mode,
     )
 
     cuit_val = supplier_cuit or "30-55555555-1"
-    safe_name = Path(file.filename).stem
-    df = pd.DataFrame(result["rows"], columns=TEMPLATE_COLUMNS)
+    safe_name = _safe_download_stem(filename)
+    df = pd.DataFrame(result["rows"], columns=TEMPLATE_COLUMNS).map(_safe_spreadsheet_value)
 
     output = io.BytesIO()
 
     def sanitize_xls_value(value):
-        # BIFF8 (.xls) max cell text length is 32767 characters.
-        if value is None:
-            return ""
-        text = str(value)
-        if len(text) > 32767:
-            text = text[:32767]
-        return text
+        return _safe_spreadsheet_value(value)
 
     if format == "xls":
         # Generate .xls (legacy format matching template exactly)
@@ -3047,7 +3429,7 @@ async def extract_and_download(
     else:
         # Generate .xlsx
         with pd.ExcelWriter(output, engine="openpyxl") as writer:
-            header_df = pd.DataFrame([[cuit_val] + [""] * 11])
+            header_df = pd.DataFrame([[_safe_spreadsheet_value(cuit_val)] + [""] * 11])
             header_df.to_excel(writer, index=False, header=False, sheet_name="Sheet1", startrow=0)
             df.to_excel(writer, index=False, sheet_name="Sheet1", startrow=1)
 
@@ -3058,7 +3440,7 @@ async def extract_and_download(
     return StreamingResponse(
         output,
         media_type=media_type,
-        headers={"Content-Disposition": f"attachment; filename={out_filename}"},
+        headers={"Content-Disposition": f'attachment; filename="{out_filename}"'},
     )
 
 
@@ -3071,15 +3453,27 @@ async def extract_batch(
     """
     Process multiple files and merge into a single result.
     """
+    if not files or len(files) > MAX_BATCH_FILES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"El lote debe contener entre 1 y {MAX_BATCH_FILES} archivos",
+        )
     all_rows = []
     all_logs = []
     all_reports = []
 
+    total_bytes = 0
     for file in files:
-        file_bytes = await file.read()
+        filename = _safe_upload_name(file.filename)
+        remaining = MAX_BATCH_BYTES - total_bytes
+        if remaining <= 0:
+            raise HTTPException(status_code=413, detail="El lote supera el tamaño máximo")
+        file_bytes = await _read_upload_limited(file, min(MAX_UPLOAD_BYTES, remaining))
+        total_bytes += len(file_bytes)
+        _validate_upload(filename, file_bytes)
         result = await orchestrator(
             file_bytes,
-            file.filename,
+            filename,
             supplier_cuit,
             validation_mode=validation_mode,
         )
@@ -3087,7 +3481,7 @@ async def extract_batch(
         all_logs.extend(result["log"])
         all_reports.append(
             {
-                "file": file.filename,
+                "file": filename,
                 "report": result["report"],
                 "validation": result.get("validation"),
             }

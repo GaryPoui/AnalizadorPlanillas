@@ -26,3 +26,24 @@ Desktop.ini
 
 # Docker
 *.log
+
+# Runtime user database
+pricebot/api/data/*.db
+pricebot/api/data/*.db-*
+
+# Confidential runtime data (never commit supplier documents or extracted rows)
+Listas/
+Respuestas/
+costs_log.jsonl
+pricebot/certs/
+*.pfx
+*.key
+*.pdf
+*.xls
+*.xlsx
+*.xlsm
+*.csv
+tests/samples/
+tests/outputs/
+tmp/*.json
+tmp/*.txt

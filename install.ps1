@@ -80,7 +80,21 @@ if ($LASTEXITCODE -ne 0) {
 if (-not (Test-Path -LiteralPath $localEnv) -and (Test-Path -LiteralPath $exampleEnv)) {
     Copy-Item -LiteralPath $exampleEnv -Destination $localEnv
     Write-Host "  Se creo pricebot\.env desde el ejemplo." -ForegroundColor Yellow
-    Write-Host "  Editalo y completa ANTHROPIC_API_KEY y los usuarios antes de publicar." -ForegroundColor Yellow
+    Write-Host "  Editalo para configurar HTTPS, correo SMTP y la URL publica antes de habilitar la red." -ForegroundColor Yellow
+    Write-Host "  La IA externa queda desactivada para proteger los documentos." -ForegroundColor Yellow
+}
+
+if (Test-Path -LiteralPath $localEnv) {
+    $hasSessionSecret = Select-String -LiteralPath $localEnv -Pattern '^\s*PRICEBOT_SESSION_SECRET\s*=\s*\S+' -Quiet
+    if (-not $hasSessionSecret) {
+        $generatedSecret = & $virtualEnvPython -c "import secrets; print(secrets.token_urlsafe(48))"
+        [System.IO.File]::AppendAllText(
+            $localEnv,
+            "`r`nPRICEBOT_SESSION_SECRET=$generatedSecret`r`n",
+            [System.Text.UTF8Encoding]::new($false)
+        )
+        Write-Host "  Se genero una clave de sesion local segura." -ForegroundColor Green
+    }
 }
 
 Write-Host ""

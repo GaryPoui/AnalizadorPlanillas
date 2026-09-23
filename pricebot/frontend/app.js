@@ -15,6 +15,7 @@ const API_ACCESS_KEY = window.PRICEBOT_API_KEY || '';
 const REQUEST_TIMEOUT_MS = 300000;
 
 let authenticated = false;
+let localAdmin = false;
 
 function apiHeaders() {
   return API_ACCESS_KEY ? {'X-PriceBot-Key': API_ACCESS_KEY} : {};
@@ -26,15 +27,41 @@ async function checkAuthentication() {
     if (resp.ok) {
       const data = await resp.json();
       authenticated = true;
+      localAdmin = Boolean(data.local_admin);
       document.getElementById('sessionUser').textContent = `Usuario: ${data.username}`;
       document.getElementById('authScreen').hidden = true;
+      document.getElementById('usersTabButton').hidden = !localAdmin;
+      if (localAdmin) await loadUsers();
       return;
     }
   } catch (_) {
     // The normal application error handling will explain an unavailable API.
   }
   authenticated = false;
+  localAdmin = false;
   document.getElementById('authScreen').hidden = false;
+}
+
+async function checkEmailConfirmation() {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('confirm');
+  if (!token) return;
+  const success = document.getElementById('authSuccess');
+  const error = document.getElementById('authError');
+  try {
+    const resp = await fetch(`${API_URL}/auth/confirm`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({token}),
+    });
+    const data = await resp.json().catch(() => ({}));
+    if (!resp.ok) throw new Error(data.detail || 'No se pudo confirmar el correo');
+    success.textContent = `Correo ${data.email} confirmado. Ya podés iniciar sesión.`;
+  } catch (err) {
+    error.textContent = err.message;
+  } finally {
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
 }
 
 document.getElementById('loginForm').addEventListener('submit', async event => {
@@ -69,14 +96,157 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
   window.location.reload();
 });
 
-checkAuthentication();
+checkEmailConfirmation().then(checkAuthentication);
 
 // ─── TAB SWITCHING ───────────────────────────
-function switchTab(name) {
+function switchTab(name, button) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
-  event.target.classList.add('active');
+  if (button) button.classList.add('active');
+}
+
+document.querySelectorAll('[data-tab]').forEach(button => {
+  button.addEventListener('click', () => switchTab(button.dataset.tab, button));
+});
+
+document.getElementById('btnExtract').addEventListener('click', startExtraction);
+document.getElementById('btnDownload').addEventListener('click', () => downloadFile('xls'));
+document.getElementById('btnClear').addEventListener('click', clearAll);
+document.getElementById('btnResultsXls').addEventListener('click', () => downloadFile('xls'));
+document.getElementById('btnResultsXlsx').addEventListener('click', () => downloadFile('xlsx'));
+document.getElementById('btnCopyJson').addEventListener('click', copyJson);
+
+// ─── LOCAL USER ADMINISTRATION ───────────────
+const createUserForm = document.getElementById('createUserForm');
+const usersMessage = document.getElementById('usersMessage');
+
+function adminHeaders() {
+  return {...apiHeaders(), 'Content-Type': 'application/json'};
+}
+
+async function loadUsers() {
+  if (!localAdmin) return;
+  try {
+    const resp = await fetch(`${API_URL}/admin/users`, {
+      headers: apiHeaders(),
+      credentials: 'include',
+    });
+    const data = await resp.json().catch(() => ({}));
+    if (!resp.ok) throw new Error(data.detail || 'No se pudo cargar la lista de usuarios');
+    document.getElementById('smtpWarning').hidden = data.smtp_configured;
+    renderUsers(data.users || []);
+  } catch (err) {
+    usersMessage.textContent = err.message;
+    usersMessage.className = 'users-message error';
+  }
+}
+
+function renderUsers(users) {
+  const container = document.getElementById('usersList');
+  container.replaceChildren();
+  if (!users.length) {
+    const empty = document.createElement('p');
+    empty.className = 'panel-help';
+    empty.textContent = 'Todavía no se crearon usuarios por correo.';
+    container.appendChild(empty);
+    return;
+  }
+
+  users.forEach(user => {
+    const row = document.createElement('div');
+    row.className = 'user-row';
+
+    const identity = document.createElement('div');
+    const email = document.createElement('strong');
+    email.textContent = user.email;
+    const state = document.createElement('span');
+    state.className = `user-state ${user.enabled && user.confirmed ? 'active' : 'pending'}`;
+    state.textContent = !user.enabled
+      ? 'Deshabilitado'
+      : user.confirmed
+        ? 'Confirmado'
+        : user.confirmation_expired ? 'Confirmación vencida' : 'Pendiente de confirmación';
+    identity.append(email, state);
+
+    const actions = document.createElement('div');
+    actions.className = 'user-actions';
+    if (!user.confirmed && user.enabled) {
+      const resend = document.createElement('button');
+      resend.type = 'button';
+      resend.className = 'btn btn-outline btn-small';
+      resend.textContent = 'Reenviar';
+      resend.addEventListener('click', () => resendConfirmation(user.email));
+      actions.appendChild(resend);
+    }
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'btn btn-outline btn-small';
+    toggle.textContent = user.enabled ? 'Deshabilitar' : 'Habilitar';
+    toggle.addEventListener('click', () => setUserEnabled(user.email, !user.enabled));
+    actions.appendChild(toggle);
+
+    row.append(identity, actions);
+    container.appendChild(row);
+  });
+}
+
+createUserForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  const button = document.getElementById('createUserBtn');
+  button.disabled = true;
+  usersMessage.textContent = '';
+  try {
+    const resp = await fetch(`${API_URL}/admin/users`, {
+      method: 'POST',
+      headers: adminHeaders(),
+      credentials: 'include',
+      body: JSON.stringify({
+        email: document.getElementById('newUserEmail').value.trim(),
+        password: document.getElementById('newUserPassword').value,
+      }),
+    });
+    const data = await resp.json().catch(() => ({}));
+    if (!resp.ok) throw new Error(data.detail || 'No se pudo crear el usuario');
+    createUserForm.reset();
+    usersMessage.textContent = `Usuario ${data.email} creado. Se envió el correo de confirmación.`;
+    usersMessage.className = 'users-message success';
+    await loadUsers();
+  } catch (err) {
+    usersMessage.textContent = err.message;
+    usersMessage.className = 'users-message error';
+    await loadUsers();
+  } finally {
+    button.disabled = false;
+  }
+});
+
+async function resendConfirmation(email) {
+  await runUserAction('/admin/users/resend', {email}, 'Correo de confirmación reenviado.');
+}
+
+async function setUserEnabled(email, enabled) {
+  await runUserAction('/admin/users/status', {email, enabled}, enabled ? 'Usuario habilitado.' : 'Usuario deshabilitado.');
+}
+
+async function runUserAction(path, body, successText) {
+  usersMessage.textContent = '';
+  try {
+    const resp = await fetch(`${API_URL}${path}`, {
+      method: 'POST',
+      headers: adminHeaders(),
+      credentials: 'include',
+      body: JSON.stringify(body),
+    });
+    const data = await resp.json().catch(() => ({}));
+    if (!resp.ok) throw new Error(data.detail || 'No se pudo completar la operación');
+    usersMessage.textContent = successText;
+    usersMessage.className = 'users-message success';
+  } catch (err) {
+    usersMessage.textContent = err.message;
+    usersMessage.className = 'users-message error';
+  }
+  await loadUsers();
 }
 
 // ─── FILE HANDLING ───────────────────────────
@@ -139,12 +309,17 @@ function renderFileList() {
   fileList.innerHTML = files.map((f, i) => `
     <div class="file-item">
       <span class="file-icon">${getIcon(f.name)}</span>
-      <span class="file-name">${f.name}</span>
+      <span class="file-name">${esc(f.name)}</span>
       <span class="file-size">${formatSize(f.size)}</span>
-      <button class="remove-btn" onclick="removeFile(${i})">×</button>
+      <button class="remove-btn" type="button" data-remove-file="${i}">×</button>
     </div>
   `).join('');
 }
+
+fileList.addEventListener('click', event => {
+  const button = event.target.closest('[data-remove-file]');
+  if (button) removeFile(Number(button.dataset.removeFile));
+});
 
 function removeFile(i) {
   files.splice(i, 1);
@@ -194,8 +369,8 @@ function addLog(step, status, detail) {
   div.className = `log-entry ${status}`;
   div.innerHTML = `
     <span class="log-time">${time}</span>
-    <span class="log-step">[${step.toUpperCase()}]</span>
-    <span class="log-msg">${detail} ${status === 'running' ? '<span class="spinner"></span>' : status === 'done' ? '✓' : '✗'}</span>
+    <span class="log-step">[${esc(step.toUpperCase())}]</span>
+    <span class="log-msg">${esc(detail)} ${status === 'running' ? '<span class="spinner"></span>' : status === 'done' ? '✓' : '✗'}</span>
   `;
   log.appendChild(div);
   log.scrollTop = log.scrollHeight;
@@ -357,7 +532,7 @@ function renderResults(rows, report) {
   if (issues.length > 0) {
     document.getElementById('issuesPanel').classList.add('visible');
     document.getElementById('issuesList').innerHTML = issues.slice(0, 10).map(iss =>
-      `<div class="issue-row">Fila ${iss.row}: <span>${iss.issues.join(', ')}</span></div>`
+      `<div class="issue-row">Fila ${esc(iss.row)}: <span>${esc((iss.issues || []).join(', '))}</span></div>`
     ).join('');
   } else {
     document.getElementById('issuesPanel').classList.remove('visible');
@@ -366,7 +541,12 @@ function renderResults(rows, report) {
 
 function esc(v) {
   if (v === null || v === undefined) return '';
-  return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return String(v)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
 }
 
 // ─── DOWNLOAD ────────────────────────────────

@@ -83,11 +83,16 @@ Descargar `spa.traineddata` y copiarlo a la carpeta `tessdata/` de Tesseract.
 Crear o editar `pricebot/.env` (UTF-8 SIN BOM — importante):
 
 ```env
-ANTHROPIC_API_KEY=sk-ant-api03-...          # obligatorio
+PRICEBOT_ALLOW_EXTERNAL_AI=0                # 1 solo con autorización para enviar datos a Anthropic
+ANTHROPIC_API_KEY=                          # completar solo si se autorizó IA externa
 CLAUDE_MODEL=claude-sonnet-4-5               # modelo activo
 PRICEBOT_API_KEY=                            # recomendado: clave larga para proteger la API
-PRICEBOT_ALLOWED_ORIGINS=http://127.0.0.1:3000,http://localhost:3000
+PRICEBOT_ALLOWED_ORIGINS=http://127.0.0.1:3000,http://localhost:3000,https://192.168.190.146:3000
+PRICEBOT_REQUIRE_HTTPS=1                    # bloquea HTTP remoto; localhost sigue disponible
+PRICEBOT_ENABLE_API_DOCS=0                  # Swagger/OpenAPI desactivados en producción
 SAVE_HISTORY=0                               # no persistir filas completas por defecto
+PRICEBOT_LOG_FILENAMES=0                    # no registrar nombres confidenciales
+TRANSFORM_CACHE_MAX_ITEMS=0                 # no retener resultados entre solicitudes
 
 TESSERACT_CMD=C:\Users\...\Tesseract-OCR\tesseract.exe  # opcional, para OCR
 
@@ -105,7 +110,16 @@ PDF_USE_MARKITDOWN=0                        # 1 solo si se necesita ese converso
 PRICEBOT_AUTH_REQUIRED=1
 PRICEBOT_SESSION_SECRET=generar-una-clave-aleatoria-larga
 PRICEBOT_COOKIE_SECURE=1                    # 1 si se usa HTTPS; 0 solo para HTTP local
+PRICEBOT_LOGIN_MAX_ATTEMPTS=5
+PRICEBOT_LOGIN_WINDOW_SEC=900
 PRICEBOT_USERS=usuario$SAL$HASH,otro$SAL$HASH
+
+# Límites contra agotamiento de memoria y archivos comprimidos maliciosos
+PRICEBOT_MAX_UPLOAD_MB=50
+PRICEBOT_MAX_BATCH_FILES=10
+PRICEBOT_MAX_BATCH_MB=100
+PRICEBOT_MAX_ARCHIVE_UNCOMPRESSED_MB=200
+PRICEBOT_MAX_PDF_PAGES=300
 
 # Tracking de costos
 COST_LOG_PATH=costs_log.jsonl               # ruta del log (default: raíz del proyecto)
@@ -135,6 +149,53 @@ monitoreo. Además, en el router/firewall del servidor permití únicamente los
 puertos necesarios y no expongas directamente el puerto 8000 a Internet;
 preferí un proxy HTTPS (Nginx/Caddy) o acceso solo desde la LAN/VPN.
 
+#### Alta y confirmación de usuarios por correo
+
+La pestaña **Usuarios** aparece únicamente al abrir el frontend desde
+`http://127.0.0.1:3000` o `http://localhost:3000` en la computadora servidor.
+La API también valida que la conexión administrativa provenga de loopback, por
+lo que ocultar o mostrar la pestaña no es la medida de seguridad principal.
+
+Configurá en `pricebot/.env`:
+
+```env
+PRICEBOT_AUTH_REQUIRED=1
+PRICEBOT_SESSION_SECRET=una-clave-aleatoria-larga
+PRICEBOT_COOKIE_SECURE=1
+PRICEBOT_REQUIRE_HTTPS=1
+PRICEBOT_PUBLIC_URL=https://192.168.190.146:3000
+PRICEBOT_CONFIRMATION_TTL_SEC=86400
+
+PRICEBOT_SMTP_HOST=smtp.proveedor.com
+PRICEBOT_SMTP_PORT=587
+PRICEBOT_SMTP_USERNAME=cuenta@empresa.com
+PRICEBOT_SMTP_PASSWORD=clave-o-password-de-aplicacion
+PRICEBOT_SMTP_FROM=cuenta@empresa.com
+PRICEBOT_SMTP_STARTTLS=1
+PRICEBOT_SMTP_SSL=0
+```
+
+Abrí la aplicación desde localhost en el servidor. Si todavía no existe ningún
+usuario activo, se habilita automáticamente un modo de alta inicial que solo
+responde por loopback. Si ya existen usuarios, iniciá sesión primero. Abrí la
+pestaña **Usuarios** y cargá correo y contraseña inicial. La contraseña se
+guarda con `scrypt`, el token de confirmación se guarda como hash y vence a las
+24 horas por defecto. Hasta confirmar el enlace recibido, el usuario no puede
+iniciar sesión. Desde la misma pantalla se puede reenviar la confirmación o
+deshabilitar un acceso.
+
+`PRICEBOT_PUBLIC_URL` debe apuntar a una dirección alcanzable por el receptor.
+Una IP privada funciona solo dentro de la misma LAN o VPN. Para acceso por
+Internet usá dominio, HTTPS y VPN/proxy; no publiques directamente el puerto
+8000. El backend rechaza HTTP remoto por defecto.
+
+Para aplicar permisos NTFS y restringir el firewall a `192.168.190.0/24`, abrí
+PowerShell como administrador en el servidor y ejecutá:
+
+```powershell
+.\hardening.ps1
+```
+
 **ADVERTENCIA**: PowerShell `Set-Content -Encoding UTF8` agrega BOM y rompe `load_dotenv`.
 Usar en su lugar:
 ```powershell
@@ -149,35 +210,44 @@ Usar en su lugar:
 C:\Users\Pasante\AppData\Local\Python\pythoncore-3.14-64\python.exe -m uvicorn main:app \
   --host 127.0.0.1 \
     --port 8000 \
-    --reload \
     --app-dir "c:\Users\Pasante\Desktop\AnalizadorPlanillas\pricebot\api"
 ```
 
 La API queda disponible en: **http://localhost:8000**
 
-Documentación interactiva Swagger: **http://localhost:8000/docs**
+Swagger y OpenAPI están desactivados por defecto. Solo en una sesión local de
+diagnóstico se pueden habilitar con `PRICEBOT_ENABLE_API_DOCS=1`.
 
-La comunicación con Anthropic usa HTTPS. Los archivos enviados a Claude son procesados por
-Anthropic; si los datos no pueden salir de la máquina, hay que desactivar el modo IA y usar
-únicamente extracción local. Para un servidor compartido por varias personas, usar el acceso por
+La IA externa está desactivada por defecto. Al establecer
+`PRICEBOT_ALLOW_EXTERNAL_AI=1`, los segmentos de PDF y las imágenes se envían a
+Anthropic mediante HTTPS. Hacelo únicamente con autorización formal para esos
+datos. Si los datos no pueden salir de la máquina, mantené el valor en `0` y usá
+extracción local. Para un servidor compartido por varias personas, usar el acceso por
 usuarios (`PRICEBOT_AUTH_REQUIRED=1`) y no colocar secretos en el frontend. `PRICEBOT_API_KEY`
 queda disponible como compatibilidad adicional para clientes internos, pero no reemplaza el login.
 
 ### Servidor accesible desde otras computadoras
 
-Por defecto `start.ps1` escucha únicamente en la propia PC. Para compartirlo dentro de una
-red local, iniciá PowerShell con:
+Por defecto `start.ps1` escucha únicamente en la propia PC y la API bloquea
+HTTP remoto. Para compartirlo en la red necesitás un certificado cuya SAN
+incluya la IP o el nombre usado por los clientes, y que esos clientes confíen
+en su autoridad emisora:
 
 ```powershell
 $env:PRICEBOT_BIND_HOST="0.0.0.0"
-$env:PRICEBOT_ALLOWED_ORIGINS="http://IP_DEL_SERVIDOR:3000"
+$env:PRICEBOT_TLS_CERTFILE="C:\ruta\pricebot-cert.pem"
+$env:PRICEBOT_TLS_KEYFILE="C:\ruta\pricebot-key.pem"
 .\start.ps1
 ```
 
-Reemplazá `IP_DEL_SERVIDOR` por la IP privada fija de la computadora servidora. En el firewall
-de Windows permití los puertos 3000 y 8000 solamente en el perfil **Privado** de la red, nunca
-en redes públicas. Para acceso fuera de la LAN, no abras esos puertos directamente: usá una VPN
-o un proxy HTTPS con autenticación.
+Configurá además `PRICEBOT_ALLOWED_ORIGINS` y `PRICEBOT_PUBLIC_URL` con la URL
+HTTPS final. En el firewall de Windows permití los puertos 3000 y 8000 solo en
+el perfil **Privado** y para la subred necesaria. `hardening.ps1` configura el
+rango `192.168.190.0/24`. Para acceso fuera de la LAN, usá una VPN o un proxy
+HTTPS con autenticación.
+
+Para un diagnóstico temporal sin documentos reales se puede establecer
+`PRICEBOT_REQUIRE_HTTPS=0`; no lo uses en operación ni con credenciales reales.
 
 Regla de extracción: todo código de producto válido detectado genera una fila, aunque no tenga
 precio. En ese caso `Precio` queda vacío y `estado_precio` toma el valor `a completar`; la fila
@@ -311,7 +381,7 @@ Archivo recibido
 Cada extracción genera una línea en `costs_log.jsonl`:
 
 ```json
-{"ts":"2026-08-19T10:30:00","file":"LCT.pdf","rows":1052,"method":"hybrid_pdf_dual","tokens_in":60788,"tokens_out":57706,"tokens_total":118494,"calls":46,"cost_display":1.048,"cost_real":0.28,"model":"claude-haiku-4-5"}
+{"ts":"2026-08-19T10:30:00","file":null,"file_type":".pdf","rows":1052,"method":"pdf_dual","tokens_in":0,"tokens_out":0,"tokens_total":0,"calls":0,"cost_display":0.0,"cost_real":0.0,"model":"claude-haiku-4-5"}
 ```
 
 Para ver el resumen de costos acumulados:
@@ -324,7 +394,7 @@ total = 0.0
 for line in Path("costs_log.jsonl").read_text().splitlines():
     r = json.loads(line)
     total += r["cost_display"]
-    print(f"{r['ts']}  {r['file']:<40}  rows={r['rows']:>5}  ${r['cost_display']:.4f}")
+    print(f"{r['ts']}  {r['file_type']:<8}  rows={r['rows']:>5}  ${r['cost_display']:.4f}")
 print(f"\nTotal acumulado: ${total:.4f}")
 ```
 
