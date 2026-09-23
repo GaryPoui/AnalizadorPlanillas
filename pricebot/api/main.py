@@ -47,8 +47,10 @@ logger = logging.getLogger("pricebot")
 
 # Load local env files for non-Docker runs.
 API_DIR = Path(__file__).resolve().parent
-load_dotenv(API_DIR / ".env", override=True)
-load_dotenv(API_DIR.parent / ".env", override=True)
+# Explicit process environment (for example, iniciar-servidor.bat or Docker)
+# must take precedence over local .env files.
+load_dotenv(API_DIR / ".env", override=False)
+load_dotenv(API_DIR.parent / ".env", override=False)
 
 ENABLE_API_DOCS = os.getenv("PRICEBOT_ENABLE_API_DOCS", "0") == "1"
 app = FastAPI(
