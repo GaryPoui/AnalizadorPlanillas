@@ -19,6 +19,7 @@ class AuthApiTests(unittest.TestCase):
         self.previous = {
             "USER_STORE": main.USER_STORE,
             "AUTH_REQUIRED": main.AUTH_REQUIRED,
+            "LOCAL_ADMIN_BYPASS": main.LOCAL_ADMIN_BYPASS,
             "SESSION_SECRET": main.SESSION_SECRET,
             "COOKIE_SECURE": main.COOKIE_SECURE,
             "API_ACCESS_KEY": main.API_ACCESS_KEY,
@@ -27,6 +28,7 @@ class AuthApiTests(unittest.TestCase):
         }
         main.USER_STORE = UserStore(Path(self.temp_directory.name) / "users.db")
         main.AUTH_REQUIRED = True
+        main.LOCAL_ADMIN_BYPASS = False
         main.SESSION_SECRET = "integration-test-session-secret"
         main.COOKIE_SECURE = False
         main.API_ACCESS_KEY = ""
@@ -156,6 +158,27 @@ class AuthApiTests(unittest.TestCase):
             client=("192.168.190.112", 50000),
         ) as remote_client:
             response = remote_client.get("/auth/me")
+            self.assertEqual(response.status_code, 401)
+
+    def test_configured_local_admin_bypass_works_with_active_users(self):
+        main.LOCAL_ADMIN_BYPASS = True
+        with TestClient(
+            main.app, base_url="http://127.0.0.1", client=("127.0.0.1", 50000)
+        ) as client:
+            me = client.get("/auth/me")
+            self.assertEqual(me.status_code, 200)
+            self.assertEqual(me.json()["username"], "Administrador local")
+            users = client.get("/admin/users")
+            self.assertEqual(users.status_code, 200)
+
+    def test_local_admin_bypass_does_not_apply_to_remote_clients(self):
+        main.LOCAL_ADMIN_BYPASS = True
+        with TestClient(
+            main.app,
+            base_url="http://192.168.190.146",
+            client=("192.168.190.112", 50000),
+        ) as client:
+            response = client.get("/auth/me")
             self.assertEqual(response.status_code, 401)
 
     def test_public_host_through_loopback_proxy_is_not_local_admin(self):

@@ -126,6 +126,7 @@ def _parse_users(raw: str) -> dict[str, tuple[bytes, bytes]]:
 
 AUTH_USERS = _parse_users(os.getenv("PRICEBOT_USERS", ""))
 AUTH_REQUIRED = os.getenv("PRICEBOT_AUTH_REQUIRED", "1") == "1"
+LOCAL_ADMIN_BYPASS = os.getenv("PRICEBOT_LOCAL_ADMIN_BYPASS", "0") == "1"
 
 _LOGIN_ATTEMPTS: dict[str, deque[float]] = defaultdict(deque)
 _LOGIN_ATTEMPTS_LOCK = threading.Lock()
@@ -262,15 +263,17 @@ async def require_api_access_key(request, call_next):
     public_paths = {"/auth/login", "/auth/confirm", "/health"}
     if request.method == "OPTIONS" or request.url.path in public_paths:
         return await call_next(request)
-    local_bootstrap = (
-        _is_local_request(request)
+    local_request = _is_local_request(request)
+    trusted_local_admin = local_request and LOCAL_ADMIN_BYPASS
+    initial_bootstrap = (
+        local_request
         and not _has_active_identities()
         and (
             request.url.path == "/auth/me"
             or request.url.path.startswith("/admin/users")
         )
     )
-    if local_bootstrap:
+    if trusted_local_admin or initial_bootstrap:
         return await call_next(request)
     if AUTH_REQUIRED:
         if not SESSION_SECRET:
@@ -397,12 +400,15 @@ async def confirm_email(payload: ConfirmEmailRequest):
 
 @app.get("/auth/me")
 async def current_user(request: Request):
-    local_bootstrap = _is_local_request(request) and not _has_active_identities()
-    if not AUTH_REQUIRED or local_bootstrap:
+    local_request = _is_local_request(request)
+    local_admin_access = local_request and (
+        LOCAL_ADMIN_BYPASS or not _has_active_identities()
+    )
+    if not AUTH_REQUIRED or local_admin_access:
         return {
             "authenticated": True,
-            "username": "Administrador local" if local_bootstrap else "local",
-            "local_admin": _is_local_request(request),
+            "username": "Administrador local" if local_admin_access else "local",
+            "local_admin": local_request,
         }
     username = _session_username(request.cookies.get(SESSION_COOKIE, ""))
     if not username:
