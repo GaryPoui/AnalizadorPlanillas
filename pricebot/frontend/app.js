@@ -333,7 +333,7 @@ fileInput.addEventListener('change', () => {
 });
 
 function addFiles(newFiles) {
-  const allowed = ['pdf','xls','xlsx','xlsm','csv','jpg','jpeg','png','webp'];
+  const allowed = ['pdf','xls','xlsx','xlsm','docx','csv','jpg','jpeg','png','webp'];
   newFiles.forEach(f => {
     const ext = f.name.split('.').pop().toLowerCase();
     if (!allowed.includes(ext)) {
@@ -444,7 +444,7 @@ async function startExtraction() {
   const btn = document.getElementById('btnExtract');
 
   btn.disabled = true;
-  btn.textContent = '⏳ Procesando...';
+  btn.textContent = 'Procesando...';
   document.getElementById('progressSection').classList.add('visible');
   document.getElementById('progressLog').innerHTML = '';
 
@@ -539,7 +539,7 @@ async function startExtraction() {
   }
 
   btn.disabled = false;
-  btn.textContent = '🤖 Extraer con IA';
+  btn.textContent = 'Procesar archivos';
 }
 
 // ─── RENDER RESULTS ──────────────────────────

@@ -1,6 +1,7 @@
 import sys
 import tempfile
 import unittest
+from io import BytesIO
 from pathlib import Path
 
 
@@ -9,6 +10,8 @@ API_DIR = ROOT / "pricebot" / "api"
 sys.path.insert(0, str(API_DIR))
 
 from fastapi.testclient import TestClient  # noqa: E402
+from openpyxl import load_workbook  # noqa: E402
+from docx import Document as DocxDocument  # noqa: E402
 import main  # noqa: E402
 from user_auth import UserStore  # noqa: E402
 
@@ -25,6 +28,8 @@ class AuthApiTests(unittest.TestCase):
             "API_ACCESS_KEY": main.API_ACCESS_KEY,
             "REQUIRE_HTTPS": main.REQUIRE_HTTPS,
             "LOGIN_MAX_ATTEMPTS": main.LOGIN_MAX_ATTEMPTS,
+            "COST_LOG_PATH": main.COST_LOG_PATH,
+            "_AI_MONTHLY_BUDGET_USD": main._AI_MONTHLY_BUDGET_USD,
         }
         main.USER_STORE = UserStore(Path(self.temp_directory.name) / "users.db")
         main.AUTH_REQUIRED = True
@@ -34,6 +39,8 @@ class AuthApiTests(unittest.TestCase):
         main.API_ACCESS_KEY = ""
         main.REQUIRE_HTTPS = False
         main.LOGIN_MAX_ATTEMPTS = 5
+        main.COST_LOG_PATH = Path(self.temp_directory.name) / "costs.jsonl"
+        main._AI_MONTHLY_BUDGET_USD = 0
         main._LOGIN_ATTEMPTS.clear()
 
         email, token = main.USER_STORE.create_pending_user(
@@ -91,6 +98,66 @@ class AuthApiTests(unittest.TestCase):
         with TestClient(main.app) as client:
             response = client.post("/extract")
             self.assertEqual(response.status_code, 401)
+
+    def test_authenticated_csv_extraction_and_xlsx_download(self):
+        with TestClient(
+            main.app, base_url="http://127.0.0.1", client=("127.0.0.1", 50000)
+        ) as client:
+            login = client.post(
+                "/auth/login",
+                json={"username": self.email, "password": "una-clave-segura"},
+            )
+            self.assertEqual(login.status_code, 200)
+
+            response = client.post(
+                "/extract/download?format=xlsx",
+                files={
+                    "file": (
+                        "smoke.csv",
+                        b"codigo,descripcion,precio\nA100,Producto de prueba,125.50\n",
+                        "text/csv",
+                    )
+                },
+            )
+
+        self.assertEqual(response.status_code, 200, response.text)
+        self.assertIn(
+            "spreadsheetml.sheet", response.headers.get("content-type", "")
+        )
+        workbook = load_workbook(BytesIO(response.content), read_only=True)
+        sheet = workbook.active
+        self.assertEqual(sheet["A2"].value, "Cód. Artículo")
+        self.assertEqual(sheet["A3"].value, "A100")
+        self.assertEqual(sheet["I3"].value, "125.5")
+        workbook.close()
+
+    def test_authenticated_docx_upload_is_accepted(self):
+        document = DocxDocument()
+        table = document.add_table(rows=2, cols=3)
+        for cell, value in zip(table.rows[0].cells, ("Código", "Descripción", "Precio")):
+            cell.text = value
+        for cell, value in zip(
+            table.rows[1].cells, ("A100", "Producto de prueba", "125.50")
+        ):
+            cell.text = value
+        payload = BytesIO()
+        document.save(payload)
+
+        with TestClient(
+            main.app, base_url="http://127.0.0.1", client=("127.0.0.1", 50000)
+        ) as client:
+            login = client.post(
+                "/auth/login",
+                json={"username": self.email, "password": "una-clave-segura"},
+            )
+            self.assertEqual(login.status_code, 200)
+            response = client.post(
+                "/extract",
+                files={"file": ("smoke.docx", payload.getvalue(), "application/vnd.openxmlformats-officedocument.wordprocessingml.document")},
+            )
+
+        self.assertEqual(response.status_code, 200, response.text)
+        self.assertEqual(response.json()["metadata"]["type"], ".docx")
 
     def test_session_cookie_is_http_only_and_same_site(self):
         with TestClient(main.app) as client:

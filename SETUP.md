@@ -103,12 +103,11 @@ HYBRID_XLS_CHUNK_CHARS=25000
 CLAUDE_TIMEOUT_SEC=90                       # timeout estricto por página/chunk
 HYBRID_CONCURRENCY=3                        # páginas/chunks simultáneos
 HYBRID_TOTAL_TIMEOUT_SEC=120                # límite total del complemento por archivo
-HYBRID_TOTAL_TIMEOUT_SEC=120                # límite total; conserva filas locales si vence
 PDF_USE_MARKITDOWN=0                        # 1 solo si se necesita ese conversor; pdfplumber es default
 
 # Acceso privado (recomendado si el servidor es accesible desde otras PCs)
 PRICEBOT_AUTH_REQUIRED=1
-PRICEBOT_SESSION_SECRET=generar-una-clave-aleatoria-larga
+PRICEBOT_SESSION_SECRET=pegar-secreto-aleatorio-generado-en-el-servidor
 PRICEBOT_COOKIE_SECURE=1                    # 1 si se usa HTTPS; 0 solo para HTTP local
 PRICEBOT_LOGIN_MAX_ATTEMPTS=5
 PRICEBOT_LOGIN_WINDOW_SEC=900
@@ -144,7 +143,22 @@ separá los registros con comas. Generá también un valor aleatorio largo para
 `PRICEBOT_SESSION_SECRET`; nunca lo publiques en Git ni lo pongas en el
 frontend.
 
-La aplicación rechaza la extracción, las descargas y la documentación API si
+Generá la clave de sesión en la PC servidor y copiá el resultado directamente a
+`PRICEBOT_SESSION_SECRET` en `pricebot/.env`. No pegar el secreto en este
+documento, correo ni chat:
+
+```powershell
+$bytes = New-Object byte[] 48
+$rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+$rng.GetBytes($bytes)
+[Convert]::ToBase64String($bytes)
+$rng.Dispose()
+```
+
+El valor es obligatorio para sesiones remotas. Guardar `.env` como UTF-8 sin BOM
+y reiniciar el servidor después de cambiarlo.
+
+La aplicación rechaza la extracción y las descargas si
 no existe una sesión válida. El endpoint `/health` queda disponible para
 monitoreo. Además, en el router/firewall del servidor permití únicamente los
 puertos necesarios y no expongas directamente el puerto 8000 a Internet;
@@ -167,14 +181,46 @@ PRICEBOT_REQUIRE_HTTPS=1
 PRICEBOT_PUBLIC_URL=https://192.168.190.146:3000
 PRICEBOT_CONFIRMATION_TTL_SEC=86400
 
-PRICEBOT_SMTP_HOST=smtp.proveedor.com
+PRICEBOT_SMTP_HOST=smtp.gmail.com
 PRICEBOT_SMTP_PORT=587
-PRICEBOT_SMTP_USERNAME=cuenta@empresa.com
-PRICEBOT_SMTP_PASSWORD=clave-o-password-de-aplicacion
-PRICEBOT_SMTP_FROM=cuenta@empresa.com
+PRICEBOT_SMTP_USERNAME=compras@dynamicenergy.com.ar
+PRICEBOT_SMTP_PASSWORD=PASSWORD_DE_APLICACION_DE_GOOGLE_SIN_ESPACIOS
+PRICEBOT_SMTP_FROM=compras@dynamicenergy.com.ar
 PRICEBOT_SMTP_STARTTLS=1
 PRICEBOT_SMTP_SSL=0
+PRICEBOT_ALERT_EMAIL=compras@dynamicenergy.com.ar
+PRICEBOT_AI_MONTHLY_BUDGET_USD=0
+PRICEBOT_AI_BUDGET_ALERT_PERCENT=80
 ```
+
+### Gmail, alertas y carga de créditos
+
+Las confirmaciones y alertas se envían usando `compras@dynamicenergy.com.ar`.
+Activar la verificación en dos pasos y crear una contraseña de aplicación desde
+[Seguridad de la cuenta Google](https://myaccount.google.com/security). Pegarla
+en `PRICEBOT_SMTP_PASSWORD` sin espacios. No usar la contraseña normal de Gmail.
+Si Workspace no ofrece contraseñas de aplicación, pedir a TI un relay SMTP autorizado.
+
+Editar `pricebot/.env` en la PC servidor, guardar como UTF-8 sin BOM y reiniciar
+PriceBot. No incluir ese archivo en Git ni enviarlo por correo. Definir
+`PRICEBOT_AI_MONTHLY_BUDGET_USD` con el presupuesto mensual estimado aprobado en
+USD; `0` desactiva solo el aviso de umbral. Al llegar a
+`PRICEBOT_AI_BUDGET_ALERT_PERCENT` se envía un aviso mensual. Si Anthropic rechaza
+una solicitud por saldo insuficiente/agotado, se envía un aviso inmediato, como
+máximo cada seis horas mientras continúe el error.
+
+El umbral se calcula con costos estimados a partir de tokens registrados: no
+consulta el saldo prepago real ni detiene el gasto. Revisar saldo, comprar
+créditos y configurar una eventual recarga automática autorizada en
+[Billing de Claude](https://platform.claude.com/settings/billing); revisar uso en
+[Usage](https://platform.claude.com/usage). Esta integración no consulta saldo.
+La clave API se administra en [API keys](https://platform.claude.com/settings/keys):
+comprar créditos no cambia la clave y rotarla no agrega créditos. Activar
+`PRICEBOT_ALLOW_EXTERNAL_AI=1` solo con autorización para enviar documentos a Anthropic.
+
+Para probar el correo, crear un usuario temporal en **Usuarios**, comprobar la
+invitación y eliminar el usuario. La alerta de umbral tiene pruebas automatizadas;
+probarla en operación exige cruzar el presupuesto mediante consumo real.
 
 Abrí la aplicación desde localhost en el servidor. Si todavía no existe ningún
 usuario activo, se habilita automáticamente un modo de alta inicial que solo
@@ -232,7 +278,8 @@ queda disponible como compatibilidad adicional para clientes internos, pero no r
 ### Servidor accesible desde otras computadoras
 
 Por defecto `start.ps1` escucha únicamente en la propia PC y la API bloquea
-HTTP remoto. Para compartirlo en la red necesitás un certificado cuya SAN
+HTTP remoto. `iniciar-servidor.bat` también exige HTTPS remoto; sin certificado
+TLS configurado, solo funciona localhost. Para compartirlo en la red necesitás un certificado cuya SAN
 incluya la IP o el nombre usado por los clientes, y que esos clientes confíen
 en su autoridad emisora:
 
@@ -240,11 +287,14 @@ en su autoridad emisora:
 $env:PRICEBOT_BIND_HOST="0.0.0.0"
 $env:PRICEBOT_TLS_CERTFILE="C:\ruta\pricebot-cert.pem"
 $env:PRICEBOT_TLS_KEYFILE="C:\ruta\pricebot-key.pem"
-.\start.ps1
+.\iniciar-servidor.bat
 ```
 
 Configurá además `PRICEBOT_ALLOWED_ORIGINS` y `PRICEBOT_PUBLIC_URL` con la URL
-HTTPS final. En el firewall de Windows permití los puertos 3000 y 8000 solo en
+HTTPS final. Mantené la clave privada del certificado fuera del repositorio.
+El mismo certificado se configura en el frontend y la API; su SAN debe contener
+el nombre/IP usado por clientes y su autoridad debe ser confiable en sus PCs.
+En el firewall de Windows permití los puertos 3000 y 8000 solo en
 el perfil **Privado** y para la subred necesaria. `hardening.ps1` configura el
 rango `192.168.190.0/24`. Para acceso fuera de la LAN, usá una VPN o un proxy
 HTTPS con autenticación.

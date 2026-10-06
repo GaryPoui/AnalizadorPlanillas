@@ -11,6 +11,7 @@ sys.path.insert(0, str(API_DIR))
 from user_auth import (  # noqa: E402
     UserStore,
     build_confirmation_url,
+    send_admin_notification_email,
     send_confirmation_email,
 )
 
@@ -138,6 +139,30 @@ class UserAuthTests(unittest.TestCase):
         smtp.starttls.assert_called_once()
         smtp.login.assert_called_once_with("pricebot@empresa.com", "app-password")
         smtp.send_message.assert_called_once()
+
+    @patch("user_auth.smtplib.SMTP")
+    def test_admin_alert_email_uses_starttls_and_configured_recipient(self, smtp_class):
+        smtp = smtp_class.return_value.__enter__.return_value
+        send_admin_notification_email(
+            recipient="compras@dynamicenergy.com.ar",
+            subject="PriceBot: alerta de prueba",
+            body="Contenido de prueba",
+            smtp_host="smtp.gmail.com",
+            smtp_port=587,
+            smtp_username="compras@dynamicenergy.com.ar",
+            smtp_password="app-password",
+            smtp_from="compras@dynamicenergy.com.ar",
+            smtp_starttls=True,
+            smtp_ssl=False,
+        )
+
+        smtp_class.assert_called_once_with("smtp.gmail.com", 587, timeout=20)
+        smtp.starttls.assert_called_once()
+        smtp.login.assert_called_once_with(
+            "compras@dynamicenergy.com.ar", "app-password"
+        )
+        sent_message = smtp.send_message.call_args.args[0]
+        self.assertEqual(sent_message["To"], "compras@dynamicenergy.com.ar")
 
 
 if __name__ == "__main__":

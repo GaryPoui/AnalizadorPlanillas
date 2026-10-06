@@ -39,9 +39,19 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
 try:
-    from .user_auth import UserStore, build_confirmation_url, send_confirmation_email
+    from .user_auth import (
+        UserStore,
+        build_confirmation_url,
+        send_admin_notification_email,
+        send_confirmation_email,
+    )
 except ImportError:  # Uvicorn/Passenger loads main.py as a top-level module.
-    from user_auth import UserStore, build_confirmation_url, send_confirmation_email
+    from user_auth import (
+        UserStore,
+        build_confirmation_url,
+        send_admin_notification_email,
+        send_confirmation_email,
+    )
 
 logger = logging.getLogger("pricebot")
 
@@ -81,6 +91,9 @@ SMTP_PASSWORD = os.getenv("PRICEBOT_SMTP_PASSWORD", "")
 SMTP_FROM = os.getenv("PRICEBOT_SMTP_FROM", SMTP_USERNAME).strip()
 SMTP_STARTTLS = os.getenv("PRICEBOT_SMTP_STARTTLS", "1") == "1"
 SMTP_SSL = os.getenv("PRICEBOT_SMTP_SSL", "0") == "1"
+ALERT_EMAIL = os.getenv(
+    "PRICEBOT_ALERT_EMAIL", "compras@dynamicenergy.com.ar"
+).strip()
 LOGIN_MAX_ATTEMPTS = max(int(os.getenv("PRICEBOT_LOGIN_MAX_ATTEMPTS", "5")), 1)
 LOGIN_WINDOW_SEC = max(int(os.getenv("PRICEBOT_LOGIN_WINDOW_SEC", "900")), 60)
 MAX_UPLOAD_BYTES = max(int(os.getenv("PRICEBOT_MAX_UPLOAD_MB", "50")), 1) * 1024 * 1024
@@ -450,7 +463,12 @@ async def logout(response: Response):
 @app.get("/admin/users")
 async def list_managed_users(request: Request):
     _require_local_admin(request)
-    return {"users": USER_STORE.list_users(), "smtp_configured": bool(SMTP_HOST and SMTP_FROM)}
+    return {
+        "users": USER_STORE.list_users(),
+        "smtp_configured": bool(
+            SMTP_HOST and SMTP_FROM and SMTP_USERNAME and SMTP_PASSWORD
+        ),
+    }
 
 
 @app.post("/admin/users")
@@ -550,7 +568,7 @@ CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-5")
 MARKITDOWN = MarkItDown()
 
 ALLOWED_UPLOAD_EXTENSIONS = {
-    ".pdf", ".xls", ".xlsx", ".xlsm", ".csv", ".jpg", ".jpeg", ".png", ".webp"
+    ".pdf", ".xls", ".xlsx", ".xlsm", ".docx", ".csv", ".jpg", ".jpeg", ".png", ".webp"
 }
 
 
@@ -616,8 +634,13 @@ def _validate_archive_safety(file_bytes: bytes, extension: str) -> None:
                 if entry.file_size > 10 * 1024 * 1024 and ratio > 200:
                     raise HTTPException(status_code=400, detail="Archivo comprimido sospechoso")
             names = {entry.filename.replace("\\", "/") for entry in entries}
-            if "[Content_Types].xml" not in names or "xl/workbook.xml" not in names:
-                raise HTTPException(status_code=400, detail="El archivo no es un libro de Excel válido")
+            required_entries = (
+                {"[Content_Types].xml", "word/document.xml"}
+                if extension == ".docx"
+                else {"[Content_Types].xml", "xl/workbook.xml"}
+            )
+            if not required_entries.issubset(names):
+                raise HTTPException(status_code=400, detail="El archivo Office no tiene una estructura válida")
             if extension == ".xlsx" and any(
                 name.lower().endswith("vbaproject.bin") for name in names
             ):
@@ -641,6 +664,7 @@ def _validate_upload(filename: str, file_bytes: bytes) -> str:
         ".xls": file_bytes.startswith(b"\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1"),
         ".xlsx": file_bytes.startswith(b"PK\x03\x04"),
         ".xlsm": file_bytes.startswith(b"PK\x03\x04"),
+        ".docx": file_bytes.startswith(b"PK\x03\x04"),
         ".jpg": file_bytes.startswith(b"\xFF\xD8\xFF"),
         ".jpeg": file_bytes.startswith(b"\xFF\xD8\xFF"),
         ".png": file_bytes.startswith(b"\x89PNG\r\n\x1a\n"),
@@ -648,7 +672,7 @@ def _validate_upload(filename: str, file_bytes: bytes) -> str:
     }
     if ext in signatures and not signatures[ext]:
         raise HTTPException(status_code=400, detail="El contenido no coincide con la extensión del archivo")
-    if ext in {".xlsx", ".xlsm"}:
+    if ext in {".xlsx", ".xlsm", ".docx"}:
         _validate_archive_safety(file_bytes, ext)
     elif ext == ".csv":
         if b"\x00" in file_bytes:
@@ -766,6 +790,10 @@ async def claude_chat(messages: list, system: str = "", max_tokens: int = 8000) 
             resp.raise_for_status()
         except httpx.HTTPStatusError as e:
             detail = e.response.text[:600] if e.response is not None else str(e)
+            if e.response is not None and _is_credit_exhaustion_error(
+                e.response.status_code, detail
+            ):
+                await _notify_credit_exhausted()
             raise HTTPException(
                 status_code=502,
                 detail=f"Anthropic API error ({e.response.status_code}): {detail}",
@@ -834,6 +862,129 @@ def _append_cost_log(filename: str, usage: dict, rows: int, method: str) -> None
         pass  # never break the main flow due to logging errors
 
 
+def _read_alert_state() -> dict:
+    try:
+        value = json.loads(_ALERT_STATE_PATH.read_text(encoding="utf-8"))
+        return value if isinstance(value, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def _write_alert_state(state: dict) -> None:
+    _ALERT_STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    temporary_path = _ALERT_STATE_PATH.with_suffix(_ALERT_STATE_PATH.suffix + ".tmp")
+    temporary_path.write_text(json.dumps(state), encoding="utf-8")
+    os.replace(temporary_path, _ALERT_STATE_PATH)
+
+
+def _send_admin_alert_once(
+    alert_key: str, subject: str, body: str, cooldown_seconds: int | None = None
+) -> bool:
+    if not SMTP_HOST or not SMTP_FROM or not ALERT_EMAIL:
+        logger.warning("Admin email alert skipped: SMTP or recipient is not configured")
+        return False
+
+    with _ALERT_LOCK:
+        state = _read_alert_state()
+        previous = state.get(alert_key)
+        now = int(time.time())
+        if previous is not None:
+            try:
+                previous_time = int(previous)
+            except (TypeError, ValueError):
+                previous_time = now
+            if cooldown_seconds is None or now - previous_time < cooldown_seconds:
+                return False
+
+        send_admin_notification_email(
+            recipient=ALERT_EMAIL,
+            subject=subject,
+            body=body,
+            smtp_host=SMTP_HOST,
+            smtp_port=SMTP_PORT,
+            smtp_username=SMTP_USERNAME,
+            smtp_password=SMTP_PASSWORD,
+            smtp_from=SMTP_FROM,
+            smtp_starttls=SMTP_STARTTLS,
+            smtp_ssl=SMTP_SSL,
+        )
+        state[alert_key] = now
+        _write_alert_state(state)
+        return True
+
+
+def _monthly_ai_spend(period: str) -> float:
+    total = 0.0
+    try:
+        with COST_LOG_PATH.open("r", encoding="utf-8") as log_file:
+            for line in log_file:
+                try:
+                    record = json.loads(line)
+                    if str(record.get("ts", "")).startswith(period):
+                        total += max(float(record.get("cost_real", 0)), 0.0)
+                except (TypeError, ValueError, json.JSONDecodeError):
+                    continue
+    except OSError:
+        pass
+    return total
+
+
+async def _maybe_send_budget_alert() -> None:
+    if _AI_MONTHLY_BUDGET_USD <= 0:
+        return
+    period = datetime.now().strftime("%Y-%m")
+    spend = _monthly_ai_spend(period)
+    threshold = _AI_MONTHLY_BUDGET_USD * _AI_BUDGET_ALERT_PERCENT / 100
+    if spend < threshold:
+        return
+
+    subject = "PriceBot: presupuesto mensual de IA próximo al límite"
+    body = (
+        f"El gasto estimado de IA de PriceBot para {period} alcanzó "
+        f"USD {spend:.2f}, el {_AI_BUDGET_ALERT_PERCENT:g}% del presupuesto "
+        f"configurado de USD {_AI_MONTHLY_BUDGET_USD:.2f}.\n\n"
+        "La estimación usa los tokens registrados por la aplicación y no representa "
+        "el saldo prepago real de Anthropic. Revisá Usage y Billing en Claude Platform."
+    )
+    try:
+        await asyncio.to_thread(
+            _send_admin_alert_once,
+            f"budget:{period}",
+            subject,
+            body,
+        )
+    except Exception:
+        logger.exception("Could not send the PriceBot AI budget alert")
+
+
+def _is_credit_exhaustion_error(status_code: int, response_text: str) -> bool:
+    if status_code == 402:
+        return True
+    return status_code == 400 and bool(
+        re.search(
+            r"credit balance|insufficient credits|billing_error|out of credits",
+            response_text,
+            re.IGNORECASE,
+        )
+    )
+
+
+async def _notify_credit_exhausted() -> None:
+    try:
+        await asyncio.to_thread(
+            _send_admin_alert_once,
+            "credit_exhausted",
+            "PriceBot: Anthropic informa saldo de créditos agotado",
+            "Una solicitud de PriceBot fue rechazada porque Anthropic informó que "
+            "el saldo de créditos está agotado o es insuficiente. Revisá Billing en "
+            "Claude Platform y agregá créditos o verificá el medio de pago. "
+            "La extracción que originó este aviso no pudo completarse con IA.",
+            _CREDIT_ALERT_COOLDOWN_SEC,
+        )
+    except Exception:
+        logger.exception("Could not send the PriceBot credit exhaustion alert")
+
+
 HISTORY_DIR = Path(os.getenv("HISTORY_DIR", str(Path(__file__).resolve().parent.parent.parent / "Respuestas" / "history")))
 SAVE_HISTORY = os.getenv("SAVE_HISTORY", "0") == "1"
 
@@ -876,6 +1027,20 @@ _DISPLAY_OUTPUT_RATE = float(os.getenv("OUTPUT_RATE_PER_M", "15.0"))
 _REAL_INPUT_RATE     = float(os.getenv("REAL_INPUT_RATE_PER_M",  "0.80"))
 _REAL_OUTPUT_RATE    = float(os.getenv("REAL_OUTPUT_RATE_PER_M",  "4.0"))
 COST_LOG_PATH = Path(os.getenv("COST_LOG_PATH", str(Path(__file__).parent.parent.parent / "costs_log.jsonl")))
+_AI_MONTHLY_BUDGET_USD = max(
+    float(os.getenv("PRICEBOT_AI_MONTHLY_BUDGET_USD", "0")), 0.0
+)
+_AI_BUDGET_ALERT_PERCENT = min(
+    max(float(os.getenv("PRICEBOT_AI_BUDGET_ALERT_PERCENT", "80")), 1.0), 100.0
+)
+_ALERT_STATE_PATH = Path(
+    os.getenv(
+        "PRICEBOT_ALERT_STATE_PATH",
+        str(COST_LOG_PATH.with_name("pricebot_alert_state.json")),
+    )
+)
+_ALERT_LOCK = threading.Lock()
+_CREDIT_ALERT_COOLDOWN_SEC = 6 * 60 * 60
 
 # Per-request token accumulator (context-var so concurrent requests don't mix)
 _request_usage: contextvars.ContextVar[dict | None] = contextvars.ContextVar("request_usage", default=None)
@@ -2070,7 +2235,7 @@ async def agent_extractor(file_bytes: bytes, filename: str, file_type: str) -> d
             structured_rows.extend(normalize_df_to_records(df))
             raw_text = df.to_csv(index=False, sep=",")
 
-        elif ext in [".docx", ".doc"]:
+        elif ext == ".docx":
             doc = DocxDocument(io.BytesIO(file_bytes))
             parts = []
             # Extract paragraphs
@@ -3406,6 +3571,7 @@ async def orchestrator(
     if usage_tracker.get("calls", 0):
         final_method = "hybrid_" + final_method
     _append_cost_log(filename, usage_tracker, len(result["rows"]), final_method)
+    await _maybe_send_budget_alert()
 
     cost_info = {
         "tokens_in":    usage_tracker["input"],

@@ -72,7 +72,7 @@
 
         <div class="dropzone" id="dropzone">
           <input type="file" id="fileInput" multiple
-            accept=".pdf,.xls,.xlsx,.xlsm,.csv,.doc,.docx,.jpg,.jpeg,.png,.webp">
+            accept=".pdf,.xls,.xlsx,.xlsm,.csv,.docx,.jpg,.jpeg,.png,.webp">
           <div class="dropzone-content">
             <span class="dropzone-icon">
               <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -80,7 +80,7 @@
               </svg>
             </span>
             <h3>Arrastrá archivos aquí o hacé clic</h3>
-            <p>PDF, Word, XLS, XLSX, CSV, JPG, PNG — máx. 50MB por archivo</p>
+            <p>PDF, XLS, XLSX, XLSM, DOCX, CSV, JPG/JPEG, PNG, WEBP — máximo 50 MB por archivo</p>
           </div>
         </div>
 
@@ -95,11 +95,11 @@
           <div class="form-group">
             <label>Formatos soportados</label>
             <div class="format-chips">
-              <span class="format-chip" title="Extracción directa + IA mapping">📊 XLSX/XLS</span>
-              <span class="format-chip" title="Parsing directo + IA mapping">📋 CSV</span>
-              <span class="format-chip" title="Extracción de tablas + IA">📄 PDF</span>
-              <span class="format-chip" title="Extracción de texto + IA">📝 Word</span>
-              <span class="format-chip" title="OCR + Vision AI">🖼️ JPG/PNG</span>
+              <span class="format-chip" title="Lectura estructurada local">📊 XLSX/XLS</span>
+              <span class="format-chip" title="Lectura estructurada local">📋 CSV</span>
+              <span class="format-chip" title="Extracción local; Claude opcional">📄 PDF</span>
+              <span class="format-chip" title="Extracción de texto y tablas">📝 DOCX</span>
+              <span class="format-chip" title="La imagen se envía a Claude Vision si está habilitado">🖼️ JPG/PNG</span>
             </div>
           </div>
         </div>
@@ -110,22 +110,22 @@
           <div class="info-grid">
             <div class="info-item">
               <span class="info-format">CSV / XLSX / XLS</span>
-              <span class="info-method">Lectura estructurada → Claude AI mapea columnas al template</span>
-              <span class="info-badge direct">Directo + IA</span>
+              <span class="info-method">Lectura estructurada y mapeo local de columnas</span>
+              <span class="info-badge direct">Local</span>
             </div>
             <div class="info-item">
               <span class="info-format">PDF con texto</span>
-              <span class="info-method">Extracción de tablas/texto → Claude AI interpreta y mapea</span>
-              <span class="info-badge ai">IA completa</span>
+              <span class="info-method">Extracción de texto y tablas; Claude puede complementar si está habilitado</span>
+              <span class="info-badge ai">Local + IA opcional</span>
             </div>
             <div class="info-item">
-              <span class="info-format">Word (DOC/DOCX)</span>
-              <span class="info-method">Extracción de texto y tablas → Claude AI interpreta y mapea</span>
-              <span class="info-badge ai">IA completa</span>
+              <span class="info-format">Word DOCX</span>
+              <span class="info-method">Extracción de texto y tablas; IA solo si está habilitada</span>
+              <span class="info-badge direct">Texto + tablas</span>
             </div>
             <div class="info-item">
               <span class="info-format">Imágenes / PDF escaneado</span>
-              <span class="info-method">Claude Vision analiza la imagen directamente</span>
+              <span class="info-method">La imagen se envía a Claude Vision si la IA externa está habilitada</span>
               <span class="info-badge vision">Vision AI</span>
             </div>
           </div>
@@ -133,7 +133,7 @@
 
         <div class="btn-row">
           <button class="btn btn-primary" id="btnExtract" disabled>
-            🤖 Extraer con IA
+            Procesar archivos
           </button>
           <button class="btn btn-secondary" id="btnDownload" disabled>
             ⬇️ Descargar XLS

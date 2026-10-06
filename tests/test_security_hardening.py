@@ -6,6 +6,7 @@ import zipfile
 from pathlib import Path
 
 from PIL import Image
+from docx import Document as DocxDocument
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -35,6 +36,17 @@ class SecurityHardeningTests(unittest.TestCase):
     def test_file_content_must_match_extension(self):
         with self.assertRaises(HTTPException) as raised:
             main._validate_upload("documento.pdf", b"not a pdf")
+        self.assertEqual(raised.exception.status_code, 400)
+
+    def test_docx_is_accepted_and_legacy_doc_is_not_advertised(self):
+        payload = io.BytesIO()
+        document = DocxDocument()
+        document.add_paragraph("Código Descripción Precio")
+        document.save(payload)
+
+        self.assertEqual(main._validate_upload("lista.docx", payload.getvalue()), ".docx")
+        with self.assertRaises(HTTPException) as raised:
+            main._validate_upload("lista.doc", payload.getvalue())
         self.assertEqual(raised.exception.status_code, 400)
 
     def test_office_zip_bomb_is_rejected(self):

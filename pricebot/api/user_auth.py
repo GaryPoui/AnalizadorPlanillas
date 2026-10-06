@@ -387,3 +387,40 @@ def send_confirmation_email(
         if smtp_username:
             server.login(smtp_username, smtp_password)
         server.send_message(message)
+
+
+def send_admin_notification_email(
+    *,
+    recipient: str,
+    subject: str,
+    body: str,
+    smtp_host: str,
+    smtp_port: int,
+    smtp_username: str,
+    smtp_password: str,
+    smtp_from: str,
+    smtp_starttls: bool,
+    smtp_ssl: bool,
+) -> None:
+    if not smtp_host or not smtp_from or not recipient:
+        raise RuntimeError("El envío de alertas por correo todavía no está configurado")
+
+    message = EmailMessage()
+    message["Subject"] = subject
+    message["From"] = smtp_from
+    message["To"] = recipient
+    message.set_content(body)
+
+    context = ssl.create_default_context()
+    if smtp_ssl:
+        server_context = smtplib.SMTP_SSL(
+            smtp_host, smtp_port, timeout=20, context=context
+        )
+    else:
+        server_context = smtplib.SMTP(smtp_host, smtp_port, timeout=20)
+    with server_context as server:
+        if not smtp_ssl and smtp_starttls:
+            server.starttls(context=context)
+        if smtp_username:
+            server.login(smtp_username, smtp_password)
+        server.send_message(message)
