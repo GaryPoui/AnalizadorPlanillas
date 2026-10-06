@@ -31,7 +31,7 @@ import pdfplumber
 import pytesseract
 from dotenv import load_dotenv
 from docx import Document as DocxDocument
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from markitdown import MarkItDown
 from fastapi import FastAPI, File, UploadFile, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -91,6 +91,7 @@ MAX_ARCHIVE_UNCOMPRESSED_BYTES = max(
 ) * 1024 * 1024
 MAX_ARCHIVE_ENTRIES = max(int(os.getenv("PRICEBOT_MAX_ARCHIVE_ENTRIES", "10000")), 100)
 MAX_PDF_PAGES = max(int(os.getenv("PRICEBOT_MAX_PDF_PAGES", "300")), 1)
+MAX_IMAGE_PIXELS = max(int(os.getenv("PRICEBOT_MAX_IMAGE_PIXELS", "40000000")), 1000000)
 ALLOW_EXTERNAL_AI = os.getenv("PRICEBOT_ALLOW_EXTERNAL_AI", "0") == "1"
 LOG_FILENAMES = os.getenv("PRICEBOT_LOG_FILENAMES", "0") == "1"
 
@@ -157,7 +158,8 @@ def _clear_failed_logins(key: str) -> None:
 
 def _session_token(username: str, expires_at: int | None = None) -> str:
     expires_at = expires_at or int(time.time()) + SESSION_TTL_SEC
-    payload = f"{username}.{expires_at}"
+    auth_version = _identity_auth_version(username)
+    payload = f"{username}.{auth_version}.{expires_at}"
     signature = hmac.new(
         SESSION_SECRET.encode("utf-8"), payload.encode("utf-8"), hashlib.sha256
     ).digest()
@@ -176,8 +178,10 @@ def _session_username(token: str) -> str | None:
         ).digest()
         if not hmac.compare_digest(expected, _decode_b64(encoded_signature)):
             return None
-        username, expires_at = payload.rsplit(".", 1)
+        username, auth_version, expires_at = payload.rsplit(".", 2)
         if int(expires_at) < int(time.time()) or not _identity_is_active(username):
+            return None
+        if int(auth_version) != _identity_auth_version(username):
             return None
         return username
     except (ValueError, TypeError, UnicodeError):
@@ -186,6 +190,12 @@ def _session_username(token: str) -> str | None:
 
 def _identity_is_active(identifier: str) -> bool:
     return identifier in AUTH_USERS or USER_STORE.is_active(identifier)
+
+
+def _identity_auth_version(identifier: str) -> int:
+    if identifier in AUTH_USERS:
+        return 0
+    return USER_STORE.auth_version(identifier) or 0
 
 
 def _has_active_identities() -> bool:
@@ -253,7 +263,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "X-PriceBot-Key"],
 )
 
@@ -341,8 +351,19 @@ class UserEmailRequest(BaseModel):
 
 
 class UserStatusRequest(BaseModel):
-    email: str
+    email: str = Field(min_length=3, max_length=254)
     enabled: bool
+
+
+class UpdateUserRequest(BaseModel):
+    email: str = Field(min_length=3, max_length=254)
+    new_email: Optional[str] = Field(default=None, min_length=3, max_length=254)
+    new_password: Optional[str] = Field(default=None, min_length=10, max_length=256)
+
+
+class DeleteUserRequest(BaseModel):
+    email: str = Field(min_length=3, max_length=254)
+    confirm_email: str = Field(min_length=3, max_length=254)
 
 
 @app.get("/health")
@@ -481,6 +502,49 @@ async def update_user_status(payload: UserStatusRequest, request: Request):
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     return {"updated": True, "email": payload.email.strip().lower(), "enabled": payload.enabled}
 
+
+@app.put("/admin/users")
+async def update_managed_user(payload: UpdateUserRequest, request: Request):
+    _require_local_admin(request)
+    try:
+        email, token = USER_STORE.update_user(
+            payload.email,
+            payload.new_email,
+            payload.new_password,
+            CONFIRMATION_TTL_SEC,
+        )
+        if token:
+            await _email_confirmation(email, token)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        logger.exception("Could not send updated account confirmation email")
+        raise HTTPException(
+            status_code=502,
+            detail=(
+                "El usuario fue actualizado, pero no se pudo enviar el correo. "
+                "Revisá SMTP y usá Reenviar."
+            ),
+        ) from exc
+    return {
+        "updated": True,
+        "email": email,
+        "confirmation_sent": bool(token),
+    }
+
+
+@app.delete("/admin/users")
+async def delete_managed_user(payload: DeleteUserRequest, request: Request):
+    _require_local_admin(request)
+    normalized_email = USER_STORE.normalize_email(payload.email)
+    if USER_STORE.normalize_email(payload.confirm_email) != normalized_email:
+        raise HTTPException(status_code=400, detail="La confirmación no coincide con el correo")
+    try:
+        USER_STORE.delete_user(normalized_email)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {"deleted": True, "email": normalized_email}
+
 # Anthropic (Claude) configuration
 CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-5")
 MARKITDOWN = MarkItDown()
@@ -520,7 +584,7 @@ async def _read_upload_limited(file: UploadFile, limit: int = MAX_UPLOAD_BYTES) 
     return b"".join(chunks)
 
 
-def _validate_archive_safety(file_bytes: bytes) -> None:
+def _validate_archive_safety(file_bytes: bytes, extension: str) -> None:
     try:
         with zipfile.ZipFile(io.BytesIO(file_bytes)) as archive:
             entries = archive.infolist()
@@ -530,12 +594,37 @@ def _validate_archive_safety(file_bytes: bytes) -> None:
             if total_uncompressed > MAX_ARCHIVE_UNCOMPRESSED_BYTES:
                 raise HTTPException(status_code=413, detail="El contenido descomprimido es demasiado grande")
             for entry in entries:
+                normalized_name = entry.filename.replace("\\", "/")
+                parts = [part for part in normalized_name.split("/") if part]
+                if (
+                    not normalized_name
+                    or normalized_name.startswith("/")
+                    or "\x00" in normalized_name
+                    or ".." in parts
+                    or (len(normalized_name) >= 2 and normalized_name[1] == ":")
+                ):
+                    raise HTTPException(status_code=400, detail="El archivo Office contiene rutas inválidas")
+                if entry.flag_bits & 0x1:
+                    raise HTTPException(status_code=400, detail="Los archivos Office cifrados no están permitidos")
+                unix_mode = (entry.external_attr >> 16) & 0xFFFF
+                if unix_mode and (unix_mode & 0o170000) == 0o120000:
+                    raise HTTPException(status_code=400, detail="El archivo Office contiene enlaces no permitidos")
                 if entry.compress_size == 0:
                     ratio = entry.file_size
                 else:
                     ratio = entry.file_size / entry.compress_size
                 if entry.file_size > 10 * 1024 * 1024 and ratio > 200:
                     raise HTTPException(status_code=400, detail="Archivo comprimido sospechoso")
+            names = {entry.filename.replace("\\", "/") for entry in entries}
+            if "[Content_Types].xml" not in names or "xl/workbook.xml" not in names:
+                raise HTTPException(status_code=400, detail="El archivo no es un libro de Excel válido")
+            if extension == ".xlsx" and any(
+                name.lower().endswith("vbaproject.bin") for name in names
+            ):
+                raise HTTPException(
+                    status_code=400,
+                    detail="El archivo XLSX contiene macros; usá XLSM si fueron autorizadas",
+                )
     except HTTPException:
         raise
     except (zipfile.BadZipFile, OSError) as exc:
@@ -560,7 +649,35 @@ def _validate_upload(filename: str, file_bytes: bytes) -> str:
     if ext in signatures and not signatures[ext]:
         raise HTTPException(status_code=400, detail="El contenido no coincide con la extensión del archivo")
     if ext in {".xlsx", ".xlsm"}:
-        _validate_archive_safety(file_bytes)
+        _validate_archive_safety(file_bytes, ext)
+    elif ext == ".csv":
+        if b"\x00" in file_bytes:
+            raise HTTPException(status_code=400, detail="El CSV contiene bytes nulos no permitidos")
+        decoded = None
+        for encoding in ("utf-8-sig", "cp1252"):
+            try:
+                decoded = file_bytes.decode(encoding)
+                break
+            except UnicodeDecodeError:
+                continue
+        if decoded is None or any(
+            ord(char) < 32 and char not in "\t\r\n" for char in decoded
+        ):
+            raise HTTPException(status_code=400, detail="El CSV contiene caracteres de control inválidos")
+    elif ext in {".jpg", ".jpeg", ".png", ".webp"}:
+        try:
+            with Image.open(io.BytesIO(file_bytes)) as image:
+                width, height = image.size
+                if width <= 0 or height <= 0 or width * height > MAX_IMAGE_PIXELS:
+                    raise HTTPException(
+                        status_code=413,
+                        detail=f"La imagen supera el máximo de {MAX_IMAGE_PIXELS:,} píxeles",
+                    )
+                image.verify()
+        except HTTPException:
+            raise
+        except (UnidentifiedImageError, OSError, ValueError) as exc:
+            raise HTTPException(status_code=400, detail="La imagen está dañada o no es válida") from exc
     return ext
 
 

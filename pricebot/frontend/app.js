@@ -186,6 +186,20 @@ function renderUsers(users) {
     toggle.addEventListener('click', () => setUserEnabled(user.email, !user.enabled));
     actions.appendChild(toggle);
 
+    const edit = document.createElement('button');
+    edit.type = 'button';
+    edit.className = 'btn btn-outline btn-small';
+    edit.textContent = 'Modificar';
+    edit.addEventListener('click', () => openEditUser(user.email));
+    actions.appendChild(edit);
+
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'btn btn-outline btn-small btn-danger';
+    remove.textContent = 'Eliminar';
+    remove.addEventListener('click', () => deleteUser(user.email));
+    actions.appendChild(remove);
+
     row.append(identity, actions);
     container.appendChild(row);
   });
@@ -229,11 +243,54 @@ async function setUserEnabled(email, enabled) {
   await runUserAction('/admin/users/status', {email, enabled}, enabled ? 'Usuario habilitado.' : 'Usuario deshabilitado.');
 }
 
-async function runUserAction(path, body, successText) {
+const editUserDialog = document.getElementById('editUserDialog');
+const editUserForm = document.getElementById('editUserForm');
+
+function openEditUser(email) {
+  document.getElementById('editOriginalEmail').value = email;
+  document.getElementById('editUserEmail').value = email;
+  document.getElementById('editUserPassword').value = '';
+  editUserDialog.showModal();
+}
+
+document.getElementById('cancelEditUser').addEventListener('click', () => editUserDialog.close());
+
+editUserForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  const originalEmail = document.getElementById('editOriginalEmail').value;
+  const newEmail = document.getElementById('editUserEmail').value.trim();
+  const newPassword = document.getElementById('editUserPassword').value;
+  const body = {
+    email: originalEmail,
+    new_email: newEmail === originalEmail ? null : newEmail,
+    new_password: newPassword || null,
+  };
+  const changed = await runUserAction(
+    '/admin/users',
+    body,
+    newEmail === originalEmail
+      ? 'Usuario actualizado. Las sesiones anteriores fueron cerradas.'
+      : 'Correo actualizado. Se envió una nueva confirmación.',
+    'PUT',
+  );
+  if (changed) editUserDialog.close();
+});
+
+async function deleteUser(email) {
+  if (!window.confirm(`¿Eliminar definitivamente el acceso de ${email}?`)) return;
+  await runUserAction(
+    '/admin/users',
+    {email, confirm_email: email},
+    `Usuario ${email} eliminado.`,
+    'DELETE',
+  );
+}
+
+async function runUserAction(path, body, successText, method = 'POST') {
   usersMessage.textContent = '';
   try {
     const resp = await fetch(`${API_URL}${path}`, {
-      method: 'POST',
+      method,
       headers: adminHeaders(),
       credentials: 'include',
       body: JSON.stringify(body),
@@ -242,11 +299,14 @@ async function runUserAction(path, body, successText) {
     if (!resp.ok) throw new Error(data.detail || 'No se pudo completar la operación');
     usersMessage.textContent = successText;
     usersMessage.className = 'users-message success';
+    await loadUsers();
+    return true;
   } catch (err) {
     usersMessage.textContent = err.message;
     usersMessage.className = 'users-message error';
+    await loadUsers();
+    return false;
   }
-  await loadUsers();
 }
 
 // ─── FILE HANDLING ───────────────────────────

@@ -59,10 +59,19 @@ class UserStore:
                     confirmation_token_hash TEXT,
                     token_expires_at INTEGER,
                     created_at INTEGER NOT NULL,
-                    confirmed_at INTEGER
+                    confirmed_at INTEGER,
+                    auth_version INTEGER NOT NULL DEFAULT 1
                 )
                 """
             )
+            columns = {
+                row["name"]
+                for row in connection.execute("PRAGMA table_info(users)").fetchall()
+            }
+            if "auth_version" not in columns:
+                connection.execute(
+                    "ALTER TABLE users ADD COLUMN auth_version INTEGER NOT NULL DEFAULT 1"
+                )
 
     @staticmethod
     def normalize_email(email: str) -> str:
@@ -108,7 +117,8 @@ class UserStore:
                     enabled = 1,
                     confirmation_token_hash = excluded.confirmation_token_hash,
                     token_expires_at = excluded.token_expires_at,
-                    confirmed_at = NULL
+                    confirmed_at = NULL,
+                    auth_version = users.auth_version + 1
                 """,
                 (email, salt, digest, token_hash, now + token_ttl_seconds, now),
             )
@@ -202,6 +212,14 @@ class UserStore:
             ).fetchone()
         return row is not None
 
+    def auth_version(self, email: str) -> int | None:
+        with self._connection() as connection:
+            row = connection.execute(
+                "SELECT auth_version FROM users WHERE email = ?",
+                (email.strip().lower(),),
+            ).fetchone()
+        return int(row["auth_version"]) if row else None
+
     def has_active_users(self) -> bool:
         with self._connection() as connection:
             row = connection.execute(
@@ -239,9 +257,79 @@ class UserStore:
         email = self.normalize_email(email)
         with self._connection() as connection:
             result = connection.execute(
-                "UPDATE users SET enabled = ? WHERE email = ?",
+                """
+                UPDATE users
+                SET enabled = ?, auth_version = auth_version + 1
+                WHERE email = ?
+                """,
                 (int(enabled), email),
             )
+            if result.rowcount != 1:
+                raise ValueError("El usuario no existe")
+
+    def update_user(
+        self,
+        email: str,
+        new_email: str | None,
+        new_password: str | None,
+        token_ttl_seconds: int,
+    ) -> tuple[str, str | None]:
+        email = self.normalize_email(email)
+        target_email = self.normalize_email(new_email) if new_email else email
+        if new_password is not None:
+            self.validate_password(new_password)
+        email_changed = target_email != email
+        if not email_changed and new_password is None:
+            raise ValueError("No se indicaron cambios para el usuario")
+
+        token = None
+        token_hash = None
+        token_expires_at = None
+        if email_changed:
+            token = secrets.token_urlsafe(32)
+            token_hash = hashlib.sha256(token.encode("utf-8")).hexdigest()
+            token_expires_at = int(time.time()) + token_ttl_seconds
+
+        with self._connection() as connection:
+            current = connection.execute(
+                "SELECT 1 FROM users WHERE email = ?", (email,)
+            ).fetchone()
+            if not current:
+                raise ValueError("El usuario no existe")
+            if email_changed:
+                duplicate = connection.execute(
+                    "SELECT 1 FROM users WHERE email = ?", (target_email,)
+                ).fetchone()
+                if duplicate:
+                    raise ValueError("El nuevo correo ya pertenece a otro usuario")
+
+            assignments = ["email = ?", "auth_version = auth_version + 1"]
+            values: list[object] = [target_email]
+            if new_password is not None:
+                salt = secrets.token_bytes(16)
+                assignments.extend(["password_salt = ?", "password_hash = ?"])
+                values.extend([salt, password_digest(new_password, salt)])
+            if email_changed:
+                assignments.extend(
+                    [
+                        "confirmed = 0",
+                        "confirmed_at = NULL",
+                        "confirmation_token_hash = ?",
+                        "token_expires_at = ?",
+                    ]
+                )
+                values.extend([token_hash, token_expires_at])
+            values.append(email)
+            connection.execute(
+                f"UPDATE users SET {', '.join(assignments)} WHERE email = ?",
+                values,
+            )
+        return target_email, token
+
+    def delete_user(self, email: str) -> None:
+        email = self.normalize_email(email)
+        with self._connection() as connection:
+            result = connection.execute("DELETE FROM users WHERE email = ?", (email,))
             if result.rowcount != 1:
                 raise ValueError("El usuario no existe")
 

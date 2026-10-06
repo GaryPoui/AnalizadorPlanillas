@@ -141,6 +141,50 @@ class AuthApiTests(unittest.TestCase):
             response = client.get("/admin/users")
             self.assertEqual(response.status_code, 403)
 
+    def test_local_admin_can_change_password_and_old_session_is_revoked(self):
+        with TestClient(
+            main.app, base_url="http://127.0.0.1", client=("127.0.0.1", 50000)
+        ) as client:
+            login = client.post(
+                "/auth/login",
+                json={"username": self.email, "password": "una-clave-segura"},
+            )
+            self.assertEqual(login.status_code, 200)
+            response = client.put(
+                "/admin/users",
+                json={
+                    "email": self.email,
+                    "new_email": None,
+                    "new_password": "otra-clave-segura",
+                },
+            )
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(client.get("/auth/me").status_code, 401)
+            relogin = client.post(
+                "/auth/login",
+                json={"username": self.email, "password": "otra-clave-segura"},
+            )
+            self.assertEqual(relogin.status_code, 200)
+
+    def test_local_admin_can_delete_user(self):
+        with TestClient(
+            main.app, base_url="http://127.0.0.1", client=("127.0.0.1", 50000)
+        ) as client:
+            login = client.post(
+                "/auth/login",
+                json={"username": self.email, "password": "una-clave-segura"},
+            )
+            self.assertEqual(login.status_code, 200)
+            response = client.request(
+                "DELETE",
+                "/admin/users",
+                json={"email": self.email, "confirm_email": self.email},
+            )
+            self.assertEqual(response.status_code, 200)
+            self.assertIsNone(
+                main.USER_STORE.authenticate(self.email, "una-clave-segura")
+            )
+
     def test_initial_bootstrap_is_available_only_from_loopback(self):
         main.USER_STORE = UserStore(
             Path(self.temp_directory.name) / "empty-users.db"

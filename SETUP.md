@@ -120,6 +120,7 @@ PRICEBOT_MAX_BATCH_FILES=10
 PRICEBOT_MAX_BATCH_MB=100
 PRICEBOT_MAX_ARCHIVE_UNCOMPRESSED_MB=200
 PRICEBOT_MAX_PDF_PAGES=300
+PRICEBOT_MAX_IMAGE_PIXELS=40000000        # límite de píxeles descomprimidos por imagen
 
 # Tracking de costos
 COST_LOG_PATH=costs_log.jsonl               # ruta del log (default: raíz del proyecto)
@@ -181,8 +182,10 @@ responde por loopback. Si ya existen usuarios, iniciá sesión primero. Abrí la
 pestaña **Usuarios** y cargá correo y contraseña inicial. La contraseña se
 guarda con `scrypt`, el token de confirmación se guarda como hash y vence a las
 24 horas por defecto. Hasta confirmar el enlace recibido, el usuario no puede
-iniciar sesión. Desde la misma pantalla se puede reenviar la confirmación o
-deshabilitar un acceso.
+iniciar sesión. Desde la misma pantalla se puede reenviar la confirmación,
+habilitar o deshabilitar el acceso, cambiar correo o contraseña y eliminar el
+usuario. Cambiar el correo exige una nueva confirmación. Cambiar la contraseña,
+deshabilitar o eliminar un usuario invalida sus sesiones anteriores.
 
 `PRICEBOT_PUBLIC_URL` debe apuntar a una dirección alcanzable por el receptor.
 Una IP privada funciona solo dentro de la misma LAN o VPN. Para acceso por
@@ -262,6 +265,10 @@ no se descarta ni se considera inválida por esa ausencia.
 | `GET`  | `/` | Health check |
 | `POST` | `/extract` | Extrae datos → JSON con rows + report + usage |
 | `POST` | `/extract/download` | Extrae datos → descarga XLSX |
+| `GET` | `/admin/users` | Lista usuarios desde la PC servidor |
+| `POST` | `/admin/users` | Crea usuario y envía confirmación |
+| `PUT` | `/admin/users` | Modifica correo o contraseña |
+| `DELETE` | `/admin/users` | Elimina definitivamente un usuario |
 
 ### Ejemplo con curl
 

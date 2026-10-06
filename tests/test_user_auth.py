@@ -53,6 +53,51 @@ class UserAuthTests(unittest.TestCase):
         self.assertTrue(self.store.is_active(email))
         self.assertTrue(self.store.has_active_users())
 
+    def test_update_password_revokes_prior_auth_version(self):
+        email, token = self.store.create_pending_user(
+            "persona@empresa.com", "una-clave-segura", 3600
+        )
+        self.store.confirm(token)
+        previous_version = self.store.auth_version(email)
+
+        updated_email, confirmation = self.store.update_user(
+            email, None, "otra-clave-segura", 3600
+        )
+
+        self.assertEqual(updated_email, email)
+        self.assertIsNone(confirmation)
+        self.assertGreater(self.store.auth_version(email), previous_version)
+        self.assertIsNone(self.store.authenticate(email, "una-clave-segura"))
+        self.assertEqual(self.store.authenticate(email, "otra-clave-segura"), email)
+
+    def test_update_email_requires_new_confirmation(self):
+        email, token = self.store.create_pending_user(
+            "persona@empresa.com", "una-clave-segura", 3600
+        )
+        self.store.confirm(token)
+
+        new_email, new_token = self.store.update_user(
+            email, "nueva@empresa.com", None, 3600
+        )
+
+        self.assertEqual(new_email, "nueva@empresa.com")
+        self.assertIsNotNone(new_token)
+        self.assertIsNone(self.store.authenticate(new_email, "una-clave-segura"))
+        self.store.confirm(new_token)
+        self.assertEqual(
+            self.store.authenticate(new_email, "una-clave-segura"), new_email
+        )
+
+    def test_delete_user_removes_access(self):
+        email, token = self.store.create_pending_user(
+            "persona@empresa.com", "una-clave-segura", 3600
+        )
+        self.store.confirm(token)
+        self.store.delete_user(email)
+        self.assertIsNone(self.store.authenticate(email, "una-clave-segura"))
+        with self.assertRaisesRegex(ValueError, "no existe"):
+            self.store.delete_user(email)
+
     def test_expired_confirmation_is_rejected(self):
         _, token = self.store.create_pending_user(
             "persona@empresa.com", "una-clave-segura", -1

@@ -241,6 +241,26 @@
           <div id="usersMessage" class="users-message" role="status"></div>
           <div id="smtpWarning" class="smtp-warning" hidden>El correo SMTP todavía no está configurado en el servidor.</div>
           <div class="users-list" id="usersList"></div>
+
+          <dialog id="editUserDialog" class="user-dialog">
+            <form id="editUserForm" class="dialog-form">
+              <h3>Modificar usuario</h3>
+              <p class="panel-help">Cambiar el correo requiere una nueva confirmación. Dejá la contraseña vacía para conservar la actual.</p>
+              <input id="editOriginalEmail" type="hidden">
+              <div class="form-group">
+                <label for="editUserEmail">Correo electrónico</label>
+                <input id="editUserEmail" type="email" autocomplete="off" required>
+              </div>
+              <div class="form-group">
+                <label for="editUserPassword">Nueva contraseña</label>
+                <input id="editUserPassword" type="password" autocomplete="new-password" minlength="10">
+              </div>
+              <div class="dialog-actions">
+                <button class="btn btn-outline" id="cancelEditUser" type="button">Cancelar</button>
+                <button class="btn btn-primary" type="submit">Guardar cambios</button>
+              </div>
+            </form>
+          </dialog>
         </div>
       </div>
 
