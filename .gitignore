@@ -38,6 +38,8 @@ costs_log.jsonl
 pricebot/certs/
 *.pfx
 *.key
+*.pem
+*.p12
 *.pdf
 *.xls
 *.xlsx

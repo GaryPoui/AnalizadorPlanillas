@@ -8,7 +8,7 @@ const API_URL = window.PRICEBOT_API_URL || (
   browserHost === 'pricebot.dynamicenergy.com.ar'
     ? '/api'
     : ['localhost', '127.0.0.1'].includes(browserHost)
-      ? 'http://127.0.0.1:8000'
+      ? `${window.location.protocol}//127.0.0.1:8000`
       : `${window.location.protocol}//${browserHost}:8000`
 );
 const API_ACCESS_KEY = window.PRICEBOT_API_KEY || '';

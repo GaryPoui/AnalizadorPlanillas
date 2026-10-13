@@ -16,8 +16,8 @@ goto :bind_ready
 set "PRICEBOT_BIND_HOST=0.0.0.0"
 :bind_ready
 if not defined PRICEBOT_PUBLIC_URL set "PRICEBOT_PUBLIC_URL=https://192.168.190.146:3000"
-if not defined PRICEBOT_ALLOWED_ORIGINS set "PRICEBOT_ALLOWED_ORIGINS=https://192.168.190.146:3000,http://127.0.0.1:3000,http://localhost:3000"
-if not defined PRICEBOT_CSP_CONNECT_SRC set "PRICEBOT_CSP_CONNECT_SRC='self' https://192.168.190.146:8000 http://127.0.0.1:8000 http://localhost:8000"
+if not defined PRICEBOT_ALLOWED_ORIGINS set "PRICEBOT_ALLOWED_ORIGINS=https://192.168.190.146:3000,https://127.0.0.1:3000,https://localhost:3000,http://127.0.0.1:3000,http://localhost:3000"
+if not defined PRICEBOT_CSP_CONNECT_SRC set "PRICEBOT_CSP_CONNECT_SRC='self' https://192.168.190.146:8000 https://127.0.0.1:8000 https://localhost:8000 http://127.0.0.1:8000 http://localhost:8000"
 
 echo.
 echo  PriceBot - iniciando servidor
@@ -31,11 +31,12 @@ echo  Acceso LAN seguro: %PRICEBOT_PUBLIC_URL% (requiere certificado TLS)
 echo.
 
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0start.ps1"
+set "PRICEBOT_EXIT_CODE=%ERRORLEVEL%"
 
-if errorlevel 1 (
+if not "%PRICEBOT_EXIT_CODE%"=="0" (
     echo.
     echo  El servidor no pudo iniciarse. Revisa el mensaje anterior.
     pause
 )
 
-endlocal
+endlocal & exit /b %PRICEBOT_EXIT_CODE%

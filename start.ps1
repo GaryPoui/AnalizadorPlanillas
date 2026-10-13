@@ -27,6 +27,9 @@ if (-not $TLS_CERT -and $BIND_HOST -notin @("127.0.0.1", "localhost", "::1")) {
 
 $SCHEME = if ($TLS_CERT) { "https" } else { "http" }
 $FRONTEND_URL = "$SCHEME`://127.0.0.1:3000"
+if ($TLS_CERT) {
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+}
 
 if (-not (Test-Path -LiteralPath $PYTHON)) {
     Write-Host ""
@@ -50,6 +53,15 @@ try {
 } catch {}
 
 if ($busy) {
+    if ($TLS_CERT) {
+        try {
+            $health = Invoke-RestMethod -Uri "https://127.0.0.1:$PORT/health" -TimeoutSec 5
+            if ($health.status -ne "ok") { throw "Respuesta inesperada" }
+        } catch {
+            Write-Host "  ERROR: el puerto $PORT ya esta ocupado, pero no responde como PriceBot con TLS confiable. Cierra el servicio anterior y vuelve a iniciar." -ForegroundColor Red
+            exit 1
+        }
+    }
     Write-Host "  El backend ya está corriendo en :$PORT" -ForegroundColor Yellow
 } else {
     # Levantar uvicorn en una nueva ventana de consola
@@ -97,6 +109,14 @@ if (-not $frontendBusy) {
     $frontendTlsArgs = if ($TLS_CERT) { " --ssl-certfile '$TLS_CERT' --ssl-keyfile '$TLS_KEY'" } else { "" }
     $frontendCmd = "& '$PYTHON' '$FRONTEND_SERVER' --port 3000 --bind '$BIND_HOST' --directory '$FRONTEND_DIR'$frontendTlsArgs; pause"
     Start-Process powershell -ArgumentList "-NoExit", "-Command", $frontendCmd -WindowStyle Normal
+} elseif ($TLS_CERT) {
+    try {
+        $existingFrontend = Invoke-WebRequest -UseBasicParsing -Uri $FRONTEND_URL -TimeoutSec 5
+        if (-not $existingFrontend.Headers["Content-Security-Policy"]) { throw "No es el frontend esperado" }
+    } catch {
+        Write-Host "  ERROR: el puerto 3000 ya esta ocupado, pero no responde como PriceBot con TLS confiable. Cierra el servicio anterior y vuelve a iniciar." -ForegroundColor Red
+        exit 1
+    }
 }
 
 Start-Process $FRONTEND_URL

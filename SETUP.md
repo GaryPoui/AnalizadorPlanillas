@@ -277,6 +277,12 @@ queda disponible como compatibilidad adicional para clientes internos, pero no r
 
 ### Servidor accesible desde otras computadoras por HTTPS
 
+Para una LAN sin dominio, está disponible el kit [TLS_LAN](TLS_LAN/LEEME.md).
+Genera la CA y las claves en el servidor, instala la confianza local y prepara
+un paquete con la raíz pública para los clientes. El certificado incluye la IP
+de LAN y loopback; no hace falta cPanel. Seguí el instructivo del kit para
+instalar, verificar y renovar. Las claves privadas nunca van en el ZIP ni en Git.
+
 Por defecto `start.ps1` escucha únicamente en la propia PC y la API bloquea
 HTTP remoto. `iniciar-servidor.bat` también limita ambos servicios a localhost
 si no encuentra certificado y clave TLS; con ambos archivos configurados,
