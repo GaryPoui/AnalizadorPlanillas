@@ -20,6 +20,10 @@ if ($TLS_CERT -and (-not (Test-Path -LiteralPath $TLS_CERT) -or -not (Test-Path 
     Write-Host "  ERROR: no se encontraron el certificado o la clave TLS." -ForegroundColor Red
     exit 1
 }
+if (-not $TLS_CERT -and $BIND_HOST -notin @("127.0.0.1", "localhost", "::1")) {
+    Write-Host "  ERROR: no se permite escuchar en la red sin un certificado TLS. Configura ambos archivos de certificado y clave, o limita PRICEBOT_BIND_HOST a localhost." -ForegroundColor Red
+    exit 1
+}
 
 $SCHEME = if ($TLS_CERT) { "https" } else { "http" }
 $FRONTEND_URL = "$SCHEME`://127.0.0.1:3000"

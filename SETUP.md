@@ -275,13 +275,14 @@ extracción local. Para un servidor compartido por varias personas, usar el acce
 usuarios (`PRICEBOT_AUTH_REQUIRED=1`) y no colocar secretos en el frontend. `PRICEBOT_API_KEY`
 queda disponible como compatibilidad adicional para clientes internos, pero no reemplaza el login.
 
-### Servidor accesible desde otras computadoras
+### Servidor accesible desde otras computadoras por HTTPS
 
 Por defecto `start.ps1` escucha únicamente en la propia PC y la API bloquea
-HTTP remoto. `iniciar-servidor.bat` también exige HTTPS remoto; sin certificado
-TLS configurado, solo funciona localhost. Para compartirlo en la red necesitás un certificado cuya SAN
-incluya la IP o el nombre usado por los clientes, y que esos clientes confíen
-en su autoridad emisora:
+HTTP remoto. `iniciar-servidor.bat` también limita ambos servicios a localhost
+si no encuentra certificado y clave TLS; con ambos archivos configurados,
+habilita HTTPS para los clientes de la LAN. Para compartirlo en la
+red se necesita un certificado cuya SAN incluya el nombre/IP usado por los
+clientes, y que esos clientes confíen en su autoridad emisora:
 
 ```powershell
 $env:PRICEBOT_BIND_HOST="0.0.0.0"
@@ -290,17 +291,18 @@ $env:PRICEBOT_TLS_KEYFILE="C:\ruta\pricebot-key.pem"
 .\iniciar-servidor.bat
 ```
 
-Configurá además `PRICEBOT_ALLOWED_ORIGINS` y `PRICEBOT_PUBLIC_URL` con la URL
-HTTPS final. Mantené la clave privada del certificado fuera del repositorio.
-El mismo certificado se configura en el frontend y la API; su SAN debe contener
-el nombre/IP usado por clientes y su autoridad debe ser confiable en sus PCs.
-En el firewall de Windows permití los puertos 3000 y 8000 solo en
-el perfil **Privado** y para la subred necesaria. `hardening.ps1` configura el
-rango `192.168.190.0/24`. Para acceso fuera de la LAN, usá una VPN o un proxy
-HTTPS con autenticación.
+Configura `PRICEBOT_ALLOWED_ORIGINS` y `PRICEBOT_PUBLIC_URL` con la URL HTTPS
+final. Mantén la clave privada del certificado fuera del repositorio y limita
+su lectura a la cuenta del servicio y administradores. El certificado debe
+incluir en SAN exactamente el nombre o IP usado por los clientes y ser
+confiable en sus equipos. En el firewall de Windows permite TCP 3000 y 8000
+solo en el perfil **Privado** y para la subred necesaria. `hardening.ps1`
+configura `192.168.190.0/24`. Para acceso fuera de la LAN, usa una VPN o un
+proxy HTTPS con autenticación; no publiques directamente el puerto 8000.
 
-Para un diagnóstico temporal sin documentos reales se puede establecer
-`PRICEBOT_REQUIRE_HTTPS=0`; no lo uses en operación ni con credenciales reales.
+No desactives `PRICEBOT_REQUIRE_HTTPS` ni `PRICEBOT_COOKIE_SECURE` en operación.
+Si el certificado aún no está instalado, el acceso remoto debe permanecer
+bloqueado; no uses documentos ni credenciales reales por HTTP.
 
 Regla de extracción: todo código de producto válido detectado genera una fila, aunque no tenga
 precio. En ese caso `Precio` queda vacío y `estado_precio` toma el valor `a completar`; la fila
