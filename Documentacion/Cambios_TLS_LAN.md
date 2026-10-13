@@ -4,6 +4,14 @@ Actualización del 13 de octubre de 2026 para la LAN `192.168.190.0/24`.
 Servidor de referencia: `192.168.190.146`. El procedimiento completo está en
 `Manual_de_Administracion_y_Operacion_PriceBot.docx` y `TLS_LAN/LEEME.md`.
 
+## Archivos para distribuir
+
+- [Archivo automático para usuarios](CONFIGURAR-PRICEBOT-LAN.bat): descargar el
+  archivo original y ejecutar con doble clic normal, sin elevar permisos.
+- [ZIP cliente completo](Clientes-PriceBot-SinAdmin.zip): extraer y ejecutar
+  `CONFIGURAR-PRICEBOT-LAN.bat`. Incluye únicamente la CA pública y herramientas
+  de cliente, no claves privadas. Corresponde a la CA e IP de referencia actuales.
+
 ## Cambios implementados
 
 - El lanzador exige HTTPS para la LAN y cookies seguras. Sin certificado y clave,
