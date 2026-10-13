@@ -9,6 +9,7 @@ from pathlib import Path
 
 
 SOURCES = (
+    "crear_acceso_automatico.py", "PREPARAR-CLIENTES.bat", "preparar-clientes.ps1",
     "INSTALAR-SERVIDOR.bat", "instalar-servidor.ps1", "generar_certificados.py",
     "requirements-tls.txt", "INICIAR-PRICEBOT-SEGURO.bat", "iniciar-seguro.ps1",
     "LEEME.md", "cliente/INSTALAR-CLIENTE.bat", "cliente/INSTALAR-SOLO-USUARIO.bat", "cliente/instalar-cliente.ps1",
@@ -20,6 +21,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--client-cert", type=Path, help="Certificado publico DER de la CA; solo va al ZIP cliente")
     parser.add_argument("--expected-sha256", default="", help="Huella de la CA verificada por TI")
+    parser.add_argument("--server-ip", default="192.168.190.146")
     args = parser.parse_args()
     if bool(args.client_cert) != bool(args.expected_sha256):
         parser.error("--client-cert y --expected-sha256 deben usarse juntos")
@@ -77,6 +79,10 @@ def main() -> None:
         if not cert.not_valid_before_utc <= now < cert.not_valid_after_utc:
             raise SystemExit("La CA esta fuera de vigencia.")
         client_contents["PriceBot-CA.cer"] = data
+        from crear_acceso_automatico import create_script
+        automatic = create_script(data, expected, args.server_ip)
+        client_contents["CONFIGURAR-PRICEBOT-LAN.bat"] = automatic
+        (output.parent / "CONFIGURAR-PRICEBOT-LAN.bat").write_bytes(automatic)
     else:
         client_contents["COPIAR-CERTIFICADO-PUBLICO.txt"] = (
             "Antes de instalar, copiar PriceBot-CA.cer desde el paquete Clientes-PriceBot.zip "
@@ -99,6 +105,8 @@ def main() -> None:
         assert not any(name.endswith((".pem", ".key", ".pfx", ".p12")) for name in archive.namelist())
     print(client_output)
     print("SHA-256:", hashlib.sha256(client_output.read_bytes()).hexdigest())
+    if args.client_cert:
+        print("Instalador de un archivo:", output.parent / "CONFIGURAR-PRICEBOT-LAN.bat")
 
 
 if __name__ == "__main__":

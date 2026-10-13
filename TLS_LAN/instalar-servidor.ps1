@@ -139,7 +139,10 @@ if not os.getenv('PRICEBOT_SESSION_SECRET', '').strip():
         Copy-Item -LiteralPath (Join-Path $PSScriptRoot "cliente\$name") -Destination $clientFolder -Force
     }
     Copy-Item -LiteralPath (Join-Path $tlsRoot "PriceBot-CA.cer") -Destination $clientFolder -Force
+    & $python (Join-Path $PSScriptRoot "crear_acceso_automatico.py") --client-cert (Join-Path $tlsRoot "PriceBot-CA.cer") --expected-sha256 $metadata.ca_sha256 --server-ip $ServerIP --output (Join-Path $clientFolder "CONFIGURAR-PRICEBOT-LAN.bat")
+    if ($LASTEXITCODE -ne 0) { throw "No se genero el acceso automatico para clientes." }
     Compress-Archive -LiteralPath @(
+        (Join-Path $clientFolder "CONFIGURAR-PRICEBOT-LAN.bat"),
         (Join-Path $clientFolder "INSTALAR-CLIENTE.bat"), (Join-Path $clientFolder "instalar-cliente.ps1"),
         (Join-Path $clientFolder "INSTALAR-SOLO-USUARIO.bat"),
         (Join-Path $clientFolder "verificar-conexion.ps1"), (Join-Path $clientFolder "LEEME.md"),

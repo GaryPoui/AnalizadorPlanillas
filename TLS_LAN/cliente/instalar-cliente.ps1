@@ -40,9 +40,12 @@ try {
             throw "Para toda la PC se necesita administrador. Sin esos permisos, ejecutar INSTALAR-SOLO-USUARIO.bat normalmente."
         }
     }
-    if (-not (Test-Path -LiteralPath "$storeLocation\$($cert.Thumbprint)")) {
-        Import-Certificate -FilePath $CertificatePath -CertStoreLocation $storeLocation | Out-Null
-    }
+    $store = [Security.Cryptography.X509Certificates.X509Store]::new("Root", [Security.Cryptography.X509Certificates.StoreLocation]::$Scope)
+    try {
+        $store.Open([Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
+        $existing = $store.Certificates.Find([Security.Cryptography.X509Certificates.X509FindType]::FindByThumbprint, $cert.Thumbprint, $false)
+        if ($existing.Count -eq 0) { $store.Add($cert) }
+    } finally { $store.Close() }
     $scopeLabel = if ($Scope -eq "CurrentUser") { "solo para tu usuario de Windows" } else { "para toda la PC" }
     Write-Host "Confianza instalada $scopeLabel. Cerrar y abrir el navegador; ingresar a la URL HTTPS de la LAN." -ForegroundColor Green
 } catch {

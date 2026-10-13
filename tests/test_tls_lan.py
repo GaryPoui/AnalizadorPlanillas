@@ -20,6 +20,7 @@ from cryptography.x509.oid import ExtendedKeyUsageOID
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "TLS_LAN"))
 from generar_certificados import generate
+from crear_acceso_automatico import create_script
 
 
 class LanCertificateTests(unittest.TestCase):
@@ -73,6 +74,31 @@ class LanCertificateTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     generate(path, ip, subnet, self.password)
                 self.assertFalse(path.exists())
+
+    def test_automatic_client_generator_rejects_wrong_ca_pin_and_public_ip(self):
+        certificate = (self.path / "PriceBot-CA.cer").read_bytes()
+        with self.assertRaises(ValueError):
+            create_script(certificate, "0" * 64, "192.168.190.146")
+        with self.assertRaises(ValueError):
+            create_script(certificate, self.metadata["ca_sha256"], "8.8.8.8")
+
+    @unittest.skipUnless(os.name == "nt", "Windows CMD and PowerShell only")
+    def test_one_file_client_checks_embedded_certificate_without_manual_input(self):
+        data = create_script((self.path / "PriceBot-CA.cer").read_bytes(), self.metadata["ca_sha256"], "192.168.190.146")
+        with tempfile.TemporaryDirectory() as directory:
+            script = Path(directory) / "CONFIGURAR-PRICEBOT-LAN.bat"
+            for expected_status in (0, 1):
+                payload = data if expected_status == 0 else data.replace(
+                    f'$expectedSha256 = "{self.metadata["ca_sha256"]}"'.encode(),
+                    b'$expectedSha256 = "' + b"0" * 64 + b'"',
+                )
+                script.write_bytes(payload)
+                result = subprocess.run(["cmd.exe", "/d", "/c", str(script), "--comprobar"],
+                                        capture_output=True, text=True, errors="replace", timeout=20)
+                self.assertEqual(result.returncode, expected_status, result.stdout + result.stderr)
+                if expected_status == 0:
+                    self.assertIn("Cert:\\CurrentUser\\Root", result.stdout)
+                    self.assertIn("No se instalo confianza", result.stdout)
 
     @unittest.skipUnless(os.name == "nt", "Windows PowerShell only")
     def test_client_preflight_accepts_only_the_expected_fingerprint_without_importing(self):

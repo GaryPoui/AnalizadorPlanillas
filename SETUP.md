@@ -282,6 +282,10 @@ Genera la CA y las claves en el servidor, instala la confianza local y prepara
 un paquete con la raíz pública para los clientes. El certificado incluye la IP
 de LAN y loopback; no hace falta cPanel. Seguí el instructivo del kit para
 instalar, verificar y renovar. Las claves privadas nunca van en el ZIP ni en Git.
+Para preparar clientes sin renovar ni reiniciar el servidor, ejecutar
+`TLS_LAN\PREPARAR-CLIENTES.bat` después de `git pull`. El archivo independiente
+`CONFIGURAR-PRICEBOT-LAN.bat` resultante instala confianza solo para el usuario
+Windows actual y verifica certificado, frontend y API automáticamente.
 
 Por defecto `start.ps1` escucha únicamente en la propia PC y la API bloquea
 HTTP remoto. `iniciar-servidor.bat` también limita ambos servicios a localhost

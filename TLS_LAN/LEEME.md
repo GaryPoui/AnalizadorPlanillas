@@ -63,6 +63,22 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\instalar-servidor.ps1 
 
 ## En cada PC autorizada
 
+La opción más simple es recibir de TI el archivo independiente
+`CONFIGURAR-PRICEBOT-LAN.bat` y hacer doble clic con el usuario Windows que
+usará el sistema. Instala la raíz pública solo para ese usuario, comprueba la
+huella incorporada, verifica HTTPS en los dos servicios y abre PriceBot.
+No pide contraseña de administrador ni copiar la huella. El archivo contiene
+solo material público y debe distribuirse por un canal confiable.
+
+Para preparar ese archivo usando la CA existente, actualizar el repo y ejecutar
+`TLS_LAN\PREPARAR-CLIENTES.bat` en el servidor. Deja el archivo y el ZIP cliente
+en `dist` del repo. No renueva la CA ni el certificado del servidor, no lee
+claves privadas y no requiere cerrar PriceBot. La cuenta debe poder leer la
+configuración TLS instalada y escribir en su repo. Una instalación nueva del
+servidor también genera el archivo en `C:\ProgramData\PriceBotTLS\Clientes`.
+
+El procedimiento manual del paquete completo sigue disponible:
+
 1. Copiar desde el servidor **solo**:
 
    ```text
@@ -70,7 +86,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\instalar-servidor.ps1 
    ```
 
 2. Extraerlo completo. Incluye `PriceBot-CA.cer` público y los instaladores de
-   confianza. No incluye la clave de la CA ni la del servidor.
+   confianza y `CONFIGURAR-PRICEBOT-LAN.bat`. No incluye la clave de la CA ni la del servidor.
 3. Sin permisos de administrador, hacer doble clic en
    `INSTALAR-SOLO-USUARIO.bat`: instala confianza solo para el usuario Windows
    actual. Para toda la PC, TI puede ejecutar `INSTALAR-CLIENTE.bat` como

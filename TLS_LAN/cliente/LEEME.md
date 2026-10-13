@@ -5,6 +5,23 @@ pública de la CA interna; no contiene claves privadas. Instalarla permite a
 Windows confiar en los certificados emitidos por esa CA, por lo que hay que
 verificar su procedencia y su huella antes de instalar.
 
+## Opción recomendada para cada usuario
+
+Cuando TI entregue `CONFIGURAR-PRICEBOT-LAN.bat`, basta hacer doble clic con el
+usuario de Windows que utilizará PriceBot. Ese archivo funciona por sí solo:
+lleva la CA pública y la huella verificada por TI. Comprueba ambas, instala
+confianza solo para el usuario actual, prueba el sitio y la API mediante HTTPS
+válido y abre el navegador. No pide pegar huellas ni contraseña de administrador.
+Windows puede mostrar un aviso de ejecución o de confianza según su política.
+Recibirlo únicamente del responsable o del repositorio corporativo verificado.
+
+Si aparece un error de red después de instalar confianza, comprobar que la PC
+esté en la LAN y que el servidor siga funcionando. Cerrar y abrir el navegador;
+si se usa el navegador integrado de Codex y conserva una advertencia anterior,
+reiniciar Codex. Después ingresar con el correo y contraseña confirmados.
+
+## Instalación manual o para toda la PC
+
 1. Extraer todo el ZIP.
 2. Obtener del responsable del servidor la huella SHA-256 por un canal confiable.
 3. Para tu usuario de Windows, hacer doble clic en `INSTALAR-SOLO-USUARIO.bat`.
