@@ -2,6 +2,8 @@
 param(
     [string]$CertificatePath = "",
     [string]$ExpectedSha256 = "",
+    [ValidateSet("CurrentUser", "LocalMachine")]
+    [string]$Scope = "LocalMachine",
     [switch]$ValidateOnly
 )
 Set-StrictMode -Version Latest
@@ -30,15 +32,19 @@ try {
     if ($cert.HasPrivateKey -or $cert.NotAfter -le (Get-Date) -or $cert.NotBefore -gt (Get-Date)) {
         throw "El certificado esta fuera de vigencia o contiene una clave privada."
     }
-    if ($ValidateOnly) { Write-Host "Validacion correcta. No se modifico Windows."; return }
-    $principal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
-    if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-        throw "Clic derecho en INSTALAR-CLIENTE.bat -> Ejecutar como administrador."
+    $storeLocation = "Cert:\$Scope\Root"
+    if ($ValidateOnly) { Write-Host "Validacion correcta para $storeLocation. No se modifico Windows."; return }
+    if ($Scope -eq "LocalMachine") {
+        $principal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+        if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+            throw "Para toda la PC se necesita administrador. Sin esos permisos, ejecutar INSTALAR-SOLO-USUARIO.bat normalmente."
+        }
     }
-    if (-not (Test-Path -LiteralPath "Cert:\LocalMachine\Root\$($cert.Thumbprint)")) {
-        Import-Certificate -FilePath $CertificatePath -CertStoreLocation "Cert:\LocalMachine\Root" | Out-Null
+    if (-not (Test-Path -LiteralPath "$storeLocation\$($cert.Thumbprint)")) {
+        Import-Certificate -FilePath $CertificatePath -CertStoreLocation $storeLocation | Out-Null
     }
-    Write-Host "Confianza instalada. Cerrar y abrir el navegador; ingresar a la URL HTTPS de la LAN." -ForegroundColor Green
+    $scopeLabel = if ($Scope -eq "CurrentUser") { "solo para tu usuario de Windows" } else { "para toda la PC" }
+    Write-Host "Confianza instalada $scopeLabel. Cerrar y abrir el navegador; ingresar a la URL HTTPS de la LAN." -ForegroundColor Green
 } catch {
     Write-Error $_ -ErrorAction Continue
     exit 1

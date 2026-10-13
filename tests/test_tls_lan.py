@@ -77,13 +77,17 @@ class LanCertificateTests(unittest.TestCase):
     @unittest.skipUnless(os.name == "nt", "Windows PowerShell only")
     def test_client_preflight_accepts_only_the_expected_fingerprint_without_importing(self):
         script = str(ROOT / "TLS_LAN" / "cliente" / "instalar-cliente.ps1")
-        for fingerprint, expected_status in [(self.metadata["ca_sha256"], 0), ("0" * 64, 1)]:
-            result = subprocess.run([
-                "powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", script,
-                "-CertificatePath", str(self.path / "PriceBot-CA.cer"),
-                "-ExpectedSha256", fingerprint, "-ValidateOnly",
-            ], capture_output=True, text=True, errors="replace")
-            self.assertEqual(result.returncode, expected_status, result.stdout + result.stderr)
+        for scope in ("CurrentUser", "LocalMachine"):
+            for fingerprint, expected_status in [(self.metadata["ca_sha256"], 0), ("0" * 64, 1)]:
+                with self.subTest(scope=scope, fingerprint_matches=expected_status == 0):
+                    result = subprocess.run([
+                        "powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", script,
+                        "-CertificatePath", str(self.path / "PriceBot-CA.cer"),
+                        "-ExpectedSha256", fingerprint, "-Scope", scope, "-ValidateOnly",
+                    ], capture_output=True, text=True, errors="replace")
+                    self.assertEqual(result.returncode, expected_status, result.stdout + result.stderr)
+                    if expected_status == 0:
+                        self.assertIn(f"Cert:\\{scope}\\Root", result.stdout)
 
     def test_real_frontend_and_api_https_reject_untrusted_certificates_and_plain_http(self):
         processes = []

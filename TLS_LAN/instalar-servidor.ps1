@@ -94,7 +94,7 @@ if not os.getenv('PRICEBOT_SESSION_SECRET', '').strip():
     & $python (Join-Path $PSScriptRoot "generar_certificados.py") --directory $tlsRoot --server-ip $ServerIP --subnet $AllowedSubnet
     if ($LASTEXITCODE -ne 0) { throw "No se genero el certificado; no se cambio la configuracion de arranque." }
     $metadata = Get-Content -LiteralPath (Join-Path $tlsRoot "certificates.json") -Raw | ConvertFrom-Json
-    & (Join-Path $PSScriptRoot "cliente\instalar-cliente.ps1") -CertificatePath (Join-Path $tlsRoot "PriceBot-CA.cer") -ExpectedSha256 $metadata.ca_sha256
+    & (Join-Path $PSScriptRoot "cliente\instalar-cliente.ps1") -CertificatePath (Join-Path $tlsRoot "PriceBot-CA.cer") -ExpectedSha256 $metadata.ca_sha256 -Scope LocalMachine
     if ($LASTEXITCODE -ne 0) { throw "No se instalo la confianza de la CA en el servidor." }
 
     $settings = [ordered]@{
@@ -135,12 +135,13 @@ if not os.getenv('PRICEBOT_SESSION_SECRET', '').strip():
     }
     $clientFolder = Join-Path $tlsRoot "Clientes"
     if (-not (Test-Path -LiteralPath $clientFolder)) { New-Item -ItemType Directory -Path $clientFolder | Out-Null }
-    foreach ($name in @("INSTALAR-CLIENTE.bat", "instalar-cliente.ps1", "verificar-conexion.ps1", "LEEME.md")) {
+    foreach ($name in @("INSTALAR-CLIENTE.bat", "INSTALAR-SOLO-USUARIO.bat", "instalar-cliente.ps1", "verificar-conexion.ps1", "LEEME.md")) {
         Copy-Item -LiteralPath (Join-Path $PSScriptRoot "cliente\$name") -Destination $clientFolder -Force
     }
     Copy-Item -LiteralPath (Join-Path $tlsRoot "PriceBot-CA.cer") -Destination $clientFolder -Force
     Compress-Archive -LiteralPath @(
         (Join-Path $clientFolder "INSTALAR-CLIENTE.bat"), (Join-Path $clientFolder "instalar-cliente.ps1"),
+        (Join-Path $clientFolder "INSTALAR-SOLO-USUARIO.bat"),
         (Join-Path $clientFolder "verificar-conexion.ps1"), (Join-Path $clientFolder "LEEME.md"),
         (Join-Path $clientFolder "PriceBot-CA.cer")
     ) -DestinationPath (Join-Path $tlsRoot "Clientes-PriceBot.zip") -Force

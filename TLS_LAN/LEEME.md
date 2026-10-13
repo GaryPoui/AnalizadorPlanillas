@@ -71,7 +71,10 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\instalar-servidor.ps1 
 
 2. Extraerlo completo. Incluye `PriceBot-CA.cer` público y los instaladores de
    confianza. No incluye la clave de la CA ni la del servidor.
-3. Clic derecho en `INSTALAR-CLIENTE.bat` → **Ejecutar como administrador**.
+3. Sin permisos de administrador, hacer doble clic en
+   `INSTALAR-SOLO-USUARIO.bat`: instala confianza solo para el usuario Windows
+   actual. Para toda la PC, TI puede ejecutar `INSTALAR-CLIENTE.bat` como
+   administrador. El servidor sigue instalando confianza para toda su PC.
 4. Pegar la huella SHA-256 comunicada desde el servidor/TI. Compararla con la
    recibida por un canal confiable, no confiar solo en un texto dentro del ZIP.
    Si no coincide, el script no instala el certificado.
