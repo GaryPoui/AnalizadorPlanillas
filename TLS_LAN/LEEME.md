@@ -25,6 +25,10 @@ certificados ni claves privadas. La generación se hace en la PC servidor.
 
 ## En la PC servidor
 
+Si HTTPS ya está instalado, para el inicio diario basta hacer doble clic en
+`INICIAR-PRICEBOT-SEGURO.bat` de la carpeta principal del repo, después de `git pull`.
+No reinstalar certificados. Ver [instrucciones de inicio](../Documentacion/Iniciar_servidor.md).
+
 1. Extraer **todo** el ZIP en una carpeta local.
 2. Clic derecho en `INSTALAR-SERVIDOR.bat` → **Ejecutar como administrador**.
 3. Introducir la ruta del repositorio, por ejemplo
